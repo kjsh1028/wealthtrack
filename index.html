@@ -48,6 +48,31 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 .card { background: var(--card); border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
 .card-title { font-size: 12px; color: var(--sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
 
+
+/* DASHBOARD ASSET CARDS */
+.asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.asset-card { background: var(--card); border-radius: 14px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); cursor: pointer; }
+.asset-card-full { background: var(--card); border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.ac-icon { font-size: 22px; margin-bottom: 8px; }
+.ac-label { font-size: 11px; color: var(--sub); font-weight: 600; margin-bottom: 4px; }
+.ac-amount { font-size: 17px; font-weight: 800; color: var(--navy); letter-spacing: -0.5px; }
+.ac-sub { font-size: 11px; color: var(--sub); margin-top: 4px; line-height: 1.5; }
+.ac-pl { font-size: 11px; margin-top: 4px; font-weight: 700; }
+.ac-pl.pos { color: var(--green); }
+.ac-pl.neg { color: var(--red); }
+.ac-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border); }
+.ac-detail-row:last-child { border-bottom: none; }
+.ac-detail-label { font-size: 12px; color: var(--sub); }
+.ac-detail-val { font-size: 12px; font-weight: 700; color: var(--navy); }
+
+/* COMPOSITION BAR */
+.comp-bar-wrap { margin-bottom: 12px; }
+.comp-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin: 8px 0; }
+.comp-bar-seg { height: 100%; transition: width 0.5s; }
+.comp-legend { display: flex; gap: 12px; flex-wrap: wrap; }
+.comp-leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--sub); }
+.comp-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
 /* DASHBOARD */
 .total-asset { background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%); border-radius: 18px; padding: 24px 20px; margin-bottom: 12px; color: #fff; }
 .total-label { font-size: 12px; opacity: 0.7; margin-bottom: 6px; }
@@ -280,24 +305,19 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
     </div>
   </div>
   <div style="padding:16px;">
+
+    <!-- 총 순자산 -->
     <div class="total-asset">
       <div class="total-label">총 순자산 (원화 환산)</div>
       <div class="total-amount"><span>₩</span><span id="dash-total">0</span></div>
       <div class="total-sub">
-        <div class="total-sub-item">
-          <div class="s-label">총 자산</div>
-          <div class="s-val" id="dash-gross">₩0</div>
-        </div>
-        <div class="total-sub-item">
-          <div class="s-label">총 부채</div>
-          <div class="s-val neg" id="dash-debt">-₩0</div>
-        </div>
-        <div class="total-sub-item">
-          <div class="s-label">카드 미결제</div>
-          <div class="s-val neg" id="dash-cc">-₩0</div>
-        </div>
+        <div class="total-sub-item"><div class="s-label">총 자산</div><div class="s-val" id="dash-gross">₩0</div></div>
+        <div class="total-sub-item"><div class="s-label">총 부채</div><div class="s-val neg" id="dash-debt">-₩0</div></div>
+        <div class="total-sub-item"><div class="s-label">카드 미결제</div><div class="s-val neg" id="dash-cc">-₩0</div></div>
       </div>
     </div>
+
+    <!-- 환율 -->
     <div class="rate-bar">
       <div class="rate-item"><div class="r-label">USD/KRW</div><div class="r-val" id="rate-usd-disp">-</div></div>
       <div class="rate-divider"></div>
@@ -306,6 +326,63 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
       <div class="rate-item"><div class="r-label">USD/CNY</div><div class="r-val" id="rate-usdcny-disp">-</div></div>
     </div>
     <div class="rate-update" id="rate-update-time">환율 미설정</div>
+
+    <!-- 자산 구성 바 -->
+    <div class="asset-card-full comp-bar-wrap" id="dash-comp-section">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+        <span style="font-size:13px;font-weight:700;color:var(--navy);">자산 구성</span>
+        <span style="font-size:12px;color:var(--sub);" id="dash-comp-total"></span>
+      </div>
+      <div class="comp-bar" id="dash-comp-bar">
+        <div class="comp-bar-seg" id="comp-cash-bar" style="background:#27ae60;width:0%"></div>
+        <div class="comp-bar-seg" id="comp-stock-bar" style="background:#2c7be5;width:0%"></div>
+        <div class="comp-bar-seg" id="comp-re-bar" style="background:#c9a84c;width:0%"></div>
+      </div>
+      <div class="comp-legend">
+        <div class="comp-leg-item"><div class="comp-dot" style="background:#27ae60"></div><span id="comp-cash-label">현금/계좌 0%</span></div>
+        <div class="comp-leg-item"><div class="comp-dot" style="background:#2c7be5"></div><span id="comp-stock-label">주식 0%</span></div>
+        <div class="comp-leg-item"><div class="comp-dot" style="background:#c9a84c"></div><span id="comp-re-label">부동산 0%</span></div>
+      </div>
+    </div>
+
+    <!-- 자산 카드 3개 -->
+    <div class="asset-grid">
+      <!-- 현금/계좌 -->
+      <div class="asset-card" onclick="showPage('accounts', document.querySelectorAll('.nav-item')[2])">
+        <div class="ac-icon">💵</div>
+        <div class="ac-label">현금 / 계좌</div>
+        <div class="ac-amount" id="dash-cash-total">₩0</div>
+        <div class="ac-sub" id="dash-cash-sub"></div>
+      </div>
+      <!-- 주식 -->
+      <div class="asset-card" onclick="showPage('invest', document.querySelectorAll('.nav-item')[3])">
+        <div class="ac-icon">📈</div>
+        <div class="ac-label">주식</div>
+        <div class="ac-amount" id="dash-stock-total">₩0</div>
+        <div class="ac-pl" id="dash-stock-pl"></div>
+        <div class="ac-sub" id="dash-stock-sub"></div>
+      </div>
+    </div>
+
+    <!-- 부동산 카드 (full width) -->
+    <div class="asset-card-full" onclick="showPage('invest', document.querySelectorAll('.nav-item')[3]); setTimeout(()=>setInvestTab(document.querySelectorAll('#page-invest .inner-tab')[1],'realestate'),100)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:22px;margin-bottom:4px;">🏠</div>
+          <div class="ac-label">부동산 순자산</div>
+          <div class="ac-amount" id="dash-re-total">₩0</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="ac-label">추정가 합계</div>
+          <div style="font-size:13px;font-weight:700;color:var(--sub);" id="dash-re-gross">₩0</div>
+          <div class="ac-label" style="margin-top:6px;">담보대출</div>
+          <div style="font-size:13px;font-weight:700;color:var(--red);" id="dash-re-loan">-₩0</div>
+        </div>
+      </div>
+      <div id="dash-re-detail" style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;"></div>
+    </div>
+
+    <!-- 이달 수입/지출 -->
     <div class="grid2">
       <div class="mini-card">
         <div class="mc-label">이번 달 수입</div>
@@ -318,6 +395,8 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
         <div class="mc-sub">이번 달</div>
       </div>
     </div>
+
+    <!-- 예산 바 -->
     <div class="month-bar card">
       <div class="bar-row">
         <span style="font-size:13px;font-weight:700;">이달 지출 현황</span>
@@ -325,6 +404,8 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
       </div>
       <div class="bar-track"><div class="bar-fill" id="dash-budget-bar" style="width:0%"></div></div>
     </div>
+
+    <!-- 최근 거래 -->
     <div class="card">
       <div class="card-title">최근 거래</div>
       <div id="dash-recent-list"><div class="empty-state"><div class="e-icon">📋</div><div class="e-text">거래 내역이 없습니다</div></div></div>
@@ -800,7 +881,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 </div>
 
 <script>
-const APP_VERSION = 'v1.3.0';
+const APP_VERSION = 'v1.4.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -897,46 +978,117 @@ function renderDashboard() {
   document.getElementById('rate-usdcny-disp').textContent = rates.usdcny || '-';
   document.getElementById('rate-update-time').textContent = rates.updatedAt ? '업데이트: ' + rates.updatedAt : '환율 미설정';
 
-  // Asset calc
-  let grossAsset = 0;
-  accounts.forEach(a => { grossAsset += toKRW(a.balance, a.currency); });
-  stocks.forEach(s => { grossAsset += toKRW(s.qty * s.price, s.market === 'KR' ? 'KRW' : s.market === 'CN' ? 'CNY' : 'USD'); });
-  realEstate.forEach(r => { grossAsset += toKRW(r.value, r.currency); });
-
-  let totalDebt = 0;
-  debts.forEach(d => { totalDebt += toKRW(d.amount, d.currency); });
-  realEstate.forEach(r => { totalDebt += toKRW(r.loan || 0, r.currency); });
-
-  // CC unpaid
   const mon = thisMonth();
+
+  // ── 현금/계좌 ──
+  let cashKRW = 0, cashKR = 0, cashCN = 0, cashOther = 0;
+  accounts.forEach(a => {
+    const k = toKRW(a.balance, a.currency);
+    cashKRW += k;
+    if (a.currency === 'KRW') cashKR += a.balance;
+    else if (a.currency === 'CNY') cashCN += a.balance;
+    else cashOther += k;
+  });
+  document.getElementById('dash-cash-total').textContent = '₩' + fmtNum(Math.round(cashKRW));
+  const cashSubParts = [];
+  if (cashKR) cashSubParts.push('🇰🇷 ₩' + fmtNum(Math.round(cashKR)));
+  if (cashCN) cashSubParts.push('🇨🇳 ¥' + fmtNum(Math.round(cashCN)));
+  document.getElementById('dash-cash-sub').innerHTML = cashSubParts.join('<br>') || '계좌 없음';
+
+  // ── 주식 ──
+  let stockKRW = 0, stockCostKRW = 0;
+  let stockByMarket = { KR: 0, CN: 0, US: 0 };
+  stocks.forEach(s => {
+    const curr = s.market === 'KR' ? 'KRW' : s.market === 'CN' ? 'CNY' : 'USD';
+    const val = toKRW(s.qty * s.price, curr);
+    const cost = toKRW(s.qty * s.avg, curr);
+    stockKRW += val; stockCostKRW += cost;
+    stockByMarket[s.market] = (stockByMarket[s.market] || 0) + val;
+  });
+  const stockPL = stockKRW - stockCostKRW;
+  const stockPLPct = stockCostKRW > 0 ? ((stockPL / stockCostKRW) * 100).toFixed(1) : 0;
+  document.getElementById('dash-stock-total').textContent = '₩' + fmtNum(Math.round(stockKRW));
+  const plEl = document.getElementById('dash-stock-pl');
+  if (stocks.length) {
+    plEl.textContent = (stockPL >= 0 ? '+' : '') + '₩' + fmtNum(Math.round(Math.abs(stockPL))) + ' (' + (stockPL >= 0 ? '+' : '') + stockPLPct + '%)';
+    plEl.className = 'ac-pl ' + (stockPL >= 0 ? 'pos' : 'neg');
+  } else { plEl.textContent = ''; }
+  const stockParts = [];
+  if (stockByMarket.KR) stockParts.push('🇰🇷 ₩' + fmtNum(Math.round(stockByMarket.KR)));
+  if (stockByMarket.CN) stockParts.push('🇨🇳 ¥환산');
+  if (stockByMarket.US) stockParts.push('🇺🇸 $환산');
+  document.getElementById('dash-stock-sub').textContent = stockParts.join(' · ') || '종목 없음';
+
+  // ── 부동산 ──
+  let reGross = 0, reLoan = 0, reNet = 0;
+  const reByOwner = {};
+  realEstate.forEach(r => {
+    const val = toKRW(r.value, r.currency);
+    const loan = toKRW(r.loan || 0, r.currency);
+    reGross += val; reLoan += loan; reNet += (val - loan);
+    const owner = r.owner || '본인';
+    if (!reByOwner[owner]) reByOwner[owner] = 0;
+    reByOwner[owner] += (val - loan);
+  });
+  document.getElementById('dash-re-total').textContent = '₩' + fmtNum(Math.round(reNet));
+  document.getElementById('dash-re-gross').textContent = '₩' + fmtNum(Math.round(reGross));
+  document.getElementById('dash-re-loan').textContent = '-₩' + fmtNum(Math.round(reLoan));
+  const reDetailEl = document.getElementById('dash-re-detail');
+  if (realEstate.length) {
+    reDetailEl.innerHTML = realEstate.map(r => {
+      const eq = toKRW(r.value - (r.loan||0), r.currency);
+      return '<div class="ac-detail-row"><div class="ac-detail-label">🏠 ' + r.name + ' <span style="font-size:10px;color:var(--sub);">(' + r.owner + ')</span></div><div class="ac-detail-val">₩' + fmtNum(Math.round(eq)) + '</div></div>';
+    }).join('') + (Object.keys(reByOwner).length > 1 ? '<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">' + Object.keys(reByOwner).map(o => '<span class="chip">'+o+' ₩'+fmtNum(Math.round(reByOwner[o]))+'</span>').join('') + '</div>' : '');
+  } else {
+    reDetailEl.innerHTML = '<div style="font-size:12px;color:var(--sub);">부동산을 추가하세요</div>';
+  }
+
+  // ── 총자산/부채 ──
+  const grossAsset = cashKRW + stockKRW + reGross;
+  let totalDebt = reLoan;
+  debts.forEach(d => { totalDebt += toKRW(d.amount, d.currency); });
   let ccUnpaid = 0;
   ledger.filter(t => t.type === 'expense' && t.date.startsWith(mon) && t.payment && t.payment.includes('신용카드') && !t.ccPaid)
         .forEach(t => { ccUnpaid += toKRW(t.amount, t.currency); });
+  const netAsset = cashKRW + stockKRW + reNet - debts.reduce((s,d) => s+toKRW(d.amount,d.currency),0) - ccUnpaid;
 
-  const netAsset = grossAsset - totalDebt - ccUnpaid;
   document.getElementById('dash-total').textContent = fmtNum(Math.round(netAsset));
   document.getElementById('dash-gross').textContent = '₩' + fmtNum(Math.round(grossAsset));
   document.getElementById('dash-debt').textContent = '-₩' + fmtNum(Math.round(totalDebt));
   document.getElementById('dash-cc').textContent = '-₩' + fmtNum(Math.round(ccUnpaid));
 
-  // Monthly income/expense
+  // ── 자산 구성 바 ──
+  const totalForComp = cashKRW + stockKRW + reNet;
+  if (totalForComp > 0) {
+    const cashPct = (cashKRW / totalForComp * 100);
+    const stockPct = (stockKRW / totalForComp * 100);
+    const rePct = (reNet / totalForComp * 100);
+    document.getElementById('comp-cash-bar').style.width = cashPct + '%';
+    document.getElementById('comp-stock-bar').style.width = stockPct + '%';
+    document.getElementById('comp-re-bar').style.width = rePct + '%';
+    document.getElementById('comp-cash-label').textContent = '현금/계좌 ' + cashPct.toFixed(0) + '%';
+    document.getElementById('comp-stock-label').textContent = '주식 ' + stockPct.toFixed(0) + '%';
+    document.getElementById('comp-re-label').textContent = '부동산 ' + rePct.toFixed(0) + '%';
+    document.getElementById('dash-comp-total').textContent = '₩' + fmtNum(Math.round(totalForComp));
+  }
+
+  // ── 이달 수입/지출 ──
   let monthIncome = 0, monthExpense = 0;
   ledger.filter(t => t.date.startsWith(mon)).forEach(t => {
     const krw = toKRW(t.amount, t.currency);
-    if (t.type === 'income') monthIncome += krw;
-    else monthExpense += krw;
+    if (t.type === 'income') monthIncome += krw; else monthExpense += krw;
   });
   document.getElementById('dash-income').textContent = '₩' + fmtNum(Math.round(monthIncome));
   document.getElementById('dash-expense').textContent = '₩' + fmtNum(Math.round(monthExpense));
 
-  // Budget bar
+  // ── 예산 바 ──
   if (budget > 0) {
     const pct = Math.min(100, (monthExpense / budget) * 100);
     document.getElementById('dash-budget-bar').style.width = pct + '%';
-    document.getElementById('dash-budget-text').textContent = fmtNum(Math.round(monthExpense)) + ' / ' + fmtNum(budget) + '₩';
+    document.getElementById('dash-budget-text').textContent = fmtNum(Math.round(monthExpense)) + ' / ₩' + fmtNum(budget);
   }
 
-  // Recent
+  // ── 최근 거래 ──
   const recent = [...ledger].sort((a,b) => b.date.localeCompare(a.date)).slice(0,5);
   const el = document.getElementById('dash-recent-list');
   if (!recent.length) { el.innerHTML = '<div class="empty-state"><div class="e-icon">📋</div><div class="e-text">거래 내역이 없습니다</div></div>'; return; }
