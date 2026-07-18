@@ -1,4 +1,4 @@
-const CACHE='wealthtrack-v1.9.0';
+const CACHE='wealthtrack-v2.0.0';
 const ASSETS=['/','/wealthtrack/','/wealthtrack/index.html','/wealthtrack/manifest.json'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
