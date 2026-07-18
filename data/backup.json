@@ -1,0 +1,19 @@
+{
+  "ledger": [],
+  "accounts": [],
+  "stocks": [],
+  "realEstate": [],
+  "debts": [],
+  "fixedExpenses": [],
+  "fixedStatus": {},
+  "rates": {
+    "usd": 1487,
+    "cny": 219,
+    "usdcny": 6.7846,
+    "updatedAt": "2026. 7. 18. 오전 11:52:35 (자동)"
+  },
+  "budget": 0,
+  "assetSnapshots": [],
+  "exportedAt": "2026-07-18T02:53:50.755Z",
+  "version": "v1.3.0"
+}
