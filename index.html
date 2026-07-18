@@ -1242,7 +1242,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 </div>
 
 <script>
-const APP_VERSION = 'v2.1.0';
+const APP_VERSION = 'v2.2.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2852,6 +2852,17 @@ function saveBudget() {
   setData('budget', budget);
   showToast('예산 저장됨');
   renderDashboard();
+  // 데이터가 비어있고 GitHub 토큰 있으면 자동 복원 제안
+  setTimeout(() => {
+    const token = localStorage.getItem('wt_gh_token');
+    const hasData = accounts.length > 0 || ledger.length > 0 || stocks.length > 0;
+    if (token && !hasData) {
+      if (confirm('📥 데이터가 비어 있습니다.\nGitHub에서 데이터를 자동 복원할까요?')) {
+        showPage('settings', null);
+        setTimeout(() => syncFromGH(), 500);
+      }
+    }
+  }, 1500);
   // 앱 시작 시 자동 환율 조회 (백그라운드)
   setTimeout(fetchAutoRates, 2000);
   // 시작 시 업데이트 체크
@@ -3158,6 +3169,30 @@ async function syncFromGH() {
 }
 
 
+async function forceReload() {
+  showToast('캐시 초기화 중... (데이터 유지됩니다)');
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+  } catch(e) {}
+  setTimeout(() => {
+    const base = window.location.href.split('?')[0];
+    window.location.replace(base + '?t=' + Date.now());
+  }, 600);
+}
+
+async function doUpdate() {
+  if (!confirm('앱을 최신 버전으로 업데이트합니다. 데이터는 유지됩니다.')) return;
+  await forceReload();
+}
+
+
 async function silentUpdateCheck() {
   try {
     const res = await fetch(GH_RAW + '?t=' + Date.now());
@@ -3340,6 +3375,11 @@ function doImport(e) {
 
 // ========== INIT ==========
 function init() {
+  // ?t= 파라미터 제거 (강제 새로고침 후 URL 정리)
+  if (window.location.search.includes('t=')) {
+    const clean = window.location.pathname;
+    window.history.replaceState({}, '', clean);
+  }
   const monInput = document.getElementById('ledger-month-filter');
   monInput.value = thisMonth();
 
@@ -3351,6 +3391,17 @@ function init() {
   }
 
   renderDashboard();
+  // 데이터가 비어있고 GitHub 토큰 있으면 자동 복원 제안
+  setTimeout(() => {
+    const token = localStorage.getItem('wt_gh_token');
+    const hasData = accounts.length > 0 || ledger.length > 0 || stocks.length > 0;
+    if (token && !hasData) {
+      if (confirm('📥 데이터가 비어 있습니다.\nGitHub에서 데이터를 자동 복원할까요?')) {
+        showPage('settings', null);
+        setTimeout(() => syncFromGH(), 500);
+      }
+    }
+  }, 1500);
   // 앱 시작 시 자동 환율 조회 (백그라운드)
   setTimeout(fetchAutoRates, 2000);
   // 시작 시 업데이트 체크
