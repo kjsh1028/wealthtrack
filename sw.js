@@ -1,40 +1,42 @@
-const CACHE = 'wealthtrack-v2.1.0';
-const STATIC = ['/wealthtrack/manifest.json'];
+const CACHE_NAME = 'wealthtrack-v2.3.0';
 
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(STATIC)).then(() => self.skipWaiting())
-  );
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
   );
-});
-
-self.addEventListener('message', e => {
-  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  // index.html은 항상 네트워크 우선 (캐시 안 씀)
-  if (url.pathname === '/wealthtrack/' || url.pathname === '/wealthtrack/index.html') {
+  if (url.hostname === 'api.anthropic.com' || url.hostname === 'api.github.com') return;
+
+  // index.html과 sw.js는 항상 네트워크에서 (캐시 무시) - LegalTrack 방식
+  const path = url.pathname;
+  if (path.endsWith('/') || path.endsWith('index.html') || path.endsWith('sw.js')) {
     e.respondWith(
-      fetch(e.request).catch(() => caches.match(e.request))
+      fetch(e.request, {cache: 'no-store'}).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+        return res;
+      }).catch(() => caches.match(e.request))
     );
     return;
   }
-  // 나머지는 캐시 우선
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).then(res => {
-      if (res && res.status === 200 && res.type === 'basic') {
-        caches.open(CACHE).then(c => c.put(e.request, res.clone()));
-      }
+    caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+      const clone = res.clone();
+      caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
       return res;
     }))
   );
+});
+
+self.addEventListener('message', e => {
+  if (e.data === 'SKIP_WAITING') self.skipWaiting();
 });
