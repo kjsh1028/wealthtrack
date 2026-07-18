@@ -800,7 +800,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 </div>
 
 <script>
-const APP_VERSION = 'v1.2.0';
+const APP_VERSION = 'v1.3.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1654,30 +1654,50 @@ function saveManualRates() {
 
 async function fetchAutoRates() {
   const statusEl = document.getElementById('rate-auto-status');
-  statusEl.textContent = '🔄 환율 조회 중...';
-  statusEl.style.color = 'var(--gold)';
-  try {
-    // frankfurter.app - 무료, CORS OK
-    const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=KRW,CNY');
-    const data = await res.json();
-    const usdKrw = data.rates.KRW;
-    const usdCny = data.rates.CNY;
-    const cnyKrw = usdKrw / usdCny;
-    rates.usd = Math.round(usdKrw);
-    rates.cny = Math.round(cnyKrw);
-    rates.usdcny = parseFloat(usdCny.toFixed(4));
-    rates.updatedAt = new Date().toLocaleString('ko-KR') + ' (자동)';
-    save('rates', rates);
-    document.getElementById('s-rate-usd').value = rates.usd;
-    document.getElementById('s-rate-cny').value = rates.cny;
-    statusEl.innerHTML = '✓ USD ' + rates.usd + '원 · CNY ' + rates.cny + '원';
-    statusEl.style.color = 'var(--green)';
-    renderDashboard();
-    showToast('환율 자동 업데이트 완료');
-  } catch(e) {
-    statusEl.textContent = '⚠️ 조회 실패 - 수동 입력하세요';
-    statusEl.style.color = 'var(--red)';
+  if (statusEl) { statusEl.textContent = '🔄 환율 조회 중...'; statusEl.style.color = 'var(--gold)'; }
+
+  // API 목록 순차 시도
+  const apis = [
+    async () => {
+      const r = await fetch('https://open.er-api.com/v6/latest/USD');
+      const d = await r.json();
+      if (!d.rates) throw new Error('no rates');
+      return { usdKrw: d.rates.KRW, usdCny: d.rates.CNY };
+    },
+    async () => {
+      const r = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+      const d = await r.json();
+      return { usdKrw: d.rates.KRW, usdCny: d.rates.CNY };
+    },
+    async () => {
+      const r = await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json');
+      const d = await r.json();
+      return { usdKrw: d.usd.krw, usdCny: d.usd.cny };
+    }
+  ];
+
+  let lastErr = null;
+  for (const api of apis) {
+    try {
+      const { usdKrw, usdCny } = await api();
+      if (!usdKrw || !usdCny) throw new Error('invalid');
+      const cnyKrw = usdKrw / usdCny;
+      rates.usd = Math.round(usdKrw);
+      rates.cny = Math.round(cnyKrw);
+      rates.usdcny = parseFloat(usdCny.toFixed(4));
+      rates.updatedAt = new Date().toLocaleString('ko-KR') + ' (자동)';
+      save('rates', rates);
+      const usdEl = document.getElementById('s-rate-usd');
+      const cnyEl = document.getElementById('s-rate-cny');
+      if (usdEl) usdEl.value = rates.usd;
+      if (cnyEl) cnyEl.value = rates.cny;
+      if (statusEl) { statusEl.innerHTML = '✓ USD ' + rates.usd + '원 · CNY ' + rates.cny + '원'; statusEl.style.color = 'var(--green)'; }
+      renderDashboard();
+      showToast('환율 업데이트: USD ' + rates.usd + '원');
+      return;
+    } catch(e) { lastErr = e; }
   }
+  if (statusEl) { statusEl.textContent = '⚠️ 조회 실패 - 수동 입력하세요'; statusEl.style.color = 'var(--red)'; }
 }
 
 function saveBudget() {
@@ -1734,6 +1754,23 @@ function applyAllData(data) {
   if (data.budget !== undefined) { budget = data.budget; setData('budget', budget); }
 }
 
+function ghRequest(method, path, token, body) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, 'https://api.github.com' + path);
+    xhr.setRequestHeader('Authorization', 'token ' + token);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.timeout = 20000;
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
+      else reject(new Error('HTTP ' + xhr.status + ': ' + xhr.responseText.substring(0,100)));
+    };
+    xhr.onerror = () => reject(new Error('네트워크 오류 - VPN 확인'));
+    xhr.ontimeout = () => reject(new Error('타임아웃 - VPN 확인'));
+    xhr.send(body ? JSON.stringify(body) : null);
+  });
+}
+
 async function syncToGH() {
   const token = localStorage.getItem('wt_gh_token');
   if (!token) { showToast('GitHub 토큰을 먼저 입력하세요'); return; }
@@ -1743,26 +1780,21 @@ async function syncToGH() {
   try {
     const payload = JSON.stringify(getAllData(), null, 2);
     const b64 = btoa(unescape(encodeURIComponent(payload)));
-    // Check existing SHA
     let sha = null;
     try {
-      const chk = await fetch('https://api.github.com/repos/kjsh1028/wealthtrack/contents/data/backup.json', { headers: { 'Authorization': 'token ' + token } });
-      if (chk.ok) { const d = await chk.json(); sha = d.sha; }
+      const existing = await ghRequest('GET', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token);
+      sha = existing.sha;
     } catch(e) {}
     const body = { message: 'sync: ' + new Date().toISOString(), content: b64 };
     if (sha) body.sha = sha;
-    const res = await fetch('https://api.github.com/repos/kjsh1028/wealthtrack/contents/data/backup.json', {
-      method: 'PUT', headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    if (res.ok) {
-      const now = new Date().toLocaleString('ko-KR');
-      localStorage.setItem('wt_sync_time', now);
-      dot.className = 'sync-dot ok'; text.textContent = '업로드 완료';
-      document.getElementById('sync-last-time').textContent = '마지막 동기화: ' + now;
-      showToast('GitHub에 업로드 완료');
-    } else { throw new Error('Upload failed'); }
-  } catch(e) { dot.className = 'sync-dot err'; text.textContent = '업로드 실패'; showToast('업로드 실패: ' + e.message); }
+    await ghRequest('PUT', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token, body);
+    const now = new Date().toLocaleString('ko-KR');
+    localStorage.setItem('wt_sync_time', now);
+    dot.className = 'sync-dot ok'; text.textContent = '업로드 완료';
+    const lastEl = document.getElementById('sync-last-time');
+    if (lastEl) lastEl.textContent = '마지막 동기화: ' + now;
+    showToast('✓ GitHub 업로드 완료');
+  } catch(e) { dot.className = 'sync-dot err'; text.textContent = '실패: ' + e.message; showToast('업로드 실패: ' + e.message); }
 }
 
 async function syncFromGH() {
@@ -1772,78 +1804,21 @@ async function syncFromGH() {
   const text = document.getElementById('sync-text');
   dot.className = 'sync-dot syncing'; text.textContent = '다운로드 중...';
   try {
-    const res = await fetch('https://api.github.com/repos/kjsh1028/wealthtrack/contents/data/backup.json', { headers: { 'Authorization': 'token ' + token } });
-    if (!res.ok) { throw new Error('파일 없음 - 먼저 업로드하세요'); }
-    const d = await res.json();
-    const payload = JSON.parse(decodeURIComponent(escape(atob(d.content))));
+    const d = await ghRequest('GET', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token);
+    const raw = d.content.replace(/\n/g,'');
+    const payload = JSON.parse(decodeURIComponent(escape(atob(raw))));
     if (!confirm('다운로드하면 현재 기기 데이터가 덮어씌워집니다. 계속하시겠습니까?')) { updateSyncStatus(); return; }
     applyAllData(payload);
     const now = new Date().toLocaleString('ko-KR');
     localStorage.setItem('wt_sync_time', now);
     dot.className = 'sync-dot ok'; text.textContent = '다운로드 완료';
-    document.getElementById('sync-last-time').textContent = '마지막 동기화: ' + now;
-    showToast('데이터 복원 완료 (' + (payload.exportedAt || '').substring(0,10) + ')');
+    const lastEl = document.getElementById('sync-last-time');
+    if (lastEl) lastEl.textContent = '마지막 동기화: ' + now;
+    showToast('✓ 데이터 복원 완료 (' + (payload.exportedAt||'').substring(0,10) + ')');
     renderDashboard();
-  } catch(e) { dot.className = 'sync-dot err'; text.textContent = '다운로드 실패'; showToast('실패: ' + e.message); }
+  } catch(e) { dot.className = 'sync-dot err'; text.textContent = '실패: ' + e.message; showToast('다운로드 실패: ' + e.message); }
 }
 
-// ========== AUTO SYNC (30초마다) ==========
-function autoSync() {
-  const token = localStorage.getItem('wt_gh_token');
-  if (!token) return;
-  syncToGH().catch(() => {});
-}
-
-// ========== UPDATE CHECK ==========
-const GH_RAW = 'https://raw.githubusercontent.com/kjsh1028/wealthtrack/main/index.html';
-
-async function checkUpdate() {
-  document.getElementById('btn-check-update').textContent = '확인 중...';
-  document.getElementById('latest-ver-sub').textContent = '확인 중...';
-  try {
-    const res = await fetch(GH_RAW + '?t=' + Date.now());
-    const html = await res.text();
-    const match = html.match(/APP_VERSION = '(v[\d.]+)'/);
-    if (!match) { showToast('버전 확인 실패'); return; }
-    const latest = match[1];
-    document.getElementById('latest-ver-display').textContent = latest;
-    document.getElementById('btn-check-update').textContent = '업데이트 확인';
-    if (latest !== APP_VERSION) {
-      document.getElementById('latest-ver-sub').textContent = '🆕 새 버전 있음';
-      document.getElementById('latest-ver-display').style.color = 'var(--green)';
-      document.getElementById('btn-do-update').style.display = 'block';
-      showUpdateBanner(latest);
-    } else {
-      document.getElementById('latest-ver-sub').textContent = '최신 버전입니다';
-      document.getElementById('latest-ver-display').style.color = 'var(--green)';
-      showToast('최신 버전입니다 (' + APP_VERSION + ')');
-    }
-  } catch(e) {
-    document.getElementById('btn-check-update').textContent = '업데이트 확인';
-    document.getElementById('latest-ver-sub').textContent = '확인 실패';
-    showToast('업데이트 확인 실패');
-  }
-}
-
-function showUpdateBanner(ver) {
-  const banner = document.getElementById('update-banner');
-  document.getElementById('update-banner-text').textContent = '🆕 새 버전 ' + ver + ' 이 있습니다';
-  banner.classList.add('show');
-}
-
-async function doUpdate() {
-  if (!confirm('앱을 최신 버전으로 업데이트합니다. 데이터는 유지됩니다.')) return;
-  // Clear SW cache and reload
-  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-    const reg = await navigator.serviceWorker.getRegistration();
-    if (reg) await reg.unregister();
-  }
-  // Clear caches
-  const keys = await caches.keys();
-  await Promise.all(keys.map(k => caches.delete(k)));
-  showToast('업데이트 적용 중...');
-  setTimeout(() => window.location.reload(true), 800);
-}
 
 async function silentUpdateCheck() {
   try {
