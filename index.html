@@ -250,6 +250,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 .cc-bar-val { font-size: 18px; font-weight: 800; color: var(--navy); }
 
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -558,7 +559,11 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
       <div class="settings-section-title">데이터 관리</div>
       <div class="card">
         <div class="settings-row" onclick="exportData()" style="cursor:pointer;">
-          <div><div class="settings-row-label">📤 데이터 내보내기</div><div class="settings-row-sub">JSON 파일로 백업</div></div>
+          <div><div class="settings-row-label">📤 JSON 내보내기</div><div class="settings-row-sub">전체 데이터 JSON 백업</div></div>
+          <div style="color:var(--sub);">›</div>
+        </div>
+        <div class="settings-row" onclick="exportExcel()" style="cursor:pointer;">
+          <div><div class="settings-row-label">📊 엑셀 내보내기</div><div class="settings-row-sub">가계부·계좌·주식·부동산 시트별 출력</div></div>
           <div style="color:var(--sub);">›</div>
         </div>
         <div class="settings-row" onclick="importData()" style="cursor:pointer;">
@@ -795,7 +800,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 </div>
 
 <script>
-const APP_VERSION = 'v1.1.0';
+const APP_VERSION = 'v1.2.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1847,6 +1852,147 @@ async function silentUpdateCheck() {
     const match = html.match(/APP_VERSION = '(v[\d.]+)'/);
     if (match && match[1] !== APP_VERSION) showUpdateBanner(match[1]);
   } catch(e) {}
+}
+
+
+// ========== EXCEL EXPORT ==========
+function exportExcel() {
+  if (typeof XLSX === 'undefined') { showToast('엑셀 라이브러리 로딩 중... 잠시 후 다시 시도하세요'); return; }
+  const wb = XLSX.utils.book_new();
+
+  // ── 시트1: 가계부 ──
+  const ledgerHeader = ['날짜','유형','통화','금액','원화환산','카테고리','결제수단','메모'];
+  const ledgerRows = [...ledger].sort((a,b) => b.date.localeCompare(a.date)).map(t => [
+    t.date,
+    t.type === 'income' ? '수입' : '지출',
+    t.currency,
+    t.amount,
+    Math.round(toKRW(t.amount, t.currency)),
+    t.category,
+    t.payment,
+    t.memo || ''
+  ]);
+  const wsLedger = XLSX.utils.aoa_to_sheet([ledgerHeader, ...ledgerRows]);
+  wsLedger['!cols'] = [10,8,8,12,14,10,16,20].map(w => ({wch:w}));
+  // 헤더 스타일
+  XLSX.utils.book_append_sheet(wb, wsLedger, '가계부');
+
+  // ── 시트2: 월별 요약 ──
+  const months = getLast6Months();
+  const summaryHeader = ['월','수입(₩)','지출(₩)','순수익(₩)'];
+  const summaryRows = months.map(mon => {
+    let inc = 0, exp = 0;
+    ledger.filter(t => t.date.startsWith(mon)).forEach(t => {
+      const k = Math.round(toKRW(t.amount, t.currency));
+      if (t.type === 'income') inc += k; else exp += k;
+    });
+    return [mon, inc, exp, inc - exp];
+  });
+  const wsSummary = XLSX.utils.aoa_to_sheet([summaryHeader, ...summaryRows]);
+  wsSummary['!cols'] = [12,14,14,14].map(w => ({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsSummary, '월별요약');
+
+  // ── 시트3: 계좌 ──
+  const accHeader = ['은행','별명','통화','잔액','원화환산'];
+  const accRows = accounts.map(a => [
+    a.bank, a.name, a.currency, a.balance, Math.round(toKRW(a.balance, a.currency))
+  ]);
+  const totalAccKRW = accounts.reduce((s,a) => s + Math.round(toKRW(a.balance, a.currency)), 0);
+  accRows.push(['','','합계','', totalAccKRW]);
+  const wsAcc = XLSX.utils.aoa_to_sheet([accHeader, ...accRows]);
+  wsAcc['!cols'] = [14,14,8,14,14].map(w => ({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsAcc, '계좌');
+
+  // ── 시트4: 주식 ──
+  const stockHeader = ['시장','티커','종목명','보유수량','평균단가','현재가','통화','평가금액(현지)','평가금액(₩)','손익(₩)','수익률(%)'];
+  const stockRows = stocks.map(s => {
+    const curr = s.market === 'KR' ? 'KRW' : s.market === 'CN' ? 'CNY' : 'USD';
+    const val = s.qty * s.price;
+    const cost = s.qty * s.avg;
+    const pl = val - cost;
+    const plPct = cost > 0 ? parseFloat(((pl/cost)*100).toFixed(2)) : 0;
+    return [
+      s.market === 'KR' ? '한국' : s.market === 'CN' ? '중국' : '미국',
+      s.ticker, s.name, s.qty, s.avg, s.price, curr,
+      Math.round(val), Math.round(toKRW(val, curr)),
+      Math.round(toKRW(pl, curr)), plPct
+    ];
+  });
+  const totalStockKRW = stocks.reduce((s,st) => {
+    const c = st.market==='KR'?'KRW':st.market==='CN'?'CNY':'USD';
+    return s + Math.round(toKRW(st.qty*st.price, c));
+  }, 0);
+  const totalCostKRW = stocks.reduce((s,st) => {
+    const c = st.market==='KR'?'KRW':st.market==='CN'?'CNY':'USD';
+    return s + Math.round(toKRW(st.qty*st.avg, c));
+  }, 0);
+  stockRows.push(['','','합계','','','','','', totalStockKRW, totalStockKRW - totalCostKRW, '']);
+  const wsStock = XLSX.utils.aoa_to_sheet([stockHeader, ...stockRows]);
+  wsStock['!cols'] = [8,10,16,10,12,12,8,14,14,14,10].map(w => ({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsStock, '주식');
+
+  // ── 시트5: 부동산 ──
+  const reHeader = ['물건명','소재지','명의','통화','취득가','현재추정가','담보대출','순자산(현지)','순자산(₩)','평가차익'];
+  const reRows = realEstate.map(r => {
+    const equity = r.value - (r.loan || 0);
+    const gain = r.value - r.cost;
+    return [r.name, r.location, r.owner, r.currency, r.cost, r.value, r.loan||0, equity, Math.round(toKRW(equity, r.currency)), gain];
+  });
+  const wsRE = XLSX.utils.aoa_to_sheet([reHeader, ...reRows]);
+  wsRE['!cols'] = [16,16,8,8,14,14,14,14,14,14].map(w => ({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsRE, '부동산');
+
+  // ── 시트6: 대출/부채 ──
+  const debtHeader = ['항목명','통화','잔액','잔액(₩)','금리(%)','만기일'];
+  const debtRows = debts.map(d => [d.name, d.currency, d.amount, Math.round(toKRW(d.amount, d.currency)), d.rate||0, d.due||'-']);
+  const totalDebt = debts.reduce((s,d) => s + Math.round(toKRW(d.amount, d.currency)), 0);
+  debtRows.push(['합계','','',totalDebt,'','']);
+  const wsDebt = XLSX.utils.aoa_to_sheet([debtHeader, ...debtRows]);
+  wsDebt['!cols'] = [20,8,14,14,10,12].map(w => ({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsDebt, '대출부채');
+
+  // ── 시트7: 고정지출 ──
+  const fixedHeader = ['항목명','통화','금액','금액(₩)','결제일','결제수단','카테고리'];
+  const fixedRows = fixedExpenses.map(f => [f.name, f.currency, f.amount, Math.round(toKRW(f.amount, f.currency)), f.day+'일', f.payment, f.category]);
+  const totalFixed = fixedExpenses.reduce((s,f) => s + Math.round(toKRW(f.amount, f.currency)), 0);
+  fixedRows.push(['합계','','',totalFixed,'','','']);
+  const wsFixed = XLSX.utils.aoa_to_sheet([fixedHeader, ...fixedRows]);
+  wsFixed['!cols'] = [20,8,12,14,8,16,12].map(w => ({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsFixed, '고정지출');
+
+  // ── 시트8: 자산총괄 ──
+  let cashKRW = accounts.reduce((s,a) => s + toKRW(a.balance, a.currency), 0);
+  let stockKRW = stocks.reduce((s,st) => { const c = st.market==='KR'?'KRW':st.market==='CN'?'CNY':'USD'; return s + toKRW(st.qty*st.price, c); }, 0);
+  let reKRW = realEstate.reduce((s,r) => s + toKRW(r.value - (r.loan||0), r.currency), 0);
+  let debtKRW = debts.reduce((s,d) => s + toKRW(d.amount, d.currency), 0);
+  const mon = thisMonth();
+  let ccKRW = ledger.filter(t => t.type==='expense' && t.date.startsWith(mon) && t.payment && t.payment.includes('신용카드') && !t.ccPaid).reduce((s,t) => s + toKRW(t.amount, t.currency), 0);
+  const totalAsset = cashKRW + stockKRW + reKRW;
+  const netAsset = totalAsset - debtKRW - ccKRW;
+  const summaryData = [
+    ['WealthTrack 자산총괄'],
+    ['기준일', new Date().toLocaleDateString('ko-KR')],
+    ['환율', 'USD=' + rates.usd + '원, CNY=' + rates.cny + '원'],
+    [''],
+    ['구분','금액(₩)','비중(%)'],
+    ['현금/계좌', Math.round(cashKRW), totalAsset>0?parseFloat(((cashKRW/totalAsset)*100).toFixed(1)):0],
+    ['주식', Math.round(stockKRW), totalAsset>0?parseFloat(((stockKRW/totalAsset)*100).toFixed(1)):0],
+    ['부동산(순자산)', Math.round(reKRW), totalAsset>0?parseFloat(((reKRW/totalAsset)*100).toFixed(1)):0],
+    ['총 자산', Math.round(totalAsset), 100],
+    [''],
+    ['대출/부채', -Math.round(debtKRW), ''],
+    ['신용카드 미결제', -Math.round(ccKRW), ''],
+    [''],
+    ['순자산', Math.round(netAsset), ''],
+  ];
+  const wsSummaryAsset = XLSX.utils.aoa_to_sheet(summaryData);
+  wsSummaryAsset['!cols'] = [18,16,10].map(w => ({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsSummaryAsset, '자산총괄');
+
+  // 파일명: wealthtrack-2025-07.xlsx
+  const filename = 'wealthtrack-' + today() + '.xlsx';
+  XLSX.writeFile(wb, filename);
+  showToast('엑셀 파일 저장됨: ' + filename);
 }
 
 // ========== DATA EXPORT/IMPORT ==========
