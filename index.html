@@ -811,6 +811,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
         </div>
         <button class="btn-primary" onclick="checkUpdate()" style="margin-top:8px;" id="btn-check-update">업데이트 확인</button>
         <button id="btn-do-update" class="btn-primary" onclick="doUpdate()" style="display:none;margin-top:8px;background:var(--green);">🆕 지금 업데이트</button>
+        <button class="btn-secondary" onclick="forceReload()" style="margin-top:8px;">🔄 강제 새로고침 (캐시 초기화)</button>
       </div>
     </div>
 
@@ -1241,7 +1242,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 </div>
 
 <script>
-const APP_VERSION = 'v2.0.0';
+const APP_VERSION = 'v2.1.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2854,9 +2855,30 @@ function saveBudget() {
   // 앱 시작 시 자동 환율 조회 (백그라운드)
   setTimeout(fetchAutoRates, 2000);
   // 시작 시 업데이트 체크
-  setTimeout(silentUpdateCheck, 4000);
+  setTimeout(silentUpdateCheck, 3000);
   // 10분마다 자동 동기화
   setInterval(autoSync, 600000);
+  // SW 업데이트 감지 - 새 버전 있으면 자동 활성화
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/wealthtrack/sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateBanner('새 버전');
+          }
+        });
+      });
+      // 이미 대기 중인 SW가 있으면 즉시 활성화
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+    }).catch(() => {});
+    // SW가 활성화되면 자동 새로고침
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
+  }
 }
 
 
@@ -3332,9 +3354,30 @@ function init() {
   // 앱 시작 시 자동 환율 조회 (백그라운드)
   setTimeout(fetchAutoRates, 2000);
   // 시작 시 업데이트 체크
-  setTimeout(silentUpdateCheck, 4000);
+  setTimeout(silentUpdateCheck, 3000);
   // 10분마다 자동 동기화
   setInterval(autoSync, 600000);
+  // SW 업데이트 감지 - 새 버전 있으면 자동 활성화
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/wealthtrack/sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateBanner('새 버전');
+          }
+        });
+      });
+      // 이미 대기 중인 SW가 있으면 즉시 활성화
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+    }).catch(() => {});
+    // SW가 활성화되면 자동 새로고침
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
+  }
 }
 
 // Close modal on overlay click
