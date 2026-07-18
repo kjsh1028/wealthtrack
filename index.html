@@ -498,6 +498,8 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
           <div class="inner-tab" onclick="setStockMarket(this,'KR')">🇰🇷 한국</div>
           <div class="inner-tab" onclick="setStockMarket(this,'CN')">🇨🇳 중국</div>
           <div class="inner-tab" onclick="setStockMarket(this,'US')">🇺🇸 미국</div>
+          <div class="inner-tab" onclick="setStockMarket(this,'HK')">🇭🇰 홍콩</div>
+          <div class="inner-tab" onclick="setStockMarket(this,'JP')">🇯🇵 일본</div>
         </div>
         <div class="sec-header">
           <span class="sec-title">보유 종목</span>
@@ -531,6 +533,8 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
           <div class="filter-chip" onclick="setTradeFilter(this,'KR')">🇰🇷 한국</div>
           <div class="filter-chip" onclick="setTradeFilter(this,'CN')">🇨🇳 중국</div>
           <div class="filter-chip" onclick="setTradeFilter(this,'US')">🇺🇸 미국</div>
+          <div class="filter-chip" onclick="setTradeFilter(this,'HK')">🇭🇰 홍콩</div>
+          <div class="filter-chip" onclick="setTradeFilter(this,'JP')">🇯🇵 일본</div>
         </div>
         <div id="trade-list"></div>
       </div>
@@ -922,6 +926,8 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
         <option value="KR">🇰🇷 한국 (KRW)</option>
         <option value="CN">🇨🇳 중국 (CNY)</option>
         <option value="US">🇺🇸 미국 (USD)</option>
+        <option value="HK">🇭🇰 홍콩 (HKD)</option>
+        <option value="JP">🇯🇵 일본 (JPY)</option>
       </select>
     </div>
 
@@ -1011,6 +1017,8 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
         <option value="KR">🇰🇷 한국 (KRW)</option>
         <option value="CN">🇨🇳 중국 (CNY)</option>
         <option value="US">🇺🇸 미국 (USD)</option>
+        <option value="HK">🇭🇰 홍콩 (HKD)</option>
+        <option value="JP">🇯🇵 일본 (JPY)</option>
       </select>
     </div>
     <div class="form-group"><label class="form-label">종목 코드/티커</label><input class="form-input" id="inp-stock-ticker" placeholder="예: 005930, BABA, AAPL"></div>
@@ -1130,7 +1138,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 </div>
 
 <script>
-const APP_VERSION = 'v1.8.0';
+const APP_VERSION = 'v1.9.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1171,7 +1179,24 @@ function toKRW(amount, curr) {
   if (curr === 'KRW') return amount;
   if (curr === 'CNY') return amount * rates.cny;
   if (curr === 'USD') return amount * rates.usd;
+  if (curr === 'HKD') return amount * (rates.hkd || rates.usd / 7.8); // HKD≈USD/7.8
+  if (curr === 'JPY') return amount * (rates.jpy || rates.usd / 150); // JPY≈USD/150
   return amount;
+}
+
+function getStockCurr(market) {
+  const map = { KR:'KRW', CN:'CNY', US:'USD', HK:'HKD', JP:'JPY' };
+  return map[market] || 'KRW';
+}
+
+function getMarketFlag(market) {
+  const map = { KR:'🇰🇷', CN:'🇨🇳', US:'🇺🇸', HK:'🇭🇰', JP:'🇯🇵' };
+  return map[market] || '🌐';
+}
+
+function getCurrSymbol(curr) {
+  const map = { KRW:'₩', CNY:'¥', USD:'$', HKD:'HK$', JPY:'¥' };
+  return map[curr] || curr;
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 function today() {
@@ -1249,8 +1274,8 @@ function renderDashboard() {
   // ── 주식 ──
   let stockKRW = 0, stockCostKRW = 0;
   let stockByMarket = { KR: 0, CN: 0, US: 0 };
-  stocks.forEach(s => {
-    const curr = s.market === 'KR' ? 'KRW' : s.market === 'CN' ? 'CNY' : 'USD';
+  stocks.filter(s=>s.qty>0).forEach(s => {
+    const curr = getStockCurr(s.market);
     const val = toKRW(s.qty * s.price, curr);
     const cost = toKRW(s.qty * s.avg, curr);
     stockKRW += val; stockCostKRW += cost;
@@ -1901,7 +1926,7 @@ function setTradeType(type, el) {
 
 function updateTradeMarket() {
   const market = document.getElementById('inp-trade-market').value;
-  const sym = market === 'KR' ? '₩' : market === 'CN' ? '¥' : '$';
+  const sym = getCurrSymbol(getStockCurr(market));
   document.querySelectorAll('#trade-curr-sym, #trade-curr-sym2').forEach(el => { if(el) el.textContent = sym; });
   populateSellStockSelect();
 }
@@ -2088,7 +2113,7 @@ function renderStockAnalysis() {
   // 미실현 손익
   let unrealizedKRW = 0, unrealizedCostKRW = 0;
   stocks.filter(s => s.qty > 0).forEach(s => {
-    const curr = s.market==='KR'?'KRW':s.market==='CN'?'CNY':'USD';
+    const curr = getStockCurr(s.market);
     unrealizedKRW += toKRW(s.qty * s.price, curr);
     unrealizedCostKRW += toKRW(s.qty * s.avg, curr);
   });
@@ -2204,13 +2229,11 @@ function renderStockList() {
   // qty > 0인 종목만 (전량 매도 종목 제외)
   items = items.filter(s => s.qty > 0);
   const el = document.getElementById('stock-list');
-  const totalKRW = stocks.reduce((s, st) => {
-    const curr = st.market === 'KR' ? 'KRW' : st.market === 'CN' ? 'CNY' : 'USD';
-    return s + toKRW(st.qty * st.price, curr);
+  const totalKRW = stocks.filter(s=>s.qty>0).reduce((s, st) => {
+    return s + toKRW(st.qty * st.price, getStockCurr(st.market));
   }, 0);
-  const totalCostKRW = stocks.reduce((s, st) => {
-    const curr = st.market === 'KR' ? 'KRW' : st.market === 'CN' ? 'CNY' : 'USD';
-    return s + toKRW(st.qty * st.avg, curr);
+  const totalCostKRW = stocks.filter(s=>s.qty>0).reduce((s, st) => {
+    return s + toKRW(st.qty * st.avg, getStockCurr(st.market));
   }, 0);
   document.getElementById('stock-total-krw').textContent = '₩' + fmtNum(Math.round(totalKRW));
   const pl = totalKRW - totalCostKRW;
@@ -2221,7 +2244,7 @@ function renderStockList() {
   if (!items.length) { el.innerHTML = '<div class="empty-state"><div class="e-icon">📈</div><div class="e-text">종목을 추가하세요</div></div>'; return; }
   const flag = { KR:'🇰🇷', CN:'🇨🇳', US:'🇺🇸' };
   el.innerHTML = items.map(s => {
-    const curr = s.market === 'KR' ? 'KRW' : s.market === 'CN' ? 'CNY' : 'USD';
+    const curr = getStockCurr(s.market);
     const val = s.qty * s.price;
     const cost = s.qty * s.avg;
     const pl = val - cost;
@@ -2239,9 +2262,12 @@ function renderStockList() {
 
 function updateStockCurr() {
   const market = document.getElementById('inp-stock-market').value;
-  const sym = market === 'KR' ? '₩' : market === 'CN' ? '¥' : '$';
-  document.getElementById('stock-curr-label').textContent = sym;
-  document.getElementById('stock-curr-label2').textContent = sym;
+  const curr = getStockCurr(market);
+  const sym = getCurrSymbol(curr);
+  const lbl1 = document.getElementById('stock-curr-label');
+  const lbl2 = document.getElementById('stock-curr-label2');
+  if (lbl1) lbl1.textContent = sym;
+  if (lbl2) lbl2.textContent = sym;
 }
 
 function openStockModal(id) {
@@ -2268,7 +2294,8 @@ function saveStock() {
   if (!ticker || !name) { showToast('종목 코드와 이름을 입력하세요'); return; }
   const id = document.getElementById('inp-stock-id').value || uid();
   const existing = stocks.find(x => x.id === id);
-  const s = { id, market: document.getElementById('inp-stock-market').value, ticker, name, qty, avg, price };
+  const market = document.getElementById('inp-stock-market').value;
+  const s = { id, market, ticker, name, qty, avg, price, currency: getStockCurr(market) };
   if (existing) stocks[stocks.indexOf(existing)] = s;
   else stocks.push(s);
   save('stocks', stocks);
@@ -2772,14 +2799,16 @@ async function updateAllPrices() {
     if (progressBar) progressBar.style.width = ((i / total) * 100) + '%';
 
     try {
-      // 티커 자동 변환: 한국 6자리 숫자면 .KS 추가
+      // 티커 자동 변환
       let ticker = s.ticker;
-      if (s.market === 'KR' && /^\d{6}$/.test(ticker)) {
-        // KQ(코스닥) vs KS(코스피) 구분 - 일단 KS로 시도, 실패 시 KQ
-        ticker = ticker + '.KS';
-      } else if (s.market === 'CN' && /^\d{6}$/.test(ticker)) {
-        // 중국: 6으로 시작하면 상하이(.SS), 0/3으로 시작하면 선전(.SZ)
+      if (s.market === 'KR' && /^[0-9]{6}$/.test(ticker)) {
+        ticker = ticker + '.KS'; // 실패 시 .KQ 재시도
+      } else if (s.market === 'CN' && /^[0-9]{6}$/.test(ticker)) {
         ticker = ticker.startsWith('6') ? ticker + '.SS' : ticker + '.SZ';
+      } else if (s.market === 'HK' && /^[0-9]+$/.test(ticker)) {
+        ticker = ticker.padStart(4,'0') + '.HK'; // 예: 700 → 0700.HK
+      } else if (s.market === 'JP' && /^[0-9]{4}$/.test(ticker)) {
+        ticker = ticker + '.T'; // 예: 7203 → 7203.T (도쿄증권거래소)
       }
 
       const price = await finnhubRequest(ticker, apiKey);
@@ -3033,7 +3062,7 @@ function exportExcel() {
   // ── 시트4: 주식 ──
   const stockHeader = ['시장','티커','종목명','보유수량','평균단가','현재가','통화','평가금액(현지)','평가금액(₩)','손익(₩)','수익률(%)'];
   const stockRows = stocks.map(s => {
-    const curr = s.market === 'KR' ? 'KRW' : s.market === 'CN' ? 'CNY' : 'USD';
+    const curr = getStockCurr(s.market);
     const val = s.qty * s.price;
     const cost = s.qty * s.avg;
     const pl = val - cost;
