@@ -501,10 +501,16 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
         </div>
         <div class="sec-header">
           <span class="sec-title">보유 종목</span>
-          <div style="display:flex;gap:8px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span class="sec-action" style="color:var(--sub);font-size:11px;" id="price-last-update"></span>
+            <span class="sec-action" onclick="updateAllPrices()">🔄 시세</span>
             <span class="sec-action" onclick="openTradeModal('buy')">+ 매수</span>
             <span class="sec-action" style="color:var(--red);" onclick="openTradeModal('sell')">− 매도</span>
           </div>
+        </div>
+        <div id="price-update-progress" style="display:none;" class="card" style="padding:10px;">
+          <div style="font-size:12px;color:var(--sub);text-align:center;" id="price-progress-text">시세 조회 중...</div>
+          <div class="bar-track" style="margin-top:6px;"><div class="bar-fill" id="price-progress-bar" style="width:0%;background:var(--green);"></div></div>
         </div>
         <div class="card"><div id="stock-list"></div></div>
       </div>
@@ -698,6 +704,25 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
         </div>
         <button class="btn-primary" onclick="checkUpdate()" style="margin-top:8px;" id="btn-check-update">업데이트 확인</button>
         <button id="btn-do-update" class="btn-primary" onclick="doUpdate()" style="display:none;margin-top:8px;background:var(--green);">🆕 지금 업데이트</button>
+      </div>
+    </div>
+
+    <!-- Finnhub API Key -->
+    <div class="settings-section">
+      <div class="settings-section-title">📈 주가 자동 업데이트 (Finnhub)</div>
+      <div class="card">
+        <div style="font-size:12px;color:var(--sub);margin-bottom:12px;line-height:1.6;">
+          finnhub.io에서 무료 API 키를 발급받아 입력하세요.<br>
+          한국: <b>005930.KS</b> / 중국: <b>600519.SS</b> / 미국: <b>AAPL</b> 형식으로 티커 입력
+        </div>
+        <div class="form-group">
+          <label class="form-label">Finnhub API Key</label>
+          <input class="form-input" type="password" id="s-finnhub-key" placeholder="d1abc23def456...">
+        </div>
+        <div id="finnhub-status" style="font-size:12px;color:var(--sub);margin-bottom:8px;"></div>
+        <button class="btn-primary" onclick="saveFinnhubKey()" style="margin-bottom:8px;">💾 키 저장 & 테스트</button>
+        <button class="btn-secondary" onclick="updateAllPrices()">📊 전 종목 현재가 업데이트</button>
+        <div style="font-size:11px;color:var(--sub);margin-top:8px;" id="price-update-time"></div>
       </div>
     </div>
 
@@ -1095,7 +1120,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 </div>
 
 <script>
-const APP_VERSION = 'v1.6.0';
+const APP_VERSION = 'v1.7.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2040,8 +2065,15 @@ function renderInvest() {
 }
 
 function renderStockList() {
+  // 마지막 업데이트 시간 표시
+  const putime = localStorage.getItem('wt_price_update_time');
+  const lastUpdateEl = document.getElementById('price-last-update');
+  if (lastUpdateEl) lastUpdateEl.textContent = putime ? putime.substring(5,16) + ' 업데이트' : '시세 미업데이트';
+
   let items = stocks;
   if (stockMarket !== 'all') items = items.filter(s => s.market === stockMarket);
+  // qty > 0인 종목만 (전량 매도 종목 제외)
+  items = items.filter(s => s.qty > 0);
   const el = document.getElementById('stock-list');
   const totalKRW = stocks.reduce((s, st) => {
     const curr = st.market === 'KR' ? 'KRW' : st.market === 'CN' ? 'CNY' : 'USD';
@@ -2453,6 +2485,16 @@ function renderSettings() {
   document.getElementById('s-budget').value = budget || '';
 
   updateSyncStatus();
+  // Finnhub 키 표시
+  const fkey = localStorage.getItem('wt_finnhub_key');
+  const fkeyEl = document.getElementById('s-finnhub-key');
+  if (fkeyEl && fkey) fkeyEl.value = fkey.substring(0,8) + '...';
+  const putime = localStorage.getItem('wt_price_update_time');
+  const putimeEl = document.getElementById('price-update-time');
+  if (putimeEl && putime) putimeEl.textContent = '마지막 업데이트: ' + putime;
+  // 보유현황 마지막 업데이트 시간
+  const lastUpdateEl = document.getElementById('price-last-update');
+  if (lastUpdateEl && putime) lastUpdateEl.textContent = putime.substring(5,16) + ' 업데이트';
 }
 
 function saveManualRates() {
@@ -2526,6 +2568,163 @@ function saveBudget() {
   setInterval(autoSync, 600000);
 }
 
+
+// ========== FINNHUB PRICE UPDATE ==========
+function saveFinnhubKey() {
+  const key = document.getElementById('s-finnhub-key').value.trim();
+  if (!key) { showToast('API 키를 입력하세요'); return; }
+  const statusEl = document.getElementById('finnhub-status');
+  statusEl.textContent = '🔄 연결 테스트 중...';
+  statusEl.style.color = 'var(--gold)';
+
+  // AAPL로 테스트
+  finnhubRequest('AAPL', key).then(price => {
+    if (price) {
+      localStorage.setItem('wt_finnhub_key', key);
+      statusEl.textContent = '✓ 연결 성공! AAPL: $' + price;
+      statusEl.style.color = 'var(--green)';
+      showToast('Finnhub API 키 저장 완료');
+    } else {
+      statusEl.textContent = '⚠️ 응답 없음 - 키를 확인하세요';
+      statusEl.style.color = 'var(--red)';
+    }
+  }).catch(e => {
+    statusEl.textContent = '✗ 연결 실패: ' + e.message;
+    statusEl.style.color = 'var(--red)';
+  });
+}
+
+function finnhubRequest(ticker, key) {
+  return new Promise((resolve, reject) => {
+    const apiKey = key || localStorage.getItem('wt_finnhub_key');
+    if (!apiKey) { reject(new Error('API 키 없음')); return; }
+    const xhr = new XMLHttpRequest();
+    const url = 'https://finnhub.io/api/v1/quote?symbol=' + encodeURIComponent(ticker) + '&token=' + apiKey;
+    xhr.open('GET', url);
+    xhr.timeout = 10000;
+    xhr.onload = () => {
+      try {
+        const data = JSON.parse(xhr.responseText);
+        // c = current price
+        if (data && data.c && data.c > 0) resolve(data.c);
+        else resolve(null);
+      } catch(e) { resolve(null); }
+    };
+    xhr.onerror = () => reject(new Error('네트워크 오류'));
+    xhr.ontimeout = () => reject(new Error('타임아웃'));
+    xhr.send();
+  });
+}
+
+async function updateAllPrices() {
+  const apiKey = localStorage.getItem('wt_finnhub_key');
+  if (!apiKey) {
+    showToast('설정 탭에서 Finnhub API 키를 먼저 입력하세요');
+    showPage('settings', document.querySelectorAll('.nav-item')[5]);
+    return;
+  }
+
+  const holdingStocks = stocks.filter(s => s.qty > 0);
+  if (!holdingStocks.length) { showToast('보유 종목이 없습니다'); return; }
+
+  // 진행 바 표시
+  const progressWrap = document.getElementById('price-update-progress');
+  const progressText = document.getElementById('price-progress-text');
+  const progressBar = document.getElementById('price-progress-bar');
+  if (progressWrap) progressWrap.style.display = 'block';
+
+  let updated = 0, failed = 0;
+  const total = holdingStocks.length;
+  const results = [];
+
+  for (let i = 0; i < holdingStocks.length; i++) {
+    const s = holdingStocks[i];
+    if (progressText) progressText.textContent = s.name + ' (' + (i+1) + '/' + total + ') 조회 중...';
+    if (progressBar) progressBar.style.width = ((i / total) * 100) + '%';
+
+    try {
+      // 티커 자동 변환: 한국 6자리 숫자면 .KS 추가
+      let ticker = s.ticker;
+      if (s.market === 'KR' && /^\d{6}$/.test(ticker)) {
+        // KQ(코스닥) vs KS(코스피) 구분 - 일단 KS로 시도, 실패 시 KQ
+        ticker = ticker + '.KS';
+      } else if (s.market === 'CN' && /^\d{6}$/.test(ticker)) {
+        // 중국: 6으로 시작하면 상하이(.SS), 0/3으로 시작하면 선전(.SZ)
+        ticker = ticker.startsWith('6') ? ticker + '.SS' : ticker + '.SZ';
+      }
+
+      const price = await finnhubRequest(ticker, apiKey);
+
+      if (price && price > 0) {
+        // KS 실패 시 KQ로 재시도 (한국 코스닥)
+        s.price = price;
+        s.lastPriceUpdate = new Date().toISOString();
+        updated++;
+        results.push({ name: s.name, ticker, price, ok: true });
+      } else if (s.market === 'KR' && ticker.endsWith('.KS')) {
+        // KQ로 재시도
+        const price2 = await finnhubRequest(s.ticker + '.KQ', apiKey);
+        if (price2 && price2 > 0) {
+          s.price = price2;
+          s.lastPriceUpdate = new Date().toISOString();
+          s.ticker = s.ticker + '.KQ'; // 티커 업데이트
+          updated++;
+          results.push({ name: s.name, ticker: s.ticker, price: price2, ok: true });
+        } else {
+          failed++;
+          results.push({ name: s.name, ticker, price: null, ok: false });
+        }
+      } else {
+        failed++;
+        results.push({ name: s.name, ticker, price: null, ok: false });
+      }
+    } catch(e) {
+      failed++;
+      results.push({ name: s.name, ticker: s.ticker, price: null, ok: false, err: e.message });
+    }
+
+    // Finnhub 무료: 분당 60회 제한 → 종목 사이 300ms 딜레이
+    if (i < holdingStocks.length - 1) await new Promise(r => setTimeout(r, 300));
+  }
+
+  save('stocks', stocks);
+
+  // 완료
+  if (progressBar) progressBar.style.width = '100%';
+  const now = new Date().toLocaleString('ko-KR');
+  localStorage.setItem('wt_price_update_time', now);
+
+  setTimeout(() => {
+    if (progressWrap) progressWrap.style.display = 'none';
+    if (progressBar) progressBar.style.width = '0%';
+  }, 1500);
+
+  const lastUpdateEl = document.getElementById('price-last-update');
+  if (lastUpdateEl) lastUpdateEl.textContent = now.substring(5,16) + ' 업데이트';
+  const settingTimeEl = document.getElementById('price-update-time');
+  if (settingTimeEl) settingTimeEl.textContent = '마지막 업데이트: ' + now;
+
+  // 결과 토스트
+  let msg = '✓ ' + updated + '개 업데이트';
+  if (failed > 0) msg += ' / ' + failed + '개 실패';
+  showToast(msg);
+
+  // 실패 종목 알림
+  const failedStocks = results.filter(r => !r.ok);
+  if (failedStocks.length) {
+    setTimeout(() => {
+      showToast('실패: ' + failedStocks.map(f => f.name).join(', ') + ' → 티커 확인 필요');
+    }, 2500);
+  }
+
+  renderStockList();
+  renderDashboard();
+}
+
+// 설정 렌더 시 Finnhub 키 표시
+const _origRenderSettings = typeof renderSettings === 'function' ? renderSettings : null;
+
+
 // ========== GITHUB SYNC ==========
 function saveGHToken() {
   const token = document.getElementById('s-gh-token').value;
@@ -2533,6 +2732,16 @@ function saveGHToken() {
   localStorage.setItem('wt_gh_token', token);
   showToast('토큰 저장됨');
   updateSyncStatus();
+  // Finnhub 키 표시
+  const fkey = localStorage.getItem('wt_finnhub_key');
+  const fkeyEl = document.getElementById('s-finnhub-key');
+  if (fkeyEl && fkey) fkeyEl.value = fkey.substring(0,8) + '...';
+  const putime = localStorage.getItem('wt_price_update_time');
+  const putimeEl = document.getElementById('price-update-time');
+  if (putimeEl && putime) putimeEl.textContent = '마지막 업데이트: ' + putime;
+  // 보유현황 마지막 업데이트 시간
+  const lastUpdateEl = document.getElementById('price-last-update');
+  if (lastUpdateEl && putime) lastUpdateEl.textContent = putime.substring(5,16) + ' 업데이트';
 }
 
 function updateSyncStatus() {
