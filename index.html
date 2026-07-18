@@ -821,8 +821,18 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
         <option value="계좌이체">계좌이체</option>
       </select>
     </div>
+    <div class="form-group">
+      <label class="form-label">연결 계좌 <span style="color:var(--sub);font-weight:400;">(선택 시 잔액 자동 반영)</span></label>
+      <select class="form-input form-select" id="inp-linked-account">
+        <option value="">계좌 미연결 (잔액 변동 없음)</option>
+      </select>
+      <div id="linked-acc-balance-preview" style="font-size:12px;color:var(--sub);margin-top:4px;"></div>
+    </div>
     <div class="form-group"><label class="form-label">메모 (선택)</label><input class="form-input" type="text" id="inp-memo" placeholder="메모를 입력하세요"></div>
     <input type="hidden" id="inp-ledger-id">
+    <input type="hidden" id="inp-ledger-prev-acc">
+    <input type="hidden" id="inp-ledger-prev-amount">
+    <input type="hidden" id="inp-ledger-prev-type">
     <button class="btn-primary" onclick="saveLedger()">저장</button>
     <button id="btn-delete-ledger" class="btn-danger" onclick="deleteLedger()" style="display:none;">삭제</button>
     <button class="btn-secondary" onclick="closeModal('modal-ledger')">취소</button>
@@ -1120,7 +1130,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 </div>
 
 <script>
-const APP_VERSION = 'v1.7.0';
+const APP_VERSION = 'v1.8.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1338,7 +1348,7 @@ function renderDashboard() {
       <div class="li-icon" style="background:${t.type==='income'?'#e8f5e9':'#fff0f0'}">${getCatIcon(t.category)}</div>
       <div class="li-main">
         <div class="li-title">${t.category}${t.memo?' · '+t.memo:''}</div>
-        <div class="li-sub">${t.payment} · ${t.date}</div>
+        <div class="li-sub">${t.payment}${t.linkedAccountId ? ' · 🏦' + (accounts.find(a=>a.id===t.linkedAccountId)?.name||'') : ''} · ${t.date}</div>
       </div>
       <div class="li-right">
         <div class="li-amount ${t.type}">${t.type==='income'?'+':'-'}${fmtCurr(t.amount, t.currency)}</div>
@@ -1400,7 +1410,7 @@ function renderLedger() {
           <div class="li-icon" style="background:${t.type==='income'?'#e8f5e9':'#fff0f0'}">${getCatIcon(t.category)}</div>
           <div class="li-main">
             <div class="li-title">${t.category}${t.memo?' · '+t.memo:''}</div>
-            <div class="li-sub">${t.payment}<span class="chip ${t.currency.toLowerCase()}" style="margin-left:4px;">${t.currency}</span></div>
+            <div class="li-sub">${t.payment}<span class="chip ${t.currency.toLowerCase()}" style="margin-left:4px;">${t.currency}</span>${t.linkedAccountId ? '<span style="font-size:10px;color:var(--green);margin-left:4px;">🏦 ' + (accounts.find(a=>a.id===t.linkedAccountId)?.name||'?') + '</span>' : ''}</div>
           </div>
           <div class="li-right">
             <div class="li-amount ${t.type}">${t.type==='income'?'+':'-'}${fmtCurr(t.amount, t.currency)}</div>
@@ -1409,11 +1419,49 @@ function renderLedger() {
     </div>`).join('');
 }
 
+function populateAccountSelect(selectedAccId, currency) {
+  const sel = document.getElementById('inp-linked-account');
+  // 통화가 맞는 계좌만 표시
+  const filtered = accounts.filter(a => !currency || a.currency === currency);
+  sel.innerHTML = '<option value="">계좌 미연결 (잔액 변동 없음)</option>' +
+    filtered.map(a => `<option value="${a.id}">${a.bank} · ${a.name} (${fmtCurr(a.balance, a.currency)})</option>`).join('');
+  if (selectedAccId) sel.value = selectedAccId;
+  updateLinkedAccPreview();
+}
+
+function updateLinkedAccPreview() {
+  const sel = document.getElementById('inp-linked-account');
+  const preview = document.getElementById('linked-acc-balance-preview');
+  if (!sel || !preview) return;
+  const accId = sel.value;
+  if (!accId) { preview.textContent = ''; return; }
+  const acc = accounts.find(a => a.id === accId);
+  if (!acc) { preview.textContent = ''; return; }
+  const amount = parseFloat(document.getElementById('inp-amount').value) || 0;
+  const isIncome = ledgerType === 'income';
+  const isCreditCard = document.getElementById('inp-payment').value.includes('신용카드');
+  if (isCreditCard) {
+    preview.textContent = '💳 신용카드: 결제일에 차감 (즉시 반영 안 됨)';
+    preview.style.color = 'var(--gold)';
+    return;
+  }
+  if (amount > 0) {
+    const newBal = isIncome ? acc.balance + amount : acc.balance - amount;
+    preview.innerHTML = '현재 잔액: <b>' + fmtCurr(acc.balance, acc.currency) + '</b> → <b style="color:' + (isIncome?'var(--green)':'var(--red)') + '">' + fmtCurr(newBal, acc.currency) + '</b>';
+  } else {
+    preview.textContent = '현재 잔액: ' + fmtCurr(acc.balance, acc.currency);
+  }
+  preview.style.color = 'var(--sub)';
+}
+
 function openLedgerModal(id) {
   ledgerType = 'expense'; ledgerCurr = 'KRW'; selectedCat = '식비';
   document.getElementById('ledger-modal-title').textContent = id ? '거래 수정' : '거래 추가';
   document.getElementById('btn-delete-ledger').style.display = id ? 'block' : 'none';
   document.getElementById('inp-ledger-id').value = id || '';
+  document.getElementById('inp-ledger-prev-acc').value = '';
+  document.getElementById('inp-ledger-prev-amount').value = '';
+  document.getElementById('inp-ledger-prev-type').value = '';
 
   if (id) {
     const t = ledger.find(x => x.id === id);
@@ -1423,12 +1471,23 @@ function openLedgerModal(id) {
     document.getElementById('inp-date').value = t.date;
     document.getElementById('inp-memo').value = t.memo || '';
     document.getElementById('inp-payment').value = t.payment;
+    // 수정 시 이전 계좌/금액 기억 (롤백용)
+    document.getElementById('inp-ledger-prev-acc').value = t.linkedAccountId || '';
+    document.getElementById('inp-ledger-prev-amount').value = t.amount || '';
+    document.getElementById('inp-ledger-prev-type').value = t.type || '';
+    populateAccountSelect(t.linkedAccountId || '', t.currency);
   } else {
     document.getElementById('inp-amount').value = '';
     document.getElementById('inp-date').value = today();
     document.getElementById('inp-memo').value = '';
     document.getElementById('inp-payment').value = '체크카드(한국)';
+    populateAccountSelect('', ledgerCurr);
   }
+
+  // 금액 변경 시 미리보기 업데이트
+  document.getElementById('inp-amount').oninput = updateLinkedAccPreview;
+  document.getElementById('inp-linked-account').onchange = updateLinkedAccPreview;
+  document.getElementById('inp-payment').onchange = updateLinkedAccPreview;
 
   document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.textContent === (ledgerType==='income'?'수입':'지출')));
   document.querySelectorAll('.curr-btn').forEach(b => b.classList.toggle('active', b.classList.contains(ledgerCurr.toLowerCase())));
@@ -1449,6 +1508,9 @@ function setLedgerCurr(curr, el) {
   ledgerCurr = curr;
   document.querySelectorAll('.curr-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+  // 통화 변경 시 계좌 드롭다운 갱신
+  const curAccId = document.getElementById('inp-linked-account').value;
+  populateAccountSelect(curAccId, curr);
 }
 
 function updateCatGrid() {
@@ -1465,31 +1527,98 @@ function selectCat(el) {
   el.classList.add('active');
 }
 
+function applyAccountBalance(accId, amount, type, reverse) {
+  // reverse=true: 롤백(취소) / reverse=false: 적용
+  if (!accId) return;
+  const acc = accounts.find(a => a.id === accId);
+  if (!acc) return;
+  const isCreditCard = document.getElementById('inp-payment') ?
+    document.getElementById('inp-payment').value.includes('신용카드') : false;
+  if (isCreditCard) return; // 신용카드는 즉시 반영 안 함
+
+  const sign = (type === 'income' ? 1 : -1) * (reverse ? -1 : 1);
+  acc.balance += sign * amount;
+  acc.balance = Math.round(acc.balance * 100) / 100; // 소수점 정리
+}
+
 function saveLedger() {
   const amount = parseFloat(document.getElementById('inp-amount').value);
   const date = document.getElementById('inp-date').value;
   if (!amount || !date) { showToast('금액과 날짜를 입력하세요'); return; }
+
   const id = document.getElementById('inp-ledger-id').value || uid();
   const existing = ledger.find(x => x.id === id);
-  const tx = { id, type: ledgerType, currency: ledgerCurr, amount, date,
-    category: selectedCat, payment: document.getElementById('inp-payment').value,
-    memo: document.getElementById('inp-memo').value, ccPaid: existing?.ccPaid || false };
+  const linkedAccountId = document.getElementById('inp-linked-account').value;
+  const payment = document.getElementById('inp-payment').value;
+  const isCreditCard = payment.includes('신용카드');
+
+  // 수정 시: 이전 계좌 반영 롤백
+  if (existing) {
+    const prevAccId = document.getElementById('inp-ledger-prev-acc').value;
+    const prevAmount = parseFloat(document.getElementById('inp-ledger-prev-amount').value) || 0;
+    const prevType = document.getElementById('inp-ledger-prev-type').value;
+    if (prevAccId && prevAmount && !existing.isCreditCard) {
+      // 이전 거래 효과 롤백
+      const prevAcc = accounts.find(a => a.id === prevAccId);
+      if (prevAcc) {
+        const sign = prevType === 'income' ? -1 : 1; // 반대로
+        prevAcc.balance += sign * prevAmount;
+        prevAcc.balance = Math.round(prevAcc.balance * 100) / 100;
+      }
+    }
+  }
+
+  // 새 거래 저장
+  const tx = {
+    id, type: ledgerType, currency: ledgerCurr, amount, date,
+    category: selectedCat, payment,
+    memo: document.getElementById('inp-memo').value,
+    ccPaid: existing?.ccPaid || false,
+    linkedAccountId: linkedAccountId || null,
+    isCreditCard
+  };
   if (existing) ledger[ledger.indexOf(existing)] = tx;
   else ledger.unshift(tx);
   save('ledger', ledger);
+
+  // 계좌 잔액 반영 (신용카드 제외)
+  if (linkedAccountId && !isCreditCard) {
+    const acc = accounts.find(a => a.id === linkedAccountId);
+    if (acc) {
+      const sign = ledgerType === 'income' ? 1 : -1;
+      acc.balance += sign * amount;
+      acc.balance = Math.round(acc.balance * 100) / 100;
+      save('accounts', accounts);
+    }
+  }
+
   closeModal('modal-ledger');
   renderLedger();
   renderDashboard();
-  showToast('저장되었습니다');
+  const accName = linkedAccountId ? (accounts.find(a=>a.id===linkedAccountId)?.name || '') : '';
+  showToast('저장됨' + (accName && !isCreditCard ? ' · ' + accName + ' 잔액 반영' : isCreditCard ? ' · 신용카드 (결제일 차감)' : ''));
 }
 
 function deleteLedger() {
   const id = document.getElementById('inp-ledger-id').value;
+  const tx = ledger.find(x => x.id === id);
+
+  // 계좌 잔액 롤백 (연결된 계좌가 있고 신용카드가 아닐 때)
+  if (tx && tx.linkedAccountId && !tx.isCreditCard) {
+    const acc = accounts.find(a => a.id === tx.linkedAccountId);
+    if (acc) {
+      const sign = tx.type === 'income' ? -1 : 1; // 반대 방향으로 롤백
+      acc.balance += sign * tx.amount;
+      acc.balance = Math.round(acc.balance * 100) / 100;
+      save('accounts', accounts);
+    }
+  }
+
   save('ledger', ledger.filter(x => x.id !== id));
   closeModal('modal-ledger');
   renderLedger();
   renderDashboard();
-  showToast('삭제되었습니다');
+  showToast('삭제됨' + (tx?.linkedAccountId && !tx?.isCreditCard ? ' · 계좌 잔액 롤백됨' : ''));
 }
 
 // ========== ACCOUNTS ==========
