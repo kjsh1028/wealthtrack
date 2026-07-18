@@ -1,4 +1,4 @@
-const CACHE = 'wealthtrack-v1.0.0';
+const CACHE = 'wealthtrack-v1.1.0';
 const ASSETS = ['/', '/wealthtrack/', '/wealthtrack/index.html', '/wealthtrack/manifest.json'];
 
 self.addEventListener('install', e => {
