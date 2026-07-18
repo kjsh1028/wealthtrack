@@ -752,6 +752,57 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
   </div>
 </div>
 
+
+<!-- Balance Adjust Modal -->
+<div class="modal-overlay" id="modal-adjust">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">잔액 조정</div>
+    <div id="adjust-acc-info" style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:16px;">
+      <div style="font-size:12px;color:var(--sub);" id="adjust-acc-name-disp"></div>
+      <div style="font-size:20px;font-weight:800;color:var(--navy);margin-top:4px;" id="adjust-acc-balance-disp"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">실제 잔액 (현재 잔액으로 설정)</label>
+      <input class="form-input" type="number" id="inp-adjust-balance" placeholder="실제 잔액을 입력하세요">
+      <div style="font-size:11px;color:var(--sub);margin-top:4px;">앱 잔액과 실제 잔액이 다를 때 실제 잔액을 입력하면 자동으로 차이를 계산합니다</div>
+    </div>
+    <div id="adjust-diff-preview" style="display:none;border-radius:10px;padding:12px 14px;margin-bottom:8px;">
+      <div style="font-size:12px;color:var(--sub);">조정 금액</div>
+      <div style="font-size:18px;font-weight:800;margin-top:4px;" id="adjust-diff-amount"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">조정 사유 (선택)</label>
+      <select class="form-input form-select" id="inp-adjust-reason">
+        <option value="잔액불일치 조정">잔액불일치 조정</option>
+        <option value="이자 수령">이자 수령</option>
+        <option value="수수료 차감">수수료 차감</option>
+        <option value="환전 조정">환전 조정</option>
+        <option value="오입력 수정">오입력 수정</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">날짜</label>
+      <input class="form-input" type="date" id="inp-adjust-date">
+    </div>
+    <input type="hidden" id="inp-adjust-acc-id">
+    <button class="btn-primary" onclick="saveAdjust()">조정 적용</button>
+    <button class="btn-secondary" onclick="openAdjustHistory()" style="margin-top:8px;">📋 조정 내역 보기</button>
+    <button class="btn-secondary" onclick="closeModal('modal-adjust')">취소</button>
+  </div>
+</div>
+
+<!-- Adjust History Modal -->
+<div class="modal-overlay" id="modal-adjust-history">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="adjust-history-title">잔액 조정 내역</div>
+    <div id="adjust-history-list"></div>
+    <button class="btn-secondary" onclick="closeModal('modal-adjust-history');openModal('modal-adjust')">← 돌아가기</button>
+  </div>
+</div>
+
 <!-- Stock Modal -->
 <div class="modal-overlay" id="modal-stock">
   <div class="modal">
@@ -881,7 +932,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 </div>
 
 <script>
-const APP_VERSION = 'v1.4.0';
+const APP_VERSION = 'v1.5.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1106,7 +1157,7 @@ function renderDashboard() {
 }
 
 function getCatIcon(cat) {
-  const m = {식비:'🍜',교통:'🚌',숙박:'🏨',업무:'💼',의료:'🏥',쇼핑:'🛍️',공과금:'📋',기타:'📌',급여:'💰',수수료:'🤝',배당:'📈',임대:'🏠',이자:'🏦'};
+  const m = {식비:'🍜',교통:'🚌',숙박:'🏨',업무:'💼',의료:'🏥',쇼핑:'🛍️',공과금:'📋',기타:'📌',급여:'💰',수수료:'🤝',배당:'📈',임대:'🏠',이자:'🏦',잔액조정:'⚖️'};
   return m[cat] || '📌';
 }
 
@@ -1267,12 +1318,18 @@ function renderAccounts() {
   const renderList = (items, el, curr) => {
     if (!items.length) { el.innerHTML = '<div class="empty-state"><div class="e-icon">🏦</div><div class="e-text">계좌를 추가하세요</div></div>'; return; }
     el.innerHTML = items.map(a => `
-      <div class="account-card ${a.currency==='KRW'?'kr':a.currency==='CNY'?'cn':''}" onclick="openAccountModal('', '${a.id}')">
-        <div class="acc-bank">${a.bank}</div>
-        <div class="acc-name">${a.name}</div>
-        <div class="acc-balance">${fmtCurr(a.balance, a.currency)}</div>
-        ${a.number ? `<div class="acc-num">****${a.number}</div>` : ''}
-        <div style="font-size:11px;opacity:0.6;margin-top:4px;">≈ ₩${fmtNum(Math.round(toKRW(a.balance, a.currency)))}</div>
+      <div class="account-card ${a.currency==='KRW'?'kr':a.currency==='CNY'?'cn':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div onclick="openAccountModal('', '${a.id}')" style="flex:1;">
+            <div class="acc-bank">${a.bank}</div>
+            <div class="acc-name">${a.name}</div>
+            <div class="acc-balance">${fmtCurr(a.balance, a.currency)}</div>
+            ${a.number ? `<div class="acc-num">****${a.number}</div>` : ''}
+            <div style="font-size:11px;opacity:0.6;margin-top:4px;">≈ ₩${fmtNum(Math.round(toKRW(a.balance, a.currency)))}</div>
+          </div>
+          <button onclick="openAdjustModal('${a.id}')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;margin-left:10px;">잔액 조정</button>
+        </div>
+        ${(a.adjustments||[]).length ? `<div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.2);padding-top:8px;font-size:11px;opacity:0.7;">최근 조정: ${(a.adjustments||[]).slice(-1)[0].date} (${(a.adjustments||[]).slice(-1)[0].diff >= 0 ? '+' : ''}${fmtCurr((a.adjustments||[]).slice(-1)[0].diff, a.currency)})</div>` : ''}
       </div>`).join('');
   };
 
@@ -1350,6 +1407,98 @@ function deleteAccount() {
   renderAccounts();
   renderDashboard();
   showToast('삭제되었습니다');
+}
+
+
+// ========== BALANCE ADJUSTMENT ==========
+function openAdjustModal(accId) {
+  const acc = accounts.find(a => a.id === accId);
+  if (!acc) return;
+  document.getElementById('inp-adjust-acc-id').value = accId;
+  document.getElementById('adjust-acc-name-disp').textContent = acc.bank + ' · ' + acc.name;
+  document.getElementById('adjust-acc-balance-disp').textContent = fmtCurr(acc.balance, acc.currency) + ' (현재 앱 잔액)';
+  document.getElementById('inp-adjust-balance').value = '';
+  document.getElementById('inp-adjust-date').value = today();
+  document.getElementById('inp-adjust-reason').value = '잔액불일치 조정';
+  document.getElementById('adjust-diff-preview').style.display = 'none';
+
+  // 실시간 차이 미리보기
+  const inp = document.getElementById('inp-adjust-balance');
+  inp.oninput = function() {
+    const newBal = parseFloat(this.value);
+    if (isNaN(newBal)) { document.getElementById('adjust-diff-preview').style.display = 'none'; return; }
+    const diff = newBal - acc.balance;
+    const preview = document.getElementById('adjust-diff-preview');
+    const diffEl = document.getElementById('adjust-diff-amount');
+    preview.style.display = 'block';
+    preview.style.background = diff >= 0 ? '#e8f5e9' : '#ffebee';
+    diffEl.style.color = diff >= 0 ? 'var(--green)' : 'var(--red)';
+    diffEl.textContent = (diff >= 0 ? '+' : '') + fmtCurr(diff, acc.currency) + (diff >= 0 ? ' 증가' : ' 감소');
+  };
+  openModal('modal-adjust');
+}
+
+function saveAdjust() {
+  const accId = document.getElementById('inp-adjust-acc-id').value;
+  const newBalance = parseFloat(document.getElementById('inp-adjust-balance').value);
+  const reason = document.getElementById('inp-adjust-reason').value;
+  const date = document.getElementById('inp-adjust-date').value;
+  if (isNaN(newBalance)) { showToast('실제 잔액을 입력하세요'); return; }
+
+  const acc = accounts.find(a => a.id === accId);
+  if (!acc) return;
+  const diff = newBalance - acc.balance;
+  const oldBalance = acc.balance;
+
+  // 조정 내역 기록
+  if (!acc.adjustments) acc.adjustments = [];
+  acc.adjustments.push({
+    date, reason, oldBalance, newBalance, diff,
+    id: uid()
+  });
+
+  // 잔액 업데이트
+  acc.balance = newBalance;
+  save('accounts', accounts);
+
+  // 가계부에도 조정 내역 기록 (추적용)
+  const adjTx = {
+    id: uid(), type: diff >= 0 ? 'income' : 'expense',
+    currency: acc.currency, amount: Math.abs(diff), date,
+    category: '잔액조정', payment: acc.bank + '(' + acc.name + ')',
+    memo: reason + ' (조정 전: ' + fmtCurr(oldBalance, acc.currency) + ' → ' + fmtCurr(newBalance, acc.currency) + ')',
+    isAdjustment: true, ccPaid: false
+  };
+  ledger.unshift(adjTx);
+  save('ledger', ledger);
+
+  closeModal('modal-adjust');
+  renderAccounts();
+  renderDashboard();
+  showToast('잔액 조정 완료: ' + (diff >= 0 ? '+' : '') + fmtCurr(diff, acc.currency));
+}
+
+function openAdjustHistory() {
+  const accId = document.getElementById('inp-adjust-acc-id').value;
+  const acc = accounts.find(a => a.id === accId);
+  if (!acc) return;
+  document.getElementById('adjust-history-title').textContent = acc.name + ' 조정 내역';
+  const list = document.getElementById('adjust-history-list');
+  const adjs = (acc.adjustments || []).slice().reverse();
+  if (!adjs.length) {
+    list.innerHTML = '<div class="empty-state"><div class="e-icon">📋</div><div class="e-text">조정 내역이 없습니다</div></div>';
+  } else {
+    list.innerHTML = '<div class="card">' + adjs.map(a => `
+      <div class="stat-row">
+        <div>
+          <div style="font-size:13px;font-weight:600;">${a.reason}</div>
+          <div style="font-size:11px;color:var(--sub);">${a.date} · ${fmtCurr(a.oldBalance, acc.currency)} → ${fmtCurr(a.newBalance, acc.currency)}</div>
+        </div>
+        <div style="font-size:14px;font-weight:700;color:${a.diff>=0?'var(--green)':'var(--red)'};">${a.diff>=0?'+':''}${fmtCurr(a.diff, acc.currency)}</div>
+      </div>`).join('') + '</div>';
+  }
+  closeModal('modal-adjust');
+  openModal('modal-adjust-history');
 }
 
 // ========== INVESTMENTS ==========
