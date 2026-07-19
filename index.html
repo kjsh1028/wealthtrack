@@ -1429,7 +1429,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071923';
+const APP_VERSION = 'v2026071922';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2251,7 +2251,7 @@ function renderCryptoList() {
       <div class="stock-ticker" style="font-size:18px;">🪙</div>
       <div class="stock-info">
         <div class="stock-name">${c.symbol} · ${c.name}</div>
-        <div class="stock-shares">${c.qty}개 · 평단 ₩${fmtNum(Math.round(c.avg))} · ${c.exchange||'업비트'}</div>
+        <div class="stock-shares">${fmtQty(c.qty)}개 · 평단 ₩${fmtNum(Math.round(c.avg))} · ${c.exchange||'업비트'}</div>
         <div class="stock-shares" style="color:var(--sub);">₩${fmtNum(Math.round(val))}</div>
       </div>
       <div class="stock-right">
@@ -3547,9 +3547,6 @@ function ghRequest(method, path, token, body) {
 async function syncToGH() {
   const token = localStorage.getItem('wt_gh_token');
   if (!token) { showToast('GitHub 토큰을 먼저 입력하세요'); return; }
-  // 빈 데이터면 절대 업로드 안 함
-  const hasData = accounts.length > 0 || ledger.length > 0 || stocks.length > 0 || realEstate.length > 0 || cryptos.length > 0;
-  if (!hasData) { console.log('[syncToGH] 데이터 없음 - 업로드 건너뜀'); return; }
   const dot = document.getElementById('sync-dot');
   const text = document.getElementById('sync-text');
   dot.className = 'sync-dot syncing'; text.textContent = '업로드 중...';
@@ -3616,37 +3613,35 @@ async function doUpdate() {
 async function ghLoad() {
   const token = localStorage.getItem('wt_gh_token');
   if(!token) return false;
-  updateSyncDot('sy', '데이터 불러오는 중...');
+  updateSyncDot('sy', 'GitHub 불러오는 중...');
   try {
     const d = await ghRequest('GET', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token);
-    const raw = d.content.replace(/[\r\n]/g, '');
+    const raw = d.content.split('\n').join('');
     const gh = JSON.parse(decodeURIComponent(escape(atob(raw))));
-    const ghAcc = (gh.accounts||[]).length;
-    const ghLed = (gh.ledger||[]).length;
-    const ghTotal = ghAcc + ghLed + (gh.stocks||[]).length + (gh.cryptos||[]).length;
-    const localTotal = accounts.length + ledger.length + stocks.length + cryptos.length;
-    if(ghTotal > 0 && ghTotal >= localTotal) {
-      // GitHub 데이터가 있고 로컬보다 많거나 같으면 불러오기
+    const localCount = accounts.length + ledger.length + stocks.length;
+    const ghCount = (gh.accounts||[]).length + (gh.ledger||[]).length + (gh.stocks||[]).length;
+    if(ghCount > localCount) {
       applyAllData(gh);
       renderDashboard();
-      const now = new Date().toLocaleString('ko-KR');
-      localStorage.setItem('wt_sync_time', now);
-      updateSyncDot('ok', '✓ 완료 (' + ghAcc + '개 계좌, ' + ghLed + '건)');
-      const lastEl = document.getElementById('sync-last-time');
-      if(lastEl) lastEl.textContent = '마지막 동기화: ' + now;
-      return true;
-    } else if(localTotal > 0 && localTotal > ghTotal) {
-      // 로컬이 더 많으면 GitHub에 업로드
-      await syncToGH();
-      return true;
+    } else if(localCount > 0 && localCount > ghCount) {
+      // 로컬이 더 많으면 GitHub에 저장
+      setTimeout(() => autoSync(), 500);
     }
-    updateSyncDot('ok', '동기화 준비됨');
-    return false;
+    const now = new Date().toLocaleString('ko-KR');
+    localStorage.setItem('wt_sync_time', now);
+    updateSyncDot('ok', '✓ 동기화 완료');
+    const lastEl = document.getElementById('sync-last-time');
+    if(lastEl) lastEl.textContent = '마지막 동기화: ' + now;
+    return true;
   } catch(e) {
-    updateSyncDot('err', '실패: ' + e.message.slice(0,20));
+    // 백업 없으면 현재 데이터 올리기
+    const hasData = accounts.length > 0 || ledger.length > 0;
+    if(hasData) setTimeout(() => autoSync(), 500);
+    updateSyncDot('ok', '동기화 준비됨');
     return false;
   }
 }
+
 function updateSyncDot(state, msg) {
   const dot = document.getElementById('sync-dot');
   const text = document.getElementById('sync-text');
@@ -3876,6 +3871,15 @@ function doImport(e) {
 
 
 // ========== 천단위 콤마 입력 유틸 ==========
+function fmtQty(qty) {
+  if (!qty && qty !== 0) return '0';
+  const n = parseFloat(qty);
+  if (n >= 100) return fmtNum(Math.round(n));
+  if (n >= 1) return n.toFixed(4).replace(/\.?0+$/, '');
+  if (n >= 0.01) return n.toFixed(6).replace(/\.?0+$/, '');
+  return n.toFixed(8).replace(/\.?0+$/, '');
+}
+
 function numToComma(val) {
   if (!val && val !== 0) return '';
   const str = String(val).replace(/[^0-9.]/g, '');
@@ -4159,33 +4163,6 @@ function goToLedger(filter) {
     c.classList.toggle('active', c.dataset.filter === filter);
   });
   renderLedger();
-}
-
-
-function diagnosisData() {
-  // localStorage에서 직접 읽어서 키별 데이터 크기 확인
-  const keys = ['wt_stocks', 'wt_realestate', 'wt_stockTrades', 'wt_accounts', 'wt_ledger', 'wt_cryptos'];
-  let msg = '📊 로컬 데이터 현황:\n';
-  keys.forEach(k => {
-    const v = localStorage.getItem(k);
-    if (v) {
-      try {
-        const arr = JSON.parse(v);
-        msg += k.replace('wt_','') + ': ' + (Array.isArray(arr) ? arr.length + '개' : '있음') + '\n';
-      } catch(e) {
-        msg += k.replace('wt_','') + ': 파싱오류\n';
-      }
-    } else {
-      msg += k.replace('wt_','') + ': 없음\n';
-    }
-  });
-  // 구버전 키도 확인
-  const oldKeys = ['stocks', 'realestate', 'wt-stocks', 'wt-realestate'];
-  oldKeys.forEach(k => {
-    const v = localStorage.getItem(k);
-    if (v) msg += '⚠️ 구버전키 ' + k + ': 있음\n';
-  });
-  alert(msg);
 }
 
 // ========== INIT ==========
