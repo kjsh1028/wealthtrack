@@ -562,7 +562,7 @@ if('serviceWorker' in navigator){
 <div id="page-invest" class="page">
   <div class="header"><h1>📈 투자자산</h1></div>
   <div style="padding:16px;">
-    <div class="inner-tabs">
+    <div class="inner-tabs" id="invest-main-tabs">
       <div class="inner-tab active" onclick="setInvestTab(this,'stock')">주식</div>
       <div class="inner-tab" onclick="setInvestTab(this,'crypto')">🪙 가상자산</div>
       <div class="inner-tab" onclick="setInvestTab(this,'realestate')">부동산</div>
@@ -1429,7 +1429,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071917';
+const APP_VERSION = 'v2026071918';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2385,7 +2385,7 @@ let investTab = 'stock', stockMarket = 'all';
 
 function setInvestTab(el, tab) {
   investTab = tab;
-  document.querySelectorAll('#page-invest > div > .inner-tabs .inner-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#invest-main-tabs .inner-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('inv-stock').style.display = tab === 'stock' ? 'block' : 'none';
   document.getElementById('inv-crypto').style.display = tab === 'crypto' ? 'block' : 'none';
@@ -4066,18 +4066,17 @@ function goToInvest(tab) {
   let investNav = null;
   navItems.forEach(n => { if(n.textContent.includes('투자')) investNav = n; });
   showPage('invest', investNav || navItems[3]);
-  if(tab !== 'stock') {
-    setTimeout(() => {
-      const tabs = document.querySelectorAll('#page-invest > div > .inner-tabs .inner-tab');
-      tabs.forEach(t => {
-        if((tab==='crypto' && t.textContent.includes('가상자산')) ||
-           (tab==='realestate' && t.textContent.includes('부동산')) ||
-           (tab==='debt' && t.textContent.includes('대출'))) {
-          setInvestTab(t, tab);
-        }
-      });
-    }, 100);
-  }
+  setTimeout(() => {
+    const tabs = document.querySelectorAll('#invest-main-tabs .inner-tab');
+    tabs.forEach(t => {
+      if((tab==='stock' && t.textContent.trim()==='주식') ||
+         (tab==='crypto' && t.textContent.includes('가상자산')) ||
+         (tab==='realestate' && t.textContent.includes('부동산')) ||
+         (tab==='debt' && t.textContent.includes('대출'))) {
+        setInvestTab(t, tab);
+      }
+    });
+  }, 50);
 }
 
 function goToAccounts() {
