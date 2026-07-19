@@ -516,6 +516,7 @@ if('serviceWorker' in navigator){
   <div style="padding:16px;">
     <div class="inner-tabs">
       <div class="inner-tab active" onclick="setInvestTab(this,'stock')">주식</div>
+      <div class="inner-tab" onclick="setInvestTab(this,'crypto')">🪙 가상자산</div>
       <div class="inner-tab" onclick="setInvestTab(this,'realestate')">부동산</div>
       <div class="inner-tab" onclick="setInvestTab(this,'debt')">대출/부채</div>
     </div>
@@ -619,6 +620,23 @@ if('serviceWorker' in navigator){
         </div>
       </div>
     </div>
+    <!-- 가상자산 섹션 -->
+    <div id="inv-crypto" style="display:none;">
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-title">가상자산 총평가 (원화)</div>
+        <div style="font-size:26px;font-weight:800;color:var(--navy);" id="crypto-total-krw">₩0</div>
+        <div style="font-size:13px;color:var(--sub);margin-top:4px;" id="crypto-pl-total"></div>
+      </div>
+      <div class="sec-header">
+        <span class="sec-title">보유 코인</span>
+        <div style="display:flex;gap:8px;">
+          <span class="sec-action" onclick="updateCryptoPrices()">🔄 시세</span>
+          <span class="sec-action" onclick="openCryptoModal()">+ 추가</span>
+        </div>
+      </div>
+      <div class="card"><div id="crypto-list"></div></div>
+    </div>
+
     <div id="inv-re" style="display:none;">
       <div class="sec-header"><span class="sec-title">보유 부동산</span><span class="sec-action" onclick="openREModal()">+ 추가</span></div>
       <div id="re-list"></div>
@@ -1003,11 +1021,21 @@ if('serviceWorker' in navigator){
     <div class="modal-title">계좌 추가</div>
     <div class="form-group"><label class="form-label">은행/기관명</label><input class="form-input" id="inp-acc-bank" placeholder="예: 신한은행, 招商银行"></div>
     <div class="form-group"><label class="form-label">계좌 별명</label><input class="form-input" id="inp-acc-name" placeholder="예: 급여통장, 생활비"></div>
+    <div class="form-group"><label class="form-label">계좌 종류</label>
+      <select class="form-input form-select" id="inp-acc-type">
+        <option value="bank">🏦 은행</option>
+        <option value="stock">📈 증권</option>
+        <option value="crypto">🪙 업비트 (가상자산)</option>
+        <option value="other">📌 기타</option>
+      </select>
+    </div>
     <div class="form-group"><label class="form-label">통화</label>
       <select class="form-input form-select" id="inp-acc-curr">
         <option value="KRW">₩ KRW (한국원)</option>
         <option value="CNY">¥ CNY (중국위안)</option>
         <option value="USD">$ USD (미국달러)</option>
+        <option value="HKD">HK$ HKD (홍콩달러)</option>
+        <option value="JPY">¥ JPY (일본엔)</option>
       </select>
     </div>
     <div class="form-group"><label class="form-label">현재 잔액</label><input class="form-input" type="number" id="inp-acc-balance" placeholder="0"></div>
@@ -1150,6 +1178,33 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 
+
+<!-- Stock Deposit Modal (증권 다중통화 예수금) -->
+<div class="modal-overlay" id="modal-stock-deposit">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="stock-deposit-title">증권 예수금 관리</div>
+    <div id="stock-deposit-acc-info" style="background:var(--bg);border-radius:10px;padding:12px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:700;" id="stock-deposit-acc-name"></div>
+    </div>
+    <div style="font-size:12px;color:var(--sub);margin-bottom:10px;">각 통화별 예수금을 입력하세요. 0이면 해당 통화 제외.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+      <div class="form-group" style="margin:0;"><label class="form-label">₩ KRW</label><input class="form-input" type="number" id="dep-krw" placeholder="0"></div>
+      <div class="form-group" style="margin:0;"><label class="form-label">$ USD</label><input class="form-input" type="number" id="dep-usd" placeholder="0"></div>
+      <div class="form-group" style="margin:0;"><label class="form-label">HK$ HKD</label><input class="form-input" type="number" id="dep-hkd" placeholder="0"></div>
+      <div class="form-group" style="margin:0;"><label class="form-label">¥ JPY</label><input class="form-input" type="number" id="dep-jpy" placeholder="0"></div>
+      <div class="form-group" style="margin:0;"><label class="form-label">¥ CNY</label><input class="form-input" type="number" id="dep-cny" placeholder="0"></div>
+      <div class="form-group" style="margin:0;"><label class="form-label">€ EUR</label><input class="form-input" type="number" id="dep-eur" placeholder="0"></div>
+    </div>
+    <div style="background:#f0f3ff;border-radius:10px;padding:12px;margin-bottom:12px;">
+      <div style="font-size:12px;color:var(--sub);">원화 환산 합계</div>
+      <div style="font-size:20px;font-weight:800;color:var(--navy);" id="dep-total-krw">₩0</div>
+    </div>
+    <input type="hidden" id="dep-acc-id">
+    <button class="btn-primary" onclick="saveStockDeposit()">저장</button>
+    <button class="btn-secondary" onclick="closeModal('modal-stock-deposit')">취소</button>
+  </div>
+</div>
 <!-- Adjust History Modal -->
 <div class="modal-overlay" id="modal-adjust-history">
   <div class="modal">
@@ -1157,6 +1212,37 @@ if('serviceWorker' in navigator){
     <div class="modal-title" id="adjust-history-title">잔액 조정 내역</div>
     <div id="adjust-history-list"></div>
     <button class="btn-secondary" onclick="closeModal('modal-adjust-history');openModal('modal-adjust')">← 돌아가기</button>
+  </div>
+</div>
+
+
+<!-- Crypto Modal -->
+<div class="modal-overlay" id="modal-crypto">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="crypto-modal-title">코인 추가</div>
+    <div class="form-group">
+      <label class="form-label">코인 심볼</label>
+      <input class="form-input" id="inp-crypto-symbol" placeholder="예: BTC, ETH, XRP" style="text-transform:uppercase;">
+      <div style="font-size:11px;color:var(--sub);margin-top:4px;">CoinGecko ID: bitcoin, ethereum, ripple 등</div>
+    </div>
+    <div class="form-group"><label class="form-label">코인명</label><input class="form-input" id="inp-crypto-name" placeholder="예: 비트코인, 이더리움"></div>
+    <div class="form-group"><label class="form-label">CoinGecko ID (자동조회용)</label><input class="form-input" id="inp-crypto-cgid" placeholder="예: bitcoin, ethereum, ripple"></div>
+    <div class="form-group"><label class="form-label">보유 수량</label><input class="form-input" type="number" id="inp-crypto-qty" placeholder="0.00000000" step="0.00000001"></div>
+    <div class="form-group"><label class="form-label">평균 매입가 (₩)</label><input class="form-input" type="number" id="inp-crypto-avg" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">현재가 (₩)</label><input class="form-input" type="number" id="inp-crypto-price" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">거래소</label>
+      <select class="form-input form-select" id="inp-crypto-exchange">
+        <option value="업비트">업비트</option>
+        <option value="빗썸">빗썸</option>
+        <option value="바이낸스">바이낸스</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <input type="hidden" id="inp-crypto-id">
+    <button class="btn-primary" onclick="saveCrypto()">저장</button>
+    <button id="btn-delete-crypto" class="btn-danger" onclick="deleteCrypto()" style="display:none;">삭제</button>
+    <button class="btn-secondary" onclick="closeModal('modal-crypto')">취소</button>
   </div>
 </div>
 
@@ -1291,7 +1377,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071908';
+const APP_VERSION = 'v2026071909';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1310,6 +1396,7 @@ let fixedExpenses = getData('fixed', []);
 let fixedStatus = getData('fixedStatus', {});
 let budget = getData('budget', 0);
 let assetSnapshots = getData('assetSnapshots', []);
+let cryptos = getData('cryptos', []);
 let stockTrades = getData('stockTrades', []);
 
 let _autoSaveTimer = null;
@@ -1323,6 +1410,7 @@ function save(key, val) {
   if (key === 'realestate') realEstate = val;
   if (key === 'debts') debts = val;
   if (key === 'fixed') fixedExpenses = val;
+  if (key === 'cryptos') cryptos = val;
   // 데이터 변경 후 3초 뒤 자동 GitHub 저장 (debounce)
   if (key !== 'rates') { // 환율은 자동저장 제외
     clearTimeout(_autoSaveTimer);
@@ -1340,6 +1428,7 @@ function toKRW(amount, curr) {
   if (curr === 'USD') return amount * rates.usd;
   if (curr === 'HKD') return amount * (rates.hkd || rates.usd / 7.8); // HKD≈USD/7.8
   if (curr === 'JPY') return amount * (rates.jpy || rates.usd / 150); // JPY≈USD/150
+  if (curr === 'EUR') return amount * (rates.eur || rates.usd * 1.08); // EUR≈USD*1.08
   return amount;
 }
 
@@ -1485,6 +1574,10 @@ function renderDashboard() {
   if (stockByMarket.CN) stockParts.push('🇨🇳 ¥환산');
   if (stockByMarket.US) stockParts.push('🇺🇸 $환산');
   document.getElementById('dash-stock-sub').textContent = stockParts.join(' · ') || '종목 없음';
+  
+  // 가상자산 대시보드 반영
+  const cryptoKRW = cryptos.reduce((s,c) => s + c.qty * c.price, 0);
+  stockKRW += cryptoKRW; // 투자자산에 포함
 
   // ── 부동산 ──
   let reGross = 0, reLoan = 0, reNet = 0;
@@ -1862,7 +1955,10 @@ function renderAccounts() {
             ${a.number ? `<div class="acc-num">****${a.number}</div>` : ''}
             <div style="font-size:11px;opacity:0.6;margin-top:4px;">≈ ₩${fmtNum(Math.round(toKRW(a.balance, a.currency)))}</div>
           </div>
-          <button onclick="openAdjustModal('${a.id}')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;margin-left:10px;">잔액 조정</button>
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-left:10px;">
+            \${a.type==='stock' ? getDepositBtn(a.id) : ''}
+            <button onclick="openAdjustModal('\${a.id}')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:10px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;">잔액조정</button>
+          </div>
         </div>
         ${(a.adjustments||[]).length ? `<div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.2);padding-top:8px;font-size:11px;opacity:0.7;">최근 조정: ${(a.adjustments||[]).slice(-1)[0].date} (${(a.adjustments||[]).slice(-1)[0].diff >= 0 ? '+' : ''}${fmtCurr((a.adjustments||[]).slice(-1)[0].diff, a.currency)})</div>` : ''}
       </div>`).join('');
@@ -1912,6 +2008,8 @@ function openAccountModal(defaultCurr, id) {
   document.getElementById('inp-acc-bank').value = a ? a.bank : '';
   document.getElementById('inp-acc-name').value = a ? a.name : '';
   document.getElementById('inp-acc-curr').value = a ? a.currency : (defaultCurr || 'KRW');
+  const typeEl = document.getElementById('inp-acc-type');
+  if(typeEl) typeEl.value = a ? (a.type||'bank') : 'bank';
   document.getElementById('inp-acc-balance').value = a ? a.balance : '';
   document.getElementById('inp-acc-num').value = a ? (a.number || '') : '';
   document.getElementById('btn-delete-acc').style.display = id ? 'block' : 'none';
@@ -1925,7 +2023,9 @@ function saveAccount() {
   if (!bank || !name) { showToast('은행명과 별명을 입력하세요'); return; }
   const id = document.getElementById('inp-acc-id').value || uid();
   const existing = accounts.find(x => x.id === id);
-  const acc = { id, bank, name, currency: document.getElementById('inp-acc-curr').value, balance, number: document.getElementById('inp-acc-num').value };
+  const typeEl2 = document.getElementById('inp-acc-type');
+  const accType = typeEl2 ? typeEl2.value : 'bank';
+  const acc = { id, bank, name, currency: document.getElementById('inp-acc-curr').value, balance, number: document.getElementById('inp-acc-num').value, type: accType, deposits: existing ? (existing.deposits||{}) : {} };
   if (existing) accounts[accounts.indexOf(existing)] = acc;
   else accounts.push(acc);
   save('accounts', accounts);
@@ -2036,6 +2136,187 @@ function openAdjustHistory() {
   openModal('modal-adjust-history');
 }
 
+
+// ========== 가상자산 (CRYPTO) ==========
+function setInvestTabCrypto() {
+  renderCryptoList();
+}
+
+function renderCryptoList() {
+  const totalKRW = cryptos.reduce((s,c) => s + c.qty * c.price, 0);
+  const totalCostKRW = cryptos.reduce((s,c) => s + c.qty * c.avg, 0);
+  const pl = totalKRW - totalCostKRW;
+  const plPct = totalCostKRW > 0 ? ((pl/totalCostKRW)*100).toFixed(1) : 0;
+
+  const totalEl = document.getElementById('crypto-total-krw');
+  const plEl = document.getElementById('crypto-pl-total');
+  if(totalEl) totalEl.textContent = '₩' + fmtNum(Math.round(totalKRW));
+  if(plEl) {
+    plEl.textContent = '손익: ' + (pl>=0?'+':'') + '₩' + fmtNum(Math.round(Math.abs(pl))) + ' (' + (pl>=0?'+':'') + plPct + '%)';
+    plEl.style.color = pl >= 0 ? 'var(--green)' : 'var(--red)';
+  }
+
+  const el = document.getElementById('crypto-list');
+  if(!el) return;
+  if(!cryptos.length) {
+    el.innerHTML = '<div class="empty-state"><div class="e-icon">🪙</div><div class="e-text">코인을 추가하세요</div></div>';
+    return;
+  }
+  el.innerHTML = cryptos.map(c => {
+    const val = c.qty * c.price;
+    const cost = c.qty * c.avg;
+    const cpl = val - cost;
+    const cplPct = cost > 0 ? ((cpl/cost)*100).toFixed(1) : 0;
+    return `<div class="stock-row" onclick="openCryptoModal('${c.id}')">
+      <div class="stock-ticker" style="font-size:18px;">🪙</div>
+      <div class="stock-info">
+        <div class="stock-name">${c.symbol} · ${c.name}</div>
+        <div class="stock-shares">${c.qty}개 · 평단 ₩${fmtNum(Math.round(c.avg))} · ${c.exchange||'업비트'}</div>
+        <div class="stock-shares" style="color:var(--sub);">₩${fmtNum(Math.round(val))}</div>
+      </div>
+      <div class="stock-right">
+        <div class="stock-val">₩${fmtNum(Math.round(c.price))}</div>
+        <div class="stock-pl ${cpl>=0?'pl-pos':'pl-neg'}">${cpl>=0?'+':''}${cplPct}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openCryptoModal(id) {
+  const c = id ? cryptos.find(x => x.id === id) : null;
+  document.getElementById('crypto-modal-title').textContent = id ? '코인 수정' : '코인 추가';
+  document.getElementById('inp-crypto-id').value = id || '';
+  document.getElementById('inp-crypto-symbol').value = c ? c.symbol : '';
+  document.getElementById('inp-crypto-name').value = c ? c.name : '';
+  document.getElementById('inp-crypto-cgid').value = c ? (c.cgid||'') : '';
+  document.getElementById('inp-crypto-qty').value = c ? c.qty : '';
+  document.getElementById('inp-crypto-avg').value = c ? c.avg : '';
+  document.getElementById('inp-crypto-price').value = c ? c.price : '';
+  document.getElementById('inp-crypto-exchange').value = c ? (c.exchange||'업비트') : '업비트';
+  document.getElementById('btn-delete-crypto').style.display = id ? 'block' : 'none';
+  openModal('modal-crypto');
+}
+
+function saveCrypto() {
+  const symbol = document.getElementById('inp-crypto-symbol').value.toUpperCase().trim();
+  const name = document.getElementById('inp-crypto-name').value.trim();
+  const qty = parseFloat(document.getElementById('inp-crypto-qty').value) || 0;
+  const avg = parseFloat(document.getElementById('inp-crypto-avg').value) || 0;
+  const price = parseFloat(document.getElementById('inp-crypto-price').value) || 0;
+  if(!symbol || !name) { showToast('심볼과 코인명을 입력하세요'); return; }
+  const id = document.getElementById('inp-crypto-id').value || uid();
+  const existing = cryptos.find(x => x.id === id);
+  const c = { id, symbol, name, cgid: document.getElementById('inp-crypto-cgid').value.trim(),
+    qty, avg, price, exchange: document.getElementById('inp-crypto-exchange').value };
+  if(existing) cryptos[cryptos.indexOf(existing)] = c;
+  else cryptos.push(c);
+  save('cryptos', cryptos);
+  closeModal('modal-crypto');
+  renderCryptoList();
+  renderDashboard();
+  showToast('저장됨');
+}
+
+function deleteCrypto() {
+  const id = document.getElementById('inp-crypto-id').value;
+  save('cryptos', cryptos.filter(x => x.id !== id));
+  closeModal('modal-crypto');
+  renderCryptoList();
+  renderDashboard();
+  showToast('삭제됨');
+}
+
+// CoinGecko 무료 API로 현재가 업데이트
+async function updateCryptoPrices() {
+  if(!cryptos.length) { showToast('보유 코인이 없습니다'); return; }
+  const ids = cryptos.filter(c => c.cgid).map(c => c.cgid).join(',');
+  if(!ids) { showToast('CoinGecko ID를 입력하세요'); return; }
+  showToast('코인 시세 조회 중...');
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=' + ids + '&vs_currencies=krw');
+    const data = await res.json();
+    let updated = 0;
+    cryptos.forEach(c => {
+      if(c.cgid && data[c.cgid] && data[c.cgid].krw) {
+        c.price = data[c.cgid].krw;
+        updated++;
+      }
+    });
+    save('cryptos', cryptos);
+    renderCryptoList();
+    renderDashboard();
+    showToast('✓ ' + updated + '개 코인 시세 업데이트');
+  } catch(e) {
+    showToast('시세 조회 실패: ' + e.message);
+  }
+}
+
+// ========== 증권 다중통화 예수금 ==========
+function openStockDeposit(accId) {
+  const acc = accounts.find(a => a.id === accId);
+  if(!acc) return;
+  document.getElementById('dep-acc-id').value = accId;
+  document.getElementById('stock-deposit-title').textContent = acc.name + ' 예수금 관리';
+  document.getElementById('stock-deposit-acc-name').textContent = acc.bank + ' · ' + acc.name;
+  const deps = acc.deposits || {};
+  document.getElementById('dep-krw').value = deps.KRW || '';
+  document.getElementById('dep-usd').value = deps.USD || '';
+  document.getElementById('dep-hkd').value = deps.HKD || '';
+  document.getElementById('dep-jpy').value = deps.JPY || '';
+  document.getElementById('dep-cny').value = deps.CNY || '';
+  document.getElementById('dep-eur').value = deps.EUR || '';
+  updateDepTotal();
+
+  // 입력 시 합계 업데이트
+  ['dep-krw','dep-usd','dep-hkd','dep-jpy','dep-cny','dep-eur'].forEach(id => {
+    document.getElementById(id).oninput = updateDepTotal;
+  });
+  openModal('modal-stock-deposit');
+}
+
+function updateDepTotal() {
+  const vals = {
+    KRW: parseFloat(document.getElementById('dep-krw').value)||0,
+    USD: parseFloat(document.getElementById('dep-usd').value)||0,
+    HKD: parseFloat(document.getElementById('dep-hkd').value)||0,
+    JPY: parseFloat(document.getElementById('dep-jpy').value)||0,
+    CNY: parseFloat(document.getElementById('dep-cny').value)||0,
+    EUR: parseFloat(document.getElementById('dep-eur').value)||0,
+  };
+  const total = Object.entries(vals).reduce((s,[curr,amt]) => s + toKRW(amt, curr), 0);
+  const el = document.getElementById('dep-total-krw');
+  if(el) el.textContent = '₩' + fmtNum(Math.round(total));
+}
+
+function saveStockDeposit() {
+  const accId = document.getElementById('dep-acc-id').value;
+  const acc = accounts.find(a => a.id === accId);
+  if(!acc) return;
+  const deps = {
+    KRW: parseFloat(document.getElementById('dep-krw').value)||0,
+    USD: parseFloat(document.getElementById('dep-usd').value)||0,
+    HKD: parseFloat(document.getElementById('dep-hkd').value)||0,
+    JPY: parseFloat(document.getElementById('dep-jpy').value)||0,
+    CNY: parseFloat(document.getElementById('dep-cny').value)||0,
+    EUR: parseFloat(document.getElementById('dep-eur').value)||0,
+  };
+  acc.deposits = deps;
+  // 계좌 잔액을 원화 환산 합계로 업데이트
+  const totalKRW = Object.entries(deps).reduce((s,[curr,amt]) => s + toKRW(amt, curr), 0);
+  acc.balance = Math.round(totalKRW);
+  acc.currency = 'KRW'; // 원화 환산값으로 표시
+  save('accounts', accounts);
+  closeModal('modal-stock-deposit');
+  renderAccounts();
+  renderDashboard();
+  showToast('✓ 예수금 저장: ₩' + fmtNum(Math.round(totalKRW)));
+}
+
+
+function getDepositBtn(accId) {
+  return '<button onclick="openStockDeposit(\'' + accId + '\')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:10px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;">예수금</button>';
+}
+
 // ========== INVESTMENTS ==========
 let investTab = 'stock', stockMarket = 'all';
 
@@ -2044,6 +2325,7 @@ function setInvestTab(el, tab) {
   document.querySelectorAll('#page-invest > div > .inner-tabs .inner-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('inv-stock').style.display = tab === 'stock' ? 'block' : 'none';
+  document.getElementById('inv-crypto').style.display = tab === 'crypto' ? 'block' : 'none';
   document.getElementById('inv-re').style.display = tab === 'realestate' ? 'block' : 'none';
   document.getElementById('inv-debt').style.display = tab === 'debt' ? 'block' : 'none';
   renderInvest();
@@ -2405,6 +2687,7 @@ function renderStockAnalysis() {
 
 function renderInvest() {
   renderStockList();
+  renderCryptoList();
   renderREList();
   renderDebtList();
   if (stockSubTab === 'trades') renderTradeList();
@@ -3106,7 +3389,7 @@ function updateSyncStatus() {
 }
 
 function getAllData() {
-  return { ledger, accounts, stocks, realEstate, debts, fixedExpenses, fixedStatus, rates, budget, assetSnapshots, stockTrades, exportedAt: new Date().toISOString(), version: APP_VERSION };
+  return { ledger, accounts, stocks, realEstate, debts, fixedExpenses, fixedStatus, rates, budget, assetSnapshots, stockTrades, cryptos, exportedAt: new Date().toISOString(), version: APP_VERSION };
 }
 
 function applyAllData(data) {
@@ -3120,6 +3403,7 @@ function applyAllData(data) {
   if (data.rates) { rates = data.rates; save('rates', rates); }
   if (data.budget !== undefined) { budget = data.budget; setData('budget', budget); }
   if (data.stockTrades) { stockTrades = data.stockTrades; save('stockTrades', stockTrades); }
+  if (data.cryptos) { cryptos = data.cryptos; save('cryptos', cryptos); }
 }
 
 function ghRequest(method, path, token, body) {
