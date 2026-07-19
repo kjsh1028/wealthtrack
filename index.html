@@ -317,9 +317,7 @@ if('serviceWorker' in navigator){
 <body>
 
 <!-- UPDATE BANNER (LegalTrack 방식) -->
-<div id="update-banner" onclick="doUpdate()" style="display:none;background:#1d4ed8;color:#fff;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;position:fixed;top:0;left:0;right:0;z-index:9999;padding-top:calc(env(safe-area-inset-top)+12px)">
-  🔄 새 버전이 있습니다 — 탭하여 업데이트
-</div>
+
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -335,6 +333,7 @@ if('serviceWorker' in navigator){
         <div class="header-sub" id="dash-date"></div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
+        <button id="update-banner" onclick="doUpdate()" style="display:none;background:#f59e0b;color:#1a2744;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer;">🔄 업데이트</button>
         <button class="btn-rate" onclick="openRateModal()" style="font-size:11px;">환율</button>
         <button onclick="showPage('settings', null)" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">⚙️</button>
       </div>
@@ -447,9 +446,7 @@ if('serviceWorker' in navigator){
       <div id="dash-recent-list"><div class="empty-state"><div class="e-icon">📋</div><div class="e-text">거래 내역이 없습니다</div></div></div>
     </div>
   </div>
-  <div id="update-banner" onclick="doUpdate()" style="display:none;background:#f59e0b;color:#1a2744;padding:12px 16px;font-size:14px;font-weight:800;cursor:pointer;text-align:center;">
-    🔄 새 버전 있음 — 탭하여 업데이트
-  </div>
+
 </div>
 
 <!-- LEDGER -->
@@ -1294,7 +1291,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071906';
+const APP_VERSION = 'v2026071907';
 
 // ========== DATA ==========
 function getData(key, def) {
