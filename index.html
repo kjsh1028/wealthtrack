@@ -34,6 +34,8 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 .nav-item.active { opacity: 1; }
 .nav-item .icon { font-size: 20px; }
 .nav-item .label { font-size: 10px; color: #fff; margin-top: 3px; }
+.nav-item.fab-center { opacity: 1; padding-top: 4px; }
+.nav-item.fab-center:active { transform: scale(0.95); }
 
 /* HEADER */
 .header { background: var(--navy); color: #fff; padding: 16px 20px 12px; padding-top: calc(env(safe-area-inset-top) + 16px); position: sticky; top: 0; z-index: 50; }
@@ -718,6 +720,10 @@ if('serviceWorker' in navigator){
 <nav class="bottom-nav">
   <div class="nav-item active" onclick="showPage('dashboard',this)"><div class="icon">🏠</div><div class="label">대시보드</div></div>
   <div class="nav-item" onclick="showPage('ledger',this)"><div class="icon">📒</div><div class="label">가계부</div></div>
+  <div class="nav-item fab-center" onclick="openLedgerModal()">
+    <div style="width:52px;height:52px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--navy);font-weight:300;box-shadow:0 4px 16px rgba(201,168,76,0.5);margin-top:-20px;">+</div>
+    <div class="label" style="color:var(--gold);">거래추가</div>
+  </div>
   <div class="nav-item" onclick="showPage('invest',this)"><div class="icon">📈</div><div class="label">투자</div></div>
   <div class="nav-item" onclick="showPage('more',this)"><div class="icon">•••</div><div class="label">더보기</div></div>
 </nav>
@@ -905,7 +911,7 @@ if('serviceWorker' in navigator){
     <div class="settings-section">
       <div class="settings-section-title">월 예산</div>
       <div class="card">
-        <div class="form-group"><label class="form-label">월 지출 예산 (₩)</label><input class="form-input" type="number" id="s-budget" placeholder="3000000"></div>
+        <div class="form-group"><label class="form-label">월 지출 예산 (₩)</label><input class="form-input" type="text" inputmode="decimal" id="s-budget" placeholder="3000000"></div>
         <button class="btn-primary" onclick="saveBudget()">저장</button>
       </div>
     </div>
@@ -963,7 +969,7 @@ if('serviceWorker' in navigator){
       <div class="curr-btn cny" onclick="setLedgerCurr('CNY',this)">¥ CNY</div>
       <div class="curr-btn usd" onclick="setLedgerCurr('USD',this)">$ USD</div>
     </div>
-    <div class="form-group"><label class="form-label">금액</label><input class="form-input" type="number" id="inp-amount" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">금액</label><input class="form-input" type="text" inputmode="decimal" id="inp-amount" placeholder="0"></div>
     <div class="form-group"><label class="form-label">날짜</label><input class="form-input" type="date" id="inp-date"></div>
     <div class="form-group"><label class="form-label">카테고리</label>
       <div class="cat-grid" id="cat-grid-expense">
@@ -1038,7 +1044,7 @@ if('serviceWorker' in navigator){
         <option value="JPY">¥ JPY (일본엔)</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label">현재 잔액</label><input class="form-input" type="number" id="inp-acc-balance" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">현재 잔액</label><input class="form-input" type="text" inputmode="decimal" id="inp-acc-balance" placeholder="0"></div>
     <div class="form-group"><label class="form-label">계좌번호 (선택)</label><input class="form-input" id="inp-acc-num" placeholder="뒤 4자리 또는 메모용"></div>
     <input type="hidden" id="inp-acc-id">
     <button class="btn-primary" onclick="saveAccount()">저장</button>
@@ -1059,7 +1065,7 @@ if('serviceWorker' in navigator){
     </div>
     <div class="form-group">
       <label class="form-label">실제 잔액 (현재 잔액으로 설정)</label>
-      <input class="form-input" type="number" id="inp-adjust-balance" placeholder="실제 잔액을 입력하세요">
+      <input class="form-input" type="text" inputmode="decimal" id="inp-adjust-balance" placeholder="실제 잔액을 입력하세요">
       <div style="font-size:11px;color:var(--sub);margin-top:4px;">앱 잔액과 실제 잔액이 다를 때 실제 잔액을 입력하면 자동으로 차이를 계산합니다</div>
     </div>
     <div id="adjust-diff-preview" style="display:none;border-radius:10px;padding:12px 14px;margin-bottom:8px;">
@@ -1138,11 +1144,11 @@ if('serviceWorker' in navigator){
     </div>
     <div class="form-group">
       <label class="form-label" id="trade-price-label">매수 단가 (<span id="trade-curr-sym">₩</span>)</label>
-      <input class="form-input" type="number" id="inp-trade-price" placeholder="0" oninput="calcTradePL()">
+      <input class="form-input" type="text" inputmode="decimal" id="inp-trade-price" placeholder="0" oninput="calcTradePL()">
     </div>
     <div class="form-group">
       <label class="form-label">수수료 (<span id="trade-curr-sym2">₩</span>, 선택)</label>
-      <input class="form-input" type="number" id="inp-trade-fee" placeholder="0" oninput="calcTradePL()">
+      <input class="form-input" type="text" inputmode="decimal" id="inp-trade-fee" placeholder="0" oninput="calcTradePL()">
     </div>
 
     <!-- 매도 시 실현손익 미리보기 -->
@@ -1189,12 +1195,12 @@ if('serviceWorker' in navigator){
     </div>
     <div style="font-size:12px;color:var(--sub);margin-bottom:10px;">각 통화별 예수금을 입력하세요. 0이면 해당 통화 제외.</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-      <div class="form-group" style="margin:0;"><label class="form-label">₩ KRW</label><input class="form-input" type="number" id="dep-krw" placeholder="0"></div>
-      <div class="form-group" style="margin:0;"><label class="form-label">$ USD</label><input class="form-input" type="number" id="dep-usd" placeholder="0"></div>
-      <div class="form-group" style="margin:0;"><label class="form-label">HK$ HKD</label><input class="form-input" type="number" id="dep-hkd" placeholder="0"></div>
-      <div class="form-group" style="margin:0;"><label class="form-label">¥ JPY</label><input class="form-input" type="number" id="dep-jpy" placeholder="0"></div>
-      <div class="form-group" style="margin:0;"><label class="form-label">¥ CNY</label><input class="form-input" type="number" id="dep-cny" placeholder="0"></div>
-      <div class="form-group" style="margin:0;"><label class="form-label">€ EUR</label><input class="form-input" type="number" id="dep-eur" placeholder="0"></div>
+      <div class="form-group" style="margin:0;"><label class="form-label">₩ KRW</label><input class="form-input" type="text" inputmode="decimal" id="dep-krw" placeholder="0"></div>
+      <div class="form-group" style="margin:0;"><label class="form-label">$ USD</label><input class="form-input" type="text" inputmode="decimal" id="dep-usd" placeholder="0"></div>
+      <div class="form-group" style="margin:0;"><label class="form-label">HK$ HKD</label><input class="form-input" type="text" inputmode="decimal" id="dep-hkd" placeholder="0"></div>
+      <div class="form-group" style="margin:0;"><label class="form-label">¥ JPY</label><input class="form-input" type="text" inputmode="decimal" id="dep-jpy" placeholder="0"></div>
+      <div class="form-group" style="margin:0;"><label class="form-label">¥ CNY</label><input class="form-input" type="text" inputmode="decimal" id="dep-cny" placeholder="0"></div>
+      <div class="form-group" style="margin:0;"><label class="form-label">€ EUR</label><input class="form-input" type="text" inputmode="decimal" id="dep-eur" placeholder="0"></div>
     </div>
     <div style="background:#f0f3ff;border-radius:10px;padding:12px;margin-bottom:12px;">
       <div style="font-size:12px;color:var(--sub);">원화 환산 합계</div>
@@ -1229,8 +1235,8 @@ if('serviceWorker' in navigator){
     <div class="form-group"><label class="form-label">코인명</label><input class="form-input" id="inp-crypto-name" placeholder="예: 비트코인, 이더리움"></div>
     <div class="form-group"><label class="form-label">CoinGecko ID (자동조회용)</label><input class="form-input" id="inp-crypto-cgid" placeholder="예: bitcoin, ethereum, ripple"></div>
     <div class="form-group"><label class="form-label">보유 수량</label><input class="form-input" type="number" id="inp-crypto-qty" placeholder="0.00000000" step="0.00000001"></div>
-    <div class="form-group"><label class="form-label">평균 매입가 (₩)</label><input class="form-input" type="number" id="inp-crypto-avg" placeholder="0"></div>
-    <div class="form-group"><label class="form-label">현재가 (₩)</label><input class="form-input" type="number" id="inp-crypto-price" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">평균 매입가 (₩)</label><input class="form-input" type="text" inputmode="decimal" id="inp-crypto-avg" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">현재가 (₩)</label><input class="form-input" type="text" inputmode="decimal" id="inp-crypto-price" placeholder="0"></div>
     <div class="form-group"><label class="form-label">거래소</label>
       <select class="form-input form-select" id="inp-crypto-exchange">
         <option value="업비트">업비트</option>
@@ -1263,8 +1269,8 @@ if('serviceWorker' in navigator){
     <div class="form-group"><label class="form-label">종목 코드/티커</label><input class="form-input" id="inp-stock-ticker" placeholder="예: 005930, BABA, AAPL"></div>
     <div class="form-group"><label class="form-label">종목명</label><input class="form-input" id="inp-stock-name" placeholder="예: 삼성전자, 알리바바"></div>
     <div class="form-group"><label class="form-label">보유 수량 (주)</label><input class="form-input" type="number" id="inp-stock-qty" placeholder="0"></div>
-    <div class="form-group"><label class="form-label">평균 매입가 (<span id="stock-curr-label">₩</span>)</label><input class="form-input" type="number" id="inp-stock-avg" placeholder="0"></div>
-    <div class="form-group"><label class="form-label">현재가 (<span id="stock-curr-label2">₩</span>)</label><input class="form-input" type="number" id="inp-stock-price" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">평균 매입가 (<span id="stock-curr-label">₩</span>)</label><input class="form-input" type="text" inputmode="decimal" id="inp-stock-avg" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">현재가 (<span id="stock-curr-label2">₩</span>)</label><input class="form-input" type="text" inputmode="decimal" id="inp-stock-price" placeholder="0"></div>
     <input type="hidden" id="inp-stock-id">
     <button class="btn-primary" onclick="saveStock()">저장</button>
     <button id="btn-delete-stock" class="btn-danger" onclick="deleteStock()" style="display:none;">삭제</button>
@@ -1292,9 +1298,9 @@ if('serviceWorker' in navigator){
         <option value="CNY">🇨🇳 중국 (¥ CNY)</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label">취득가</label><input class="form-input" type="number" id="inp-re-cost" placeholder="0"></div>
-    <div class="form-group"><label class="form-label">현재 추정가</label><input class="form-input" type="number" id="inp-re-value" placeholder="0"></div>
-    <div class="form-group"><label class="form-label">담보대출 잔액</label><input class="form-input" type="number" id="inp-re-loan" placeholder="0 (없으면 0)"></div>
+    <div class="form-group"><label class="form-label">취득가</label><input class="form-input" type="text" inputmode="decimal" id="inp-re-cost" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">현재 추정가</label><input class="form-input" type="text" inputmode="decimal" id="inp-re-value" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">담보대출 잔액</label><input class="form-input" type="text" inputmode="decimal" id="inp-re-loan" placeholder="0 (없으면 0)"></div>
     <input type="hidden" id="inp-re-id">
     <button class="btn-primary" onclick="saveRE()">저장</button>
     <button id="btn-delete-re" class="btn-danger" onclick="deleteRE()" style="display:none;">삭제</button>
@@ -1315,7 +1321,7 @@ if('serviceWorker' in navigator){
         <option value="USD">$ USD</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label">잔액</label><input class="form-input" type="number" id="inp-debt-amount" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">잔액</label><input class="form-input" type="text" inputmode="decimal" id="inp-debt-amount" placeholder="0"></div>
     <div class="form-group"><label class="form-label">금리 (연 %)</label><input class="form-input" type="number" id="inp-debt-rate" placeholder="예: 4.5"></div>
     <div class="form-group"><label class="form-label">만기일 (선택)</label><input class="form-input" type="date" id="inp-debt-due"></div>
     <input type="hidden" id="inp-debt-id">
@@ -1338,7 +1344,7 @@ if('serviceWorker' in navigator){
         <option value="USD">$ USD</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label">금액</label><input class="form-input" type="number" id="inp-fixed-amount" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">금액</label><input class="form-input" type="text" inputmode="decimal" id="inp-fixed-amount" placeholder="0"></div>
     <div class="form-group"><label class="form-label">결제일 (매월 몇 일)</label><input class="form-input" type="number" id="inp-fixed-day" placeholder="예: 15" min="1" max="31"></div>
     <div class="form-group"><label class="form-label">결제수단</label>
       <select class="form-input form-select" id="inp-fixed-payment">
@@ -1377,7 +1383,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071910';
+const APP_VERSION = 'v2026071911';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1776,7 +1782,7 @@ function openLedgerModal(id) {
     const t = ledger.find(x => x.id === id);
     if (!t) return;
     ledgerType = t.type; ledgerCurr = t.currency; selectedCat = t.category;
-    document.getElementById('inp-amount').value = t.amount;
+    document.getElementById('inp-amount').value = numToComma(t.amount);
     document.getElementById('inp-date').value = t.date;
     document.getElementById('inp-memo').value = t.memo || '';
     document.getElementById('inp-payment').value = t.payment;
@@ -1851,7 +1857,7 @@ function applyAccountBalance(accId, amount, type, reverse) {
 }
 
 function saveLedger() {
-  const amount = parseFloat(document.getElementById('inp-amount').value);
+  const amount = commaToNum(document.getElementById('inp-amount').value);
   const date = document.getElementById('inp-date').value;
   if (!amount || !date) { showToast('금액과 날짜를 입력하세요'); return; }
 
@@ -2025,7 +2031,7 @@ function openAccountModal(defaultCurr, id) {
   document.getElementById('inp-acc-curr').value = a ? a.currency : (defaultCurr || 'KRW');
   const typeEl = document.getElementById('inp-acc-type');
   if(typeEl) typeEl.value = a ? (a.type||'bank') : 'bank';
-  document.getElementById('inp-acc-balance').value = a ? a.balance : '';
+  document.getElementById('inp-acc-balance').value = a ? numToComma(a.balance) : '';
   document.getElementById('inp-acc-num').value = a ? (a.number || '') : '';
   document.getElementById('btn-delete-acc').style.display = id ? 'block' : 'none';
   openModal('modal-account');
@@ -2034,7 +2040,7 @@ function openAccountModal(defaultCurr, id) {
 function saveAccount() {
   const bank = document.getElementById('inp-acc-bank').value;
   const name = document.getElementById('inp-acc-name').value;
-  const balance = parseFloat(document.getElementById('inp-acc-balance').value) || 0;
+  const balance = commaToNum(document.getElementById('inp-acc-balance').value);
   if (!bank || !name) { showToast('은행명과 별명을 입력하세요'); return; }
   const id = document.getElementById('inp-acc-id').value || uid();
   const existing = accounts.find(x => x.id === id);
@@ -2090,7 +2096,7 @@ function openAdjustModal(accId) {
 
 function saveAdjust() {
   const accId = document.getElementById('inp-adjust-acc-id').value;
-  const newBalance = parseFloat(document.getElementById('inp-adjust-balance').value);
+  const newBalance = commaToNum(document.getElementById('inp-adjust-balance').value);
   const reason = document.getElementById('inp-adjust-reason').value;
   const date = document.getElementById('inp-adjust-date').value;
   if (isNaN(newBalance)) { showToast('실제 잔액을 입력하세요'); return; }
@@ -2215,9 +2221,9 @@ function openCryptoModal(id) {
 function saveCrypto() {
   const symbol = document.getElementById('inp-crypto-symbol').value.toUpperCase().trim();
   const name = document.getElementById('inp-crypto-name').value.trim();
-  const qty = parseFloat(document.getElementById('inp-crypto-qty').value) || 0;
-  const avg = parseFloat(document.getElementById('inp-crypto-avg').value) || 0;
-  const price = parseFloat(document.getElementById('inp-crypto-price').value) || 0;
+  const qty = commaToNum(document.getElementById('inp-crypto-qty').value);
+  const avg = commaToNum(document.getElementById('inp-crypto-avg').value);
+  const price = commaToNum(document.getElementById('inp-crypto-price').value);
   if(!symbol || !name) { showToast('심볼과 코인명을 입력하세요'); return; }
   const id = document.getElementById('inp-crypto-id').value || uid();
   const existing = cryptos.find(x => x.id === id);
@@ -2443,9 +2449,9 @@ function calcTradePL() {
   if (currentTradeType !== 'sell') return;
   const sid = document.getElementById('inp-trade-stock-select').value;
   const s = sid ? stocks.find(x => x.id === sid) : null;
-  const qty = parseFloat(document.getElementById('inp-trade-qty').value) || 0;
-  const price = parseFloat(document.getElementById('inp-trade-price').value) || 0;
-  const fee = parseFloat(document.getElementById('inp-trade-fee').value) || 0;
+  const qty = commaToNum(document.getElementById('inp-trade-qty').value);
+  const price = commaToNum(document.getElementById('inp-trade-price').value);
+  const fee = commaToNum(document.getElementById('inp-trade-fee').value);
   if (!s || !qty || !price) { document.getElementById('trade-pl-preview').style.display = 'none'; return; }
 
   const curr = s.market === 'KR' ? 'KRW' : s.market === 'CN' ? 'CNY' : 'USD';
@@ -2470,11 +2476,11 @@ function calcTradePL() {
 function saveTrade() {
   const ticker = document.getElementById('inp-trade-ticker').value.trim();
   const name = document.getElementById('inp-trade-name').value.trim();
-  const qty = parseFloat(document.getElementById('inp-trade-qty').value) || 0;
-  const price = parseFloat(document.getElementById('inp-trade-price').value) || 0;
+  const qty = commaToNum(document.getElementById('inp-trade-qty').value);
+  const price = commaToNum(document.getElementById('inp-trade-price').value);
   const date = document.getElementById('inp-trade-date').value;
   const market = document.getElementById('inp-trade-market').value;
-  const fee = parseFloat(document.getElementById('inp-trade-fee').value) || 0;
+  const fee = commaToNum(document.getElementById('inp-trade-fee').value);
   const memo = document.getElementById('inp-trade-memo').value;
 
   if (!ticker || !name || !qty || !price || !date) { showToast('필수 항목을 모두 입력하세요'); return; }
@@ -2769,8 +2775,8 @@ function openStockModal(id) {
   document.getElementById('inp-stock-ticker').value = s ? s.ticker : '';
   document.getElementById('inp-stock-name').value = s ? s.name : '';
   document.getElementById('inp-stock-qty').value = s ? s.qty : '';
-  document.getElementById('inp-stock-avg').value = s ? s.avg : '';
-  document.getElementById('inp-stock-price').value = s ? s.price : '';
+  document.getElementById('inp-stock-avg').value = s ? numToComma(s.avg) : '';
+  document.getElementById('inp-stock-price').value = s ? numToComma(s.price) : '';
   document.getElementById('btn-delete-stock').style.display = id ? 'block' : 'none';
   updateStockCurr();
   openModal('modal-stock');
@@ -2779,9 +2785,9 @@ function openStockModal(id) {
 function saveStock() {
   const ticker = document.getElementById('inp-stock-ticker').value;
   const name = document.getElementById('inp-stock-name').value;
-  const qty = parseFloat(document.getElementById('inp-stock-qty').value) || 0;
-  const avg = parseFloat(document.getElementById('inp-stock-avg').value) || 0;
-  const price = parseFloat(document.getElementById('inp-stock-price').value) || 0;
+  const qty = commaToNum(document.getElementById('inp-stock-qty').value);
+  const avg = commaToNum(document.getElementById('inp-stock-avg').value);
+  const price = commaToNum(document.getElementById('inp-stock-price').value);
   if (!ticker || !name) { showToast('종목 코드와 이름을 입력하세요'); return; }
   const id = document.getElementById('inp-stock-id').value || uid();
   const existing = stocks.find(x => x.id === id);
@@ -2844,9 +2850,9 @@ function saveRE() {
   const existing = realEstate.find(x => x.id === id);
   const r = { id, name, location: document.getElementById('inp-re-location').value,
     owner: document.getElementById('inp-re-owner').value, currency: document.getElementById('inp-re-curr').value,
-    cost: parseFloat(document.getElementById('inp-re-cost').value)||0,
-    value: parseFloat(document.getElementById('inp-re-value').value)||0,
-    loan: parseFloat(document.getElementById('inp-re-loan').value)||0 };
+    cost: commaToNum(document.getElementById('inp-re-cost').value),
+    value: commaToNum(document.getElementById('inp-re-value').value),
+    loan: commaToNum(document.getElementById('inp-re-loan').value) };
   if (existing) realEstate[realEstate.indexOf(existing)] = r;
   else realEstate.push(r);
   save('realestate', realEstate);
@@ -2894,7 +2900,7 @@ function saveDebt() {
   const id = document.getElementById('inp-debt-id').value || uid();
   const existing = debts.find(x => x.id === id);
   const d = { id, name, currency: document.getElementById('inp-debt-curr').value,
-    amount: parseFloat(document.getElementById('inp-debt-amount').value)||0,
+    amount: commaToNum(document.getElementById('inp-debt-amount').value),
     rate: parseFloat(document.getElementById('inp-debt-rate').value)||0,
     due: document.getElementById('inp-debt-due').value };
   if (existing) debts[debts.indexOf(existing)] = d;
@@ -2967,7 +2973,7 @@ function openFixedModal(id) {
 
 function saveFixed() {
   const name = document.getElementById('inp-fixed-name').value;
-  const amount = parseFloat(document.getElementById('inp-fixed-amount').value) || 0;
+  const amount = commaToNum(document.getElementById('inp-fixed-amount').value);
   if (!name || !amount) { showToast('항목명과 금액을 입력하세요'); return; }
   const id = document.getElementById('inp-fixed-id').value || uid();
   const existing = fixedExpenses.find(x => x.id === id);
@@ -3203,7 +3209,7 @@ async function fetchAutoRates() {
 }
 
 function saveBudget() {
-  budget = parseFloat(document.getElementById('s-budget').value) || 0;
+  budget = commaToNum(document.getElementById('s-budget').value);
   setData('budget', budget);
   showToast('예산 저장됨');
   renderDashboard();
@@ -3762,6 +3768,68 @@ function doImport(e) {
   reader.readAsText(file);
 }
 
+
+
+// ========== 천단위 콤마 입력 유틸 ==========
+function numToComma(val) {
+  if (!val && val !== 0) return '';
+  const str = String(val).replace(/[^0-9.]/g, '');
+  const parts = str.split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return parts.join('.');
+}
+
+function commaToNum(str) {
+  if (!str) return 0;
+  return parseFloat(String(str).replace(/,/g, '')) || 0;
+}
+
+// 입력 필드에 콤마 포맷 적용
+function applyCommaFormat(el) {
+  el.addEventListener('input', function() {
+    const pos = this.selectionStart;
+    const prevLen = this.value.length;
+    const raw = this.value.replace(/[^0-9.]/g, '');
+    const parts = raw.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    this.value = parts.join('.');
+    // 커서 위치 보정
+    const newLen = this.value.length;
+    this.setSelectionRange(pos + (newLen - prevLen), pos + (newLen - prevLen));
+  });
+  el.addEventListener('focus', function() {
+    if (this.value === '0') this.value = '';
+  });
+  el.addEventListener('blur', function() {
+    if (!this.value) this.value = '';
+  });
+}
+
+// 특정 id의 입력 필드에 콤마 포맷 적용
+function initCommaInputs() {
+  const commaFields = [
+    'inp-amount',        // 가계부 금액
+    'inp-acc-balance',   // 계좌 잔액
+    'inp-stock-avg',     // 주식 평균단가
+    'inp-stock-price',   // 주식 현재가
+    'inp-re-cost',       // 부동산 취득가
+    'inp-re-value',      // 부동산 추정가
+    'inp-re-loan',       // 부동산 담보대출
+    'inp-debt-amount',   // 대출 금액
+    'inp-fixed-amount',  // 고정지출 금액
+    'inp-trade-price',   // 주식 매수/매도가
+    'inp-trade-fee',     // 수수료
+    'inp-crypto-avg',    // 코인 평단가
+    'inp-crypto-price',  // 코인 현재가
+    'inp-adjust-balance',// 잔액 조정
+    'dep-krw', 'dep-usd', 'dep-hkd', 'dep-jpy', 'dep-cny', 'dep-eur', // 예수금
+    's-budget',          // 월 예산
+  ];
+  commaFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) applyCommaFormat(el);
+  });
+}
 
 // ========== INIT ==========
 async function init() {
