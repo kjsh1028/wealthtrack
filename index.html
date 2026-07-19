@@ -447,21 +447,21 @@ if('serviceWorker' in navigator){
 
     <!-- 자산 카드 2x2 - 금액만 표시, 탭하면 해당 탭으로 이동 -->
     <div class="asset-grid" style="margin-bottom:12px;">
-      <div class="asset-card" onclick="showPage('more',null);setTimeout(()=>showPage('accounts',null),50)">
+      <div class="asset-card" onclick="goToAccounts()">
         <div class="ac-label">💵 현금/계좌</div>
         <div class="ac-amount" id="dash-cash-total">₩0</div>
       </div>
-      <div class="asset-card" onclick="showPage('invest',document.querySelectorAll('.nav-item')[3])">
+      <div class="asset-card" onclick="goToInvest('stock')">
         <div class="ac-label">📈 주식</div>
         <div class="ac-amount" id="dash-stock-total">₩0</div>
         <div class="ac-pl" id="dash-stock-pl" style="font-size:12px;margin-top:2px;"></div>
       </div>
-      <div class="asset-card" onclick="showPage('invest',document.querySelectorAll('.nav-item')[3]);setTimeout(()=>setInvestTab(document.querySelector('#page-invest .inner-tab:nth-child(2)'),'crypto'),100)">
+      <div class="asset-card" onclick="goToInvest('crypto')">
         <div class="ac-label">🪙 가상자산</div>
         <div class="ac-amount" id="dash-crypto-total">₩0</div>
         <div class="ac-pl" id="dash-crypto-pl" style="font-size:12px;margin-top:2px;"></div>
       </div>
-      <div class="asset-card" onclick="showPage('invest',document.querySelectorAll('.nav-item')[3]);setTimeout(()=>setInvestTab(document.querySelector('#page-invest .inner-tab:nth-child(3)'),'realestate'),100)">
+      <div class="asset-card" onclick="goToInvest('realestate')">
         <div class="ac-label">🏠 부동산</div>
         <div class="ac-amount" id="dash-re-total">₩0</div>
       </div>
@@ -1429,7 +1429,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071916';
+const APP_VERSION = 'v2026071917';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -4058,6 +4058,33 @@ function closeDetailPanel() {
   document.getElementById('detail-overlay').classList.remove('open');
 }
 
+
+
+function goToInvest(tab) {
+  // 투자 탭 nav-item 직접 찾기 (텍스트로)
+  const navItems = document.querySelectorAll('.nav-item');
+  let investNav = null;
+  navItems.forEach(n => { if(n.textContent.includes('투자')) investNav = n; });
+  showPage('invest', investNav || navItems[3]);
+  if(tab !== 'stock') {
+    setTimeout(() => {
+      const tabs = document.querySelectorAll('#page-invest > div > .inner-tabs .inner-tab');
+      tabs.forEach(t => {
+        if((tab==='crypto' && t.textContent.includes('가상자산')) ||
+           (tab==='realestate' && t.textContent.includes('부동산')) ||
+           (tab==='debt' && t.textContent.includes('대출'))) {
+          setInvestTab(t, tab);
+        }
+      });
+    }, 100);
+  }
+}
+
+function goToAccounts() {
+  const moreNav = document.querySelector('.nav-item:last-child');
+  showPage('more', moreNav);
+  setTimeout(() => showPage('accounts', null), 50);
+}
 
 function goToLedger(filter) {
   // 가계부 탭으로 이동
