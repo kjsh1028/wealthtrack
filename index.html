@@ -459,15 +459,15 @@ if('serviceWorker' in navigator){
       </div>
     </div>
 
-    <!-- 자산 카드 3개 -->
-    <div class="asset-grid">
+    <!-- 자산 카드 2x2 그리드 -->
+    <div class="asset-grid" style="margin-bottom:12px;">
       <!-- 현금/계좌 -->
       <div class="asset-card" onclick="openDetailPanel('cash')">
         <div class="ac-icon">💵</div>
         <div class="ac-label">현금 / 계좌</div>
         <div class="ac-amount" id="dash-cash-total">₩0</div>
         <div class="ac-sub" id="dash-cash-sub"></div>
-        <div class="tap-hint">탭하여 상세보기 ›</div>
+        <div class="tap-hint">탭하여 상세 ›</div>
       </div>
       <!-- 주식 -->
       <div class="asset-card" onclick="openDetailPanel('stock')">
@@ -475,35 +475,24 @@ if('serviceWorker' in navigator){
         <div class="ac-label">주식</div>
         <div class="ac-amount" id="dash-stock-total">₩0</div>
         <div class="ac-pl" id="dash-stock-pl"></div>
-        <div class="ac-sub" id="dash-stock-sub"></div>
-        <div class="tap-hint">탭하여 상세보기 ›</div>
+        <div class="tap-hint">탭하여 상세 ›</div>
       </div>
-      <!-- 가상자산 카드 -->
-      <div class="asset-card" onclick="openDetailPanel('crypto')" style="background:var(--card);border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <!-- 가상자산 -->
+      <div class="asset-card" onclick="openDetailPanel('crypto')">
         <div class="ac-icon">🪙</div>
         <div class="ac-label">가상자산</div>
         <div class="ac-amount" id="dash-crypto-total">₩0</div>
         <div class="ac-pl" id="dash-crypto-pl"></div>
-        <div class="tap-hint">탭하여 상세보기 ›</div>
+        <div class="tap-hint">탭하여 상세 ›</div>
       </div>
-    </div>
-
-    <!-- 부동산 카드 (full width) -->
-    <div class="asset-card-full" onclick="openDetailPanel('realestate')">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-          <div style="font-size:22px;margin-bottom:4px;">🏠</div>
-          <div class="ac-label">부동산 순자산</div>
-          <div class="ac-amount" id="dash-re-total">₩0</div>
-        </div>
-        <div style="text-align:right;">
-          <div class="ac-label">추정가 합계</div>
-          <div style="font-size:13px;font-weight:700;color:var(--sub);" id="dash-re-gross">₩0</div>
-          <div class="ac-label" style="margin-top:6px;">담보대출</div>
-          <div style="font-size:13px;font-weight:700;color:var(--red);" id="dash-re-loan">-₩0</div>
-        </div>
+      <!-- 부동산 -->
+      <div class="asset-card" onclick="openDetailPanel('realestate')">
+        <div class="ac-icon">🏠</div>
+        <div class="ac-label">부동산 순자산</div>
+        <div class="ac-amount" id="dash-re-total">₩0</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:3px;" id="dash-re-sub"></div>
+        <div class="tap-hint">탭하여 상세 ›</div>
       </div>
-      <div class="tap-hint" style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">탭하여 상세보기 ›</div>
     </div>
 
     <!-- 이달 수입/지출 -->
@@ -1470,7 +1459,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071912';
+const APP_VERSION = 'v2026071913';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1662,11 +1651,8 @@ function renderDashboard() {
     plEl.textContent = (stockPL >= 0 ? '+' : '') + '₩' + fmtNum(Math.round(Math.abs(stockPL))) + ' (' + (stockPL >= 0 ? '+' : '') + stockPLPct + '%)';
     plEl.className = 'ac-pl ' + (stockPL >= 0 ? 'pos' : 'neg');
   } else { plEl.textContent = ''; }
-  const stockParts = [];
-  if (stockByMarket.KR) stockParts.push('🇰🇷 ₩' + fmtNum(Math.round(stockByMarket.KR)));
-  if (stockByMarket.CN) stockParts.push('🇨🇳 ¥환산');
-  if (stockByMarket.US) stockParts.push('🇺🇸 $환산');
-  document.getElementById('dash-stock-sub').textContent = stockParts.join(' · ') || '종목 없음';
+  const stockSubEl = document.getElementById('dash-stock-sub');
+  if(stockSubEl) stockSubEl.textContent = '';
   
   // 가상자산 대시보드 반영
   const cryptoKRW = cryptos.reduce((s,c) => s + c.qty * c.price, 0);
@@ -1684,17 +1670,8 @@ function renderDashboard() {
     reByOwner[owner] += (val - loan);
   });
   document.getElementById('dash-re-total').textContent = '₩' + fmtNum(Math.round(reNet));
-  document.getElementById('dash-re-gross').textContent = '₩' + fmtNum(Math.round(reGross));
-  document.getElementById('dash-re-loan').textContent = '-₩' + fmtNum(Math.round(reLoan));
-  const reDetailEl = document.getElementById('dash-re-detail');
-  if (realEstate.length) {
-    reDetailEl.innerHTML = realEstate.map(r => {
-      const eq = toKRW(r.value - (r.loan||0), r.currency);
-      return '<div class="ac-detail-row"><div class="ac-detail-label">🏠 ' + r.name + ' <span style="font-size:10px;color:var(--sub);">(' + r.owner + ')</span></div><div class="ac-detail-val">₩' + fmtNum(Math.round(eq)) + '</div></div>';
-    }).join('') + (Object.keys(reByOwner).length > 1 ? '<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">' + Object.keys(reByOwner).map(o => '<span class="chip">'+o+' ₩'+fmtNum(Math.round(reByOwner[o]))+'</span>').join('') + '</div>' : '');
-  } else {
-    reDetailEl.innerHTML = '<div style="font-size:12px;color:var(--sub);">부동산을 추가하세요</div>';
-  }
+  const reSubEl = document.getElementById('dash-re-sub');
+  if(reSubEl) reSubEl.textContent = realEstate.length ? realEstate.length + '개 물건 · 대출 -₩' + fmtNum(Math.round(reLoan/100000000*10)/10) + '억' : '부동산 없음';
 
   // ── 총자산/부채 ──
   const grossAsset = cashKRW + stockKRW + reGross;
