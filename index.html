@@ -842,13 +842,6 @@ if('serviceWorker' in navigator){
         </div>
         <button class="btn-primary" onclick="saveGHToken()">💾 토큰 저장 & 자동 동기화</button>
         <div style="font-size:11px;color:var(--sub);margin-top:8px;" id="sync-last-time"></div>
-        <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
-          <div style="font-size:11px;color:var(--sub);margin-bottom:6px;">수동 동기화 (필요 시)</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <button class="btn-secondary" onclick="syncToGH()" style="font-size:12px;">⬆️ 강제 업로드</button>
-            <button class="btn-secondary" onclick="syncFromGH()" style="font-size:12px;">⬇️ 강제 다운로드</button>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -1298,7 +1291,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2.7.0';
+const APP_VERSION = 'v2.8.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -3207,7 +3200,6 @@ async function forceReload() {
   } catch(e) { location.reload(true); }
 }
 async function doUpdate() {
-  if(!confirm('앱을 최신 버전으로 업데이트합니다. 데이터는 유지됩니다.')) return;
   await forceReload();
 }
 
@@ -3251,13 +3243,52 @@ function updateSyncDot(state, msg) {
   if(text) text.textContent = msg;
 }
 
+const GH_RAW = 'https://raw.githubusercontent.com/kjsh1028/wealthtrack/main/index.html';
+
+function showUpdateBanner() {
+  const b = document.getElementById('update-banner');
+  if(b) b.style.display = 'block';
+}
+
+async function checkUpdate() {
+  const btn = document.getElementById('btn-check-update');
+  if(btn) btn.textContent = '확인 중...';
+  try {
+    const res = await fetch(GH_RAW + '?t=' + Date.now());
+    const html = await res.text();
+    const match = html.match(/APP_VERSION = '(v[0-9.]+)'/);
+    if(!match) { showToast('버전 확인 실패'); if(btn) btn.textContent='업데이트 확인'; return; }
+    const latest = match[1];
+    const latestEl = document.getElementById('latest-ver-display');
+    const latestSub = document.getElementById('latest-ver-sub');
+    if(latestEl) latestEl.textContent = latest;
+    if(btn) btn.textContent = '업데이트 확인';
+    if(latest !== APP_VERSION) {
+      if(latestSub) latestSub.textContent = '🆕 새 버전 있음';
+      if(latestEl) latestEl.style.color = 'var(--green)';
+      showUpdateBanner();
+      showToast('🆕 새 버전 ' + latest + ' — 상단 배너를 탭하세요');
+    } else {
+      if(latestSub) latestSub.textContent = '✓ 최신 버전입니다';
+      if(latestEl) latestEl.style.color = 'var(--green)';
+      showToast('최신 버전입니다 (' + APP_VERSION + ')');
+    }
+  } catch(e) {
+    if(btn) btn.textContent = '업데이트 확인';
+    showToast('업데이트 확인 실패');
+  }
+}
+
 
 async function silentUpdateCheck() {
   try {
     const res = await fetch(GH_RAW + '?t=' + Date.now());
     const html = await res.text();
     const match = html.match(/APP_VERSION = '(v[\d.]+)'/);
-    if (match && match[1] !== APP_VERSION) showUpdateBanner(match[1]);
+    if(match && match[1] !== APP_VERSION) {
+      const b = document.getElementById('update-banner');
+      if(b) b.style.display = 'block';
+    }
   } catch(e) {}
 }
 
