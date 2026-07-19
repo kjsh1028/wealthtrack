@@ -1429,7 +1429,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071919';
+const APP_VERSION = 'v2026071920';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1842,7 +1842,22 @@ function openLedgerModal(id) {
   }
 
   // 금액 변경 시 미리보기 업데이트
-  document.getElementById('inp-amount').oninput = updateLinkedAccPreview;
+  // 금액 필드 실시간 쉼표 포맷 (이미 applyCommaFormat 적용돼 있지만 value 재설정 후 재바인딩)
+  const amtEl = document.getElementById('inp-amount');
+  amtEl.oninput = function() {
+    const pos = this.selectionStart;
+    const prevLen = this.value.length;
+    const raw = this.value.replace(/[^0-9.]/g, '');
+    const parts = raw.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const formatted = parts.join('.');
+    this.value = formatted;
+    const newLen = this.value.length;
+    const offset = newLen - prevLen;
+    const newPos = Math.max(0, pos + offset);
+    this.setSelectionRange(newPos, newPos);
+    updateLinkedAccPreview();
+  };
   document.getElementById('inp-linked-account').onchange = updateLinkedAccPreview;
   document.getElementById('inp-payment').onchange = updateLinkedAccPreview;
 
@@ -4104,6 +4119,7 @@ function goToLedger(filter) {
 async function init() {
   const monInput = document.getElementById('ledger-month-filter');
   monInput.value = thisMonth();
+  initCommaInputs();
   // LegalTrack 방식: 토큰 있으면 시작 시 바로 ghLoad
   const token = localStorage.getItem('wt_gh_token');
   if(token) {
