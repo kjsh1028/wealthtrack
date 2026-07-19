@@ -786,14 +786,17 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
         <div id="sync-status-display" class="sync-status"><div class="sync-dot" id="sync-dot"></div><span id="sync-text">동기화 미설정</span></div>
         <div class="form-group"><label class="form-label">GitHub Token</label>
           <input class="form-input" type="password" id="s-gh-token" placeholder="ghp_..." autocomplete="off">
-          <div style="font-size:11px;color:var(--sub);margin-top:4px;">github.com → Settings → Developer settings → Personal access tokens</div>
+          <div style="font-size:11px;color:var(--sub);margin-top:4px;">토큰 저장 후 자동으로 데이터를 불러옵니다</div>
         </div>
-        <button class="btn-primary" onclick="saveGHToken()" style="margin-bottom:8px;">💾 토큰 저장</button>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <button class="btn-secondary" onclick="syncToGH()">⬆️ 업로드</button>
-          <button class="btn-secondary" onclick="syncFromGH()">⬇️ 다운로드</button>
-        </div>
+        <button class="btn-primary" onclick="saveGHToken()">💾 토큰 저장 & 자동 동기화</button>
         <div style="font-size:11px;color:var(--sub);margin-top:8px;" id="sync-last-time"></div>
+        <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
+          <div style="font-size:11px;color:var(--sub);margin-bottom:6px;">수동 동기화 (필요 시)</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <button class="btn-secondary" onclick="syncToGH()" style="font-size:12px;">⬆️ 강제 업로드</button>
+            <button class="btn-secondary" onclick="syncFromGH()" style="font-size:12px;">⬇️ 강제 다운로드</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1263,6 +1266,7 @@ let budget = getData('budget', 0);
 let assetSnapshots = getData('assetSnapshots', []);
 let stockTrades = getData('stockTrades', []);
 
+let _autoSaveTimer = null;
 function save(key, val) {
   setData(key, val);
   if (key === 'rates') rates = val;
@@ -1273,6 +1277,11 @@ function save(key, val) {
   if (key === 'realestate') realEstate = val;
   if (key === 'debts') debts = val;
   if (key === 'fixed') fixedExpenses = val;
+  // 데이터 변경 후 3초 뒤 자동 GitHub 저장 (debounce)
+  if (key !== 'rates') { // 환율은 자동저장 제외
+    clearTimeout(_autoSaveTimer);
+    _autoSaveTimer = setTimeout(() => autoSync(), 3000);
+  }
 }
 
 // ========== UTILS ==========
@@ -3045,18 +3054,10 @@ function saveGHToken() {
   const token = document.getElementById('s-gh-token').value;
   if (!token || token.includes('...')) { showToast('올바른 토큰을 입력하세요'); return; }
   localStorage.setItem('wt_gh_token', token);
-  showToast('토큰 저장됨');
+  showToast('토큰 저장됨 - 데이터 불러오는 중...');
   updateSyncStatus();
-  // Finnhub 키 표시
-  const fkey = localStorage.getItem('wt_finnhub_key');
-  const fkeyEl = document.getElementById('s-finnhub-key');
-  if (fkeyEl && fkey) fkeyEl.value = fkey.substring(0,8) + '...';
-  const putime = localStorage.getItem('wt_price_update_time');
-  const putimeEl = document.getElementById('price-update-time');
-  if (putimeEl && putime) putimeEl.textContent = '마지막 업데이트: ' + putime;
-  // 보유현황 마지막 업데이트 시간
-  const lastUpdateEl = document.getElementById('price-last-update');
-  if (lastUpdateEl && putime) lastUpdateEl.textContent = putime.substring(5,16) + ' 업데이트';
+  // 토큰 저장 즉시 자동 merge 동기화
+  setTimeout(() => ghAutoSync(), 300);
 }
 
 function updateSyncStatus() {
@@ -3112,11 +3113,6 @@ function ghRequest(method, path, token, body) {
 async function syncToGH() {
   const token = localStorage.getItem('wt_gh_token');
   if (!token) { showToast('GitHub 토큰을 먼저 입력하세요'); return; }
-  // 데이터 비어있으면 수동 업로드도 경고
-  const hasData = accounts.length > 0 || ledger.length > 0 || stocks.length > 0 || realEstate.length > 0;
-  if (!hasData) {
-    if (!confirm('현재 데이터가 비어 있습니다. 빈 데이터를 업로드하면 기존 백업이 사라집니다. 계속하시겠습니까?')) return;
-  }
   const dot = document.getElementById('sync-dot');
   const text = document.getElementById('sync-text');
   dot.className = 'sync-dot syncing'; text.textContent = '업로드 중...';
@@ -3162,23 +3158,6 @@ async function syncFromGH() {
   } catch(e) { dot.className = 'sync-dot err'; text.textContent = '실패: ' + e.message; showToast('다운로드 실패: ' + e.message); }
 }
 
-
-function autoSync() {
-  const token = localStorage.getItem('wt_gh_token');
-  if (!token) return;
-  // 데이터 비어있으면 업로드 안 함 (빈 데이터 덮어쓰기 방지)
-  const hasData = accounts.length > 0 || ledger.length > 0 || stocks.length > 0 || realEstate.length > 0;
-  if (!hasData) return;
-  const payload = JSON.stringify(getAllData(), null, 2);
-  const b64 = btoa(unescape(encodeURIComponent(payload)));
-  ghRequest('GET', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token)
-    .then(d => ghRequest('PUT', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token,
-      { message: 'auto-sync: ' + new Date().toISOString(), content: b64, sha: d.sha }))
-    .catch(() => ghRequest('PUT', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token,
-      { message: 'auto-sync: ' + new Date().toISOString(), content: b64 }))
-    .then(() => { localStorage.setItem('wt_sync_time', new Date().toLocaleString('ko-KR')); })
-    .catch(() => {});
-}
 
 async function silentUpdateCheck() {
   try {
