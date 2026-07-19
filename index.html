@@ -1429,7 +1429,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071920';
+const APP_VERSION = 'v2026071921';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2932,12 +2932,53 @@ function deleteRE() {
 
 function renderDebtList() {
   const el = document.getElementById('debt-list');
-  if (!debts.length) { el.innerHTML = '<div class="empty-state"><div class="e-icon">💳</div><div class="e-text">대출/부채를 추가하세요</div></div>'; return; }
-  el.innerHTML = debts.map(d => `
-    <div class="stat-row" onclick="openDebtModal('${d.id}')">
-      <div><div class="stat-label">${d.name}</div><div style="font-size:11px;color:var(--sub);">금리 ${d.rate||0}% · 만기 ${d.due||'-'}</div></div>
-      <div class="stat-val" style="color:var(--red);">${fmtCurr(d.amount, d.currency)}</div>
-    </div>`).join('');
+
+  // 부동산 담보대출 (loan > 0인 항목만)
+  const reLoans = realEstate.filter(r => (r.loan || 0) > 0);
+
+  // 수동 등록 부채 + 부동산 담보대출 합산
+  const totalManual = debts.reduce((s,d) => s + toKRW(d.amount, d.currency), 0);
+  const totalReLoan = reLoans.reduce((s,r) => s + toKRW(r.loan, r.currency), 0);
+  const grandTotal = totalManual + totalReLoan;
+
+  if (!debts.length && !reLoans.length) {
+    el.innerHTML = '<div class="empty-state"><div class="e-icon">💳</div><div class="e-text">대출/부채를 추가하세요</div></div>';
+    return;
+  }
+
+  let html = '';
+
+  // 부동산 담보대출 (읽기 전용 - 부동산에서 관리)
+  if (reLoans.length) {
+    html += '<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;padding:0 2px;">🏠 부동산 담보대출</div>';
+    html += reLoans.map(r => `
+      <div class="stat-row" onclick="setInvestTab(document.querySelector('#invest-main-tabs .inner-tab:nth-child(3)'),\'realestate\')">
+        <div>
+          <div class="stat-label">${r.name} 담보대출</div>
+          <div style="font-size:11px;color:var(--sub);">부동산 탭에서 관리 · ${r.currency} · ≈ ₩${fmtNum(Math.round(toKRW(r.loan, r.currency)))}</div>
+        </div>
+        <div class="stat-val" style="color:var(--red);">${fmtCurr(r.loan, r.currency)}</div>
+      </div>`).join('');
+  }
+
+  // 수동 등록 부채
+  if (debts.length) {
+    if (reLoans.length) html += '<div style="height:12px;"></div>';
+    html += '<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;padding:0 2px;">💳 대출 / 부채</div>';
+    html += debts.map(d => `
+      <div class="stat-row" onclick="openDebtModal('${d.id}')">
+        <div><div class="stat-label">${d.name}</div><div style="font-size:11px;color:var(--sub);">금리 ${d.rate||0}% · 만기 ${d.due||'-'}</div></div>
+        <div class="stat-val" style="color:var(--red);">${fmtCurr(d.amount, d.currency)}</div>
+      </div>`).join('');
+  }
+
+  // 합계
+  html += `<div style="margin-top:12px;padding:12px;background:rgba(220,53,69,0.06);border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:13px;font-weight:700;color:var(--red);">총 부채 합계</div>
+    <div style="font-size:16px;font-weight:800;color:var(--red);">-₩${fmtNum(Math.round(grandTotal))}</div>
+  </div>`;
+
+  el.innerHTML = html;
 }
 
 function openDebtModal(id) {
