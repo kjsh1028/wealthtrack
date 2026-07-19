@@ -1429,7 +1429,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071924';
+const APP_VERSION = 'v2026071925';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1448,13 +1448,13 @@ let fixedExpenses = getData('fixed', []);
 let fixedStatus = getData('fixedStatus', {});
 let budget = getData('budget', 0);
 let assetSnapshots = getData('assetSnapshots', []);
-let exportedAt = getData('exportedAt', null);
 let cryptos = getData('cryptos', []);
 let stockTrades = getData('stockTrades', []);
 
 let _autoSaveTimer = null;
 function save(key, val) {
   setData(key, val);
+  if (key !== 'rates') localStorage.setItem('wt_last_saved', new Date().toISOString());
   if (key === 'rates') rates = val;
   if (key === 'ledger') ledger = val;
   if (key === 'accounts') accounts = val;
@@ -1464,11 +1464,6 @@ function save(key, val) {
   if (key === 'debts') debts = val;
   if (key === 'fixed') fixedExpenses = val;
   if (key === 'cryptos') cryptos = val;
-  // 데이터 변경 시 exportedAt 갱신
-  if (!['rates','exportedAt'].includes(key)) {
-    exportedAt = new Date().toISOString();
-    setData('exportedAt', exportedAt);
-  }
   // 데이터 변경 후 3초 뒤 자동 GitHub 저장 (debounce)
   if (key !== 'rates') { // 환율은 자동저장 제외
     clearTimeout(_autoSaveTimer);
@@ -3554,6 +3549,11 @@ function ghRequest(method, path, token, body) {
   });
 }
 
+// autoSync = syncToGH 별칭 (데이터 변경 시 자동 호출)
+async function autoSync() {
+  await syncToGH();
+}
+
 async function syncToGH() {
   const token = localStorage.getItem('wt_gh_token');
   if (!token) { showToast('GitHub 토큰을 먼저 입력하세요'); return; }
@@ -3623,47 +3623,40 @@ async function doUpdate() {
 async function ghLoad() {
   const token = localStorage.getItem('wt_gh_token');
   if(!token) return false;
-  updateSyncDot('sy', '데이터 불러오는 중...');
+  updateSyncDot('sy', 'GitHub 불러오는 중...');
   try {
     const d = await ghRequest('GET', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token);
-    const raw = d.content.replace(/[\r\n]/g, '');
+    const raw = d.content.split('\n').join('');
     const gh = JSON.parse(decodeURIComponent(escape(atob(raw))));
-    const ghTotal = (gh.accounts||[]).length + (gh.ledger||[]).length +
-                    (gh.stocks||[]).length + (gh.realEstate||[]).length + (gh.cryptos||[]).length;
-
-    if(ghTotal === 0) {
-      // GitHub가 비어있으면 로컬 → GitHub 업로드
-      const localTotal = accounts.length + ledger.length + stocks.length + realEstate.length + cryptos.length;
-      if(localTotal > 0) await syncToGH();
-      updateSyncDot('ok', '동기화 준비됨');
-      return false;
-    }
-
-    // GitHub 데이터가 있으면 항상 적용 (exportedAt 비교)
+    // 타임스탬프 기반 동기화: 더 최신 데이터를 우선
     const ghTime = gh.exportedAt ? new Date(gh.exportedAt).getTime() : 0;
-    const localTime = exportedAt ? new Date(exportedAt).getTime() : 0;
-
-    if(ghTime >= localTime) {
-      // GitHub가 더 최신이거나 같으면 불러오기
+    const localTimeStr = localStorage.getItem('wt_last_saved');
+    const localTime = localTimeStr ? new Date(localTimeStr).getTime() : 0;
+    if(ghTime > localTime) {
+      // GitHub가 더 최신 → 로컬에 적용
       applyAllData(gh);
+      localStorage.setItem('wt_last_saved', gh.exportedAt);
       renderDashboard();
-      const now = new Date().toLocaleString('ko-KR');
-      localStorage.setItem('wt_sync_time', now);
-      updateSyncDot('ok', '✓ 완료 (' + (gh.accounts||[]).length + '개 계좌)');
-      const lastEl = document.getElementById('sync-last-time');
-      if(lastEl) lastEl.textContent = '마지막 동기화: ' + now;
-      return true;
-    } else {
-      // 로컬이 더 최신이면 GitHub에 업로드
-      await syncToGH();
-      updateSyncDot('ok', '✓ 업로드 완료');
-      return true;
+    } else if(localTime > ghTime) {
+      // 로컬이 더 최신 → GitHub에 업로드
+      setTimeout(() => autoSync(), 500);
     }
+    // 같으면 아무것도 안 함
+    const now = new Date().toLocaleString('ko-KR');
+    localStorage.setItem('wt_sync_time', now);
+    updateSyncDot('ok', '✓ 동기화 완료');
+    const lastEl = document.getElementById('sync-last-time');
+    if(lastEl) lastEl.textContent = '마지막 동기화: ' + now;
+    return true;
   } catch(e) {
-    updateSyncDot('err', '실패: ' + e.message.slice(0,20));
+    // 백업 없으면 현재 데이터 올리기
+    const hasData = accounts.length > 0 || ledger.length > 0;
+    if(hasData) setTimeout(() => autoSync(), 500);
+    updateSyncDot('ok', '동기화 준비됨');
     return false;
   }
 }
+
 function updateSyncDot(state, msg) {
   const dot = document.getElementById('sync-dot');
   const text = document.getElementById('sync-text');
