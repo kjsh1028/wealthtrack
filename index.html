@@ -1377,7 +1377,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071909';
+const APP_VERSION = 'v2026071910';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1419,7 +1419,7 @@ function save(key, val) {
 }
 
 // ========== UTILS ==========
-const CURR_SYMBOL = { KRW: '₩', CNY: '¥', USD: '$' };
+const CURR_SYMBOL = { KRW: '₩', CNY: '¥', USD: '$', HKD: 'HK$', JPY: '¥', EUR: '€' };
 function fmtNum(n) { return Math.abs(n).toLocaleString('ko-KR'); }
 function fmtCurr(n, curr) { return CURR_SYMBOL[curr] + fmtNum(n); }
 function toKRW(amount, curr) {
@@ -1944,24 +1944,39 @@ function renderAccounts() {
   const cn = accounts.filter(a => a.currency === 'CNY');
 
   const renderList = (items, el, curr) => {
-    if (!items.length) { el.innerHTML = '<div class="empty-state"><div class="e-icon">🏦</div><div class="e-text">계좌를 추가하세요</div></div>'; return; }
-    el.innerHTML = items.map(a => `
-      <div class="account-card ${a.currency==='KRW'?'kr':a.currency==='CNY'?'cn':''}">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div onclick="openAccountModal('', '${a.id}')" style="flex:1;">
-            <div class="acc-bank">${a.bank}</div>
-            <div class="acc-name">${a.name}</div>
-            <div class="acc-balance">${fmtCurr(a.balance, a.currency)}</div>
-            ${a.number ? `<div class="acc-num">****${a.number}</div>` : ''}
-            <div style="font-size:11px;opacity:0.6;margin-top:4px;">≈ ₩${fmtNum(Math.round(toKRW(a.balance, a.currency)))}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-left:10px;">
-            \${a.type==='stock' ? getDepositBtn(a.id) : ''}
-            <button onclick="openAdjustModal('\${a.id}')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:10px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;">잔액조정</button>
-          </div>
-        </div>
-        ${(a.adjustments||[]).length ? `<div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.2);padding-top:8px;font-size:11px;opacity:0.7;">최근 조정: ${(a.adjustments||[]).slice(-1)[0].date} (${(a.adjustments||[]).slice(-1)[0].diff >= 0 ? '+' : ''}${fmtCurr((a.adjustments||[]).slice(-1)[0].diff, a.currency)})</div>` : ''}
-      </div>`).join('');
+    if (!items.length) {
+      el.innerHTML = '<div class="empty-state"><div class="e-icon">🏦</div><div class="e-text">계좌를 추가하세요</div></div>';
+      return;
+    }
+    el.innerHTML = items.map(a => {
+      const isStock = a.type === 'stock';
+      const isCrypto = a.type === 'crypto';
+      const typeIcon = isStock ? ' 📈' : isCrypto ? ' 🪙' : '';
+      const depBtn = isStock ? getDepositBtn(a.id) : '';
+      const depDetail = (isStock && a.deposits)
+        ? Object.entries(a.deposits||{}).filter(function(e){return e[1]>0;}).map(function(e){return e[0]+' '+fmtNum(e[1]);}).join(' · ')
+        : '';
+      const balDisplay = fmtCurr(a.balance, a.currency);
+      const krwDisplay = fmtNum(Math.round(toKRW(a.balance, a.currency)));
+      const accClass = a.currency==='KRW' ? 'account-card kr' : a.currency==='CNY' ? 'account-card cn' : 'account-card';
+      return '<div class="' + accClass + '">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+          + '<div onclick="openAccountModal(\'\',' + "'" + a.id + "'" + ')" style="flex:1;">'
+            + '<div class="acc-bank">' + a.bank + typeIcon + '</div>'
+            + '<div class="acc-name">' + a.name + '</div>'
+            + '<div class="acc-balance">' + balDisplay + '</div>'
+            + (a.number ? '<div class="acc-num">****' + a.number + '</div>' : '')
+            + (depDetail ? '<div style="font-size:10px;opacity:0.7;margin-top:3px;">' + depDetail + '</div>' : '')
+            + '<div style="font-size:11px;opacity:0.6;margin-top:4px;">≈ ₩' + krwDisplay + '</div>'
+          + '</div>'
+          + '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-left:10px;">'
+            + depBtn
+            + '<button onclick="openAdjustModal(\'' + a.id + '\')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:10px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;">잔액조정</button>'
+          + '</div>'
+        + '</div>'
+        + ((a.adjustments||[]).length ? '<div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.2);padding-top:8px;font-size:11px;opacity:0.7;">최근 조정: ' + (a.adjustments||[]).slice(-1)[0].date + '</div>' : '')
+        + '</div>';
+    }).join('');
   };
 
   renderList(kr, document.getElementById('kr-accounts-list'), 'KRW');
@@ -2565,7 +2580,7 @@ function renderTradeList() {
     el.innerHTML = '<div class="empty-state"><div class="e-icon">📋</div><div class="e-text">거래 내역이 없습니다<br>매수/매도 버튼으로 추가하세요</div></div>';
     return;
   }
-  const flag = { KR:'🇰🇷', CN:'🇨🇳', US:'🇺🇸' };
+  const flag = { KR:'🇰🇷', CN:'🇨🇳', US:'🇺🇸', HK:'🇭🇰', JP:'🇯🇵' };
   el.innerHTML = '<div class="card">' + items.map(t => {
     const isSell = t.type === 'sell';
     const total = t.price * t.qty;
@@ -2624,7 +2639,7 @@ function renderStockAnalysis() {
     if (!byStock[key]) byStock[key] = { ticker: t.ticker, name: t.name, market: t.market, pl: 0, currency: t.currency };
     byStock[key].pl += t.realizedPL || 0;
   });
-  const flag = { KR:'🇰🇷', CN:'🇨🇳', US:'🇺🇸' };
+  const flag = { KR:'🇰🇷', CN:'🇨🇳', US:'🇺🇸', HK:'🇭🇰', JP:'🇯🇵' };
   const byStockEl = document.getElementById('an-by-stock');
   const stockEntries = Object.values(byStock).sort((a,b) => b.pl - a.pl);
   if (!stockEntries.length) {
@@ -2718,7 +2733,7 @@ function renderStockList() {
   document.getElementById('stock-pl-total').style.color = pl >= 0 ? 'var(--green)' : 'var(--red)';
 
   if (!items.length) { el.innerHTML = '<div class="empty-state"><div class="e-icon">📈</div><div class="e-text">종목을 추가하세요</div></div>'; return; }
-  const flag = { KR:'🇰🇷', CN:'🇨🇳', US:'🇺🇸' };
+  const flag = { KR:'🇰🇷', CN:'🇨🇳', US:'🇺🇸', HK:'🇭🇰', JP:'🇯🇵' };
   el.innerHTML = items.map(s => {
     const curr = getStockCurr(s.market);
     const val = s.qty * s.price;
