@@ -287,24 +287,6 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/wealthtrack/sw.js').then(reg=>{
-    reg.addEventListener('updatefound',()=>{
-      const nw=reg.installing;
-      nw.addEventListener('statechange',()=>{
-        if(nw.state==='installed'&&navigator.serviceWorker.controller){
-          const b=document.getElementById('update-banner');
-          if(b){
-            document.getElementById('update-banner-text').textContent='🆕 새 버전이 있습니다 - 탭하여 업데이트';
-            b.classList.add('show');
-          }
-        }
-      });
-    });
-  });
-}
-</script>
 </head>
 <body>
 
@@ -1260,7 +1242,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2.3.0';
+const APP_VERSION = 'v2.1.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2876,6 +2858,27 @@ function saveBudget() {
   setTimeout(silentUpdateCheck, 3000);
   // 10분마다 자동 동기화
   setInterval(autoSync, 600000);
+  // SW 업데이트 감지 - 새 버전 있으면 자동 활성화
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/wealthtrack/sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateBanner('새 버전');
+          }
+        });
+      });
+      // 이미 대기 중인 SW가 있으면 즉시 활성화
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+    }).catch(() => {});
+    // SW가 활성화되면 자동 새로고침
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
+  }
 }
 
 
@@ -3109,6 +3112,11 @@ function ghRequest(method, path, token, body) {
 async function syncToGH() {
   const token = localStorage.getItem('wt_gh_token');
   if (!token) { showToast('GitHub 토큰을 먼저 입력하세요'); return; }
+  // 데이터 비어있으면 수동 업로드도 경고
+  const hasData = accounts.length > 0 || ledger.length > 0 || stocks.length > 0 || realEstate.length > 0;
+  if (!hasData) {
+    if (!confirm('현재 데이터가 비어 있습니다. 빈 데이터를 업로드하면 기존 백업이 사라집니다. 계속하시겠습니까?')) return;
+  }
   const dot = document.getElementById('sync-dot');
   const text = document.getElementById('sync-text');
   dot.className = 'sync-dot syncing'; text.textContent = '업로드 중...';
@@ -3155,24 +3163,22 @@ async function syncFromGH() {
 }
 
 
-async function forceReload() {
-  showToast('업데이트 적용 중...');
-  try {
-    if('serviceWorker' in navigator && navigator.serviceWorker.controller){
-      navigator.serviceWorker.controller.postMessage('SKIP_WAITING');
-      navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
-    } else {
-      if('caches' in window){ const keys=await caches.keys(); await Promise.all(keys.map(k=>caches.delete(k))); }
-      location.reload(true);
-    }
-  } catch(e) { location.reload(true); }
+function autoSync() {
+  const token = localStorage.getItem('wt_gh_token');
+  if (!token) return;
+  // 데이터 비어있으면 업로드 안 함 (빈 데이터 덮어쓰기 방지)
+  const hasData = accounts.length > 0 || ledger.length > 0 || stocks.length > 0 || realEstate.length > 0;
+  if (!hasData) return;
+  const payload = JSON.stringify(getAllData(), null, 2);
+  const b64 = btoa(unescape(encodeURIComponent(payload)));
+  ghRequest('GET', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token)
+    .then(d => ghRequest('PUT', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token,
+      { message: 'auto-sync: ' + new Date().toISOString(), content: b64, sha: d.sha }))
+    .catch(() => ghRequest('PUT', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token,
+      { message: 'auto-sync: ' + new Date().toISOString(), content: b64 }))
+    .then(() => { localStorage.setItem('wt_sync_time', new Date().toLocaleString('ko-KR')); })
+    .catch(() => {});
 }
-
-async function doUpdate() {
-  if(!confirm('앱을 최신 버전으로 업데이트합니다. 데이터는 유지됩니다.')) return;
-  await forceReload();
-}
-
 
 async function silentUpdateCheck() {
   try {
@@ -3373,6 +3379,27 @@ function init() {
   setTimeout(silentUpdateCheck, 3000);
   // 10분마다 자동 동기화
   setInterval(autoSync, 600000);
+  // SW 업데이트 감지 - 새 버전 있으면 자동 활성화
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/wealthtrack/sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateBanner('새 버전');
+          }
+        });
+      });
+      // 이미 대기 중인 SW가 있으면 즉시 활성화
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+    }).catch(() => {});
+    // SW가 활성화되면 자동 새로고침
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
+  }
 }
 
 // Close modal on overlay click
