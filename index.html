@@ -317,7 +317,7 @@ if('serviceWorker' in navigator){
 <body>
 
 <!-- UPDATE BANNER -->
-<div id="update-banner" onclick="doUpdate()" style="display:none;background:#1d4ed8;color:#fff;padding:14px 16px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;position:fixed;top:0;left:0;right:0;z-index:99999;padding-top:calc(env(safe-area-inset-top)+14px)">
+<div id="update-banner" onclick="doUpdate()" style="display:none;background:#1d4ed8;color:#fff;padding:16px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;position:fixed;bottom:70px;left:0;right:0;z-index:99999;box-shadow:0 -2px 12px rgba(0,0,0,0.3);-webkit-tap-highlight-color:rgba(255,255,255,0.2);">
   🔄 새 버전이 있습니다 — 탭하여 업데이트
 </div>
 
@@ -1291,7 +1291,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2.9.0';
+const APP_VERSION = 'v3.0.0';
 
 // ========== DATA ==========
 function getData(key, def) {
