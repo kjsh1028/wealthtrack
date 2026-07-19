@@ -2055,7 +2055,8 @@ function applyTradeTypeUI() {
   document.getElementById('trade-modal-title').textContent = isSell ? '매도 입력' : '매수 입력';
   document.getElementById('btn-save-trade').textContent = isSell ? '매도 저장' : '매수 저장';
   document.getElementById('btn-save-trade').style.background = isSell ? 'var(--red)' : 'var(--navy)';
-  document.getElementById('trade-price-label').innerHTML = (isSell ? '매도 단가' : '매수 단가') + ' (<span id="trade-curr-sym">)</span>';
+  const priceLabel = document.getElementById('trade-price-label');
+  if (priceLabel) priceLabel.textContent = (isSell ? '매도 단가' : '매수 단가');
   document.getElementById('trade-stock-select-wrap').style.display = isSell ? 'block' : 'none';
   document.querySelectorAll('#trade-type-seg .seg-btn').forEach((b,i) => {
     b.classList.toggle('active', (i===0 && !isSell) || (i===1 && isSell));
