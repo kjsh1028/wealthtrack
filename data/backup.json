@@ -1,6 +1,96 @@
 {
   "ledger": [
     {
+      "id": "mrrfr12kfnm7",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 605460,
+      "date": "2026-07-19",
+      "category": "기타",
+      "payment": "신용카드(한국)",
+      "memo": "트레블 솔카드",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": true
+    },
+    {
+      "id": "mrrfqck2om0d",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 308631,
+      "date": "2026-07-19",
+      "category": "기타",
+      "payment": "신용카드(한국)",
+      "memo": "신한카드",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": true
+    },
+    {
+      "id": "mrrfhoqy1viq",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 4000,
+      "date": "2026-07-19",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "용산 김밥",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
+      "id": "mrra4ltw29rr",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 100,
+      "date": "2026-07-19",
+      "category": "잔액조정",
+      "payment": "신한은행(급여 생활비)",
+      "memo": "잔액불일치 조정 (조정 전: ₩70,230,712 → ₩70,230,612)",
+      "isAdjustment": true,
+      "ccPaid": false
+    },
+    {
+      "id": "mrra3pw6pmkh",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 1000,
+      "date": "2026-07-19",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "생수",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
+      "id": "mrr9mrohobk2",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 1900,
+      "date": "2026-07-19",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "빵",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
+      "id": "mrr5to795sl6",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 4200,
+      "date": "2026-07-19",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "커피",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mrr35h60wssr",
       "type": "expense",
       "currency": "KRW",
@@ -253,8 +343,18 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 70237812,
-      "number": "7321"
+      "balance": 70226612,
+      "number": "7321",
+      "adjustments": [
+        {
+          "date": "2026-07-19",
+          "reason": "잔액불일치 조정",
+          "oldBalance": 70230712,
+          "newBalance": 70230612,
+          "diff": -100,
+          "id": "mrra4ltwfvpw"
+        }
+      ]
     },
     {
       "id": "mrq0aee0e0wp",
@@ -263,22 +363,308 @@
       "currency": "CNY",
       "balance": 292443,
       "number": "2273"
+    },
+    {
+      "id": "mrr7gtucry5p",
+      "bank": "미래에셋증권계좌",
+      "name": "증권계좌",
+      "currency": "KRW",
+      "balance": 92469484,
+      "number": "",
+      "type": "stock",
+      "deposits": {}
+    },
+    {
+      "id": "mrr7jrpghxb2",
+      "bank": "업비트 계좌",
+      "name": "업비트 예치금",
+      "currency": "KRW",
+      "balance": 16933670,
+      "number": "",
+      "type": "crypto",
+      "deposits": {}
     }
   ],
-  "stocks": [],
-  "realEstate": [],
-  "debts": [],
-  "fixedExpenses": [],
+  "stocks": [
+    {
+      "id": "mrr606spknfp",
+      "market": "HK",
+      "ticker": "00700",
+      "name": "텐센트",
+      "qty": 100,
+      "avg": 606.5,
+      "price": 606.5,
+      "adjustments": []
+    },
+    {
+      "id": "mrr616q41qzm",
+      "market": "HK",
+      "ticker": "09908",
+      "name": "알리바바그룹홀딩스",
+      "qty": 100,
+      "avg": 168.9,
+      "price": 168.9,
+      "adjustments": []
+    }
+  ],
+  "realEstate": [
+    {
+      "id": "mrr63gx8v6yk",
+      "name": "부산 해운대 경동아파트",
+      "location": "부산 해운대 해변로 85 경동아파느 102-302",
+      "owner": "본인",
+      "currency": "KRW",
+      "cost": 500000000,
+      "value": 900000000,
+      "loan": 0
+    },
+    {
+      "id": "mrr74ojabw7m",
+      "name": "서울시 상암동 아파트",
+      "location": "상암동 1654 디엠씨이안상암 1 단지 1303 호",
+      "owner": "본인",
+      "currency": "KRW",
+      "cost": 500000000,
+      "value": 800000000,
+      "loan": 200000000
+    },
+    {
+      "id": "mrr9rp98zugh",
+      "name": "합비 중하이 아파트",
+      "location": "중국 합비",
+      "owner": "배우자",
+      "currency": "CNY",
+      "cost": 3400000,
+      "value": 3400000,
+      "loan": 1400000
+    },
+    {
+      "id": "mrr9syreo09t",
+      "name": "합비 샹파이 아파트",
+      "location": "합비 페이시시엔",
+      "owner": "배우자",
+      "currency": "CNY",
+      "cost": 300000,
+      "value": 700000,
+      "loan": 0
+    },
+    {
+      "id": "mrra7err3dsq",
+      "name": "홍성 토지",
+      "location": "홍성군 서부면 판교리 970-20",
+      "owner": "본인",
+      "currency": "KRW",
+      "cost": 100000000,
+      "value": 700000000,
+      "loan": 0
+    },
+    {
+      "id": "mrraai27reh4",
+      "name": "양산 임야",
+      "location": "양산시 원동면 화제리 산63-1",
+      "owner": "본인",
+      "currency": "KRW",
+      "cost": 20000000,
+      "value": 100000000,
+      "loan": 0
+    }
+  ],
+  "debts": [
+    {
+      "id": "mrrfmgiv9ron",
+      "name": "정석영 대출",
+      "currency": "KRW",
+      "amount": 80000000,
+      "rate": 0,
+      "due": ""
+    }
+  ],
+  "fixedExpenses": [
+    {
+      "id": "mrrfuqsjb3ux",
+      "name": "관리비",
+      "currency": "KRW",
+      "amount": 300000,
+      "day": 31,
+      "payment": "체크카드(한국)",
+      "category": "주거"
+    },
+    {
+      "id": "mrrfzwqoleuq",
+      "name": "상해 월세",
+      "currency": "CNY",
+      "amount": 18000,
+      "day": 31,
+      "payment": "체크카드(중국)",
+      "category": "주거"
+    },
+    {
+      "id": "mrrg1eqt789c",
+      "name": "클로드",
+      "currency": "KRW",
+      "amount": 199000,
+      "day": 6,
+      "payment": "신용카드(한국)",
+      "category": "구독"
+    },
+    {
+      "id": "mrrg31jy8zhc",
+      "name": "Chatg GPT",
+      "currency": "KRW",
+      "amount": 29000,
+      "day": 13,
+      "payment": "신용카드(한국)",
+      "category": "구독"
+    },
+    {
+      "id": "mrrg3tkizgft",
+      "name": "Icloud",
+      "currency": "KRW",
+      "amount": 11100,
+      "day": 15,
+      "payment": "신용카드(한국)",
+      "category": "구독"
+    },
+    {
+      "id": "mrrg61185c6t",
+      "name": "Ytube ",
+      "currency": "CNY",
+      "amount": 88,
+      "day": 2,
+      "payment": "신용카드(중국)",
+      "category": "구독"
+    },
+    {
+      "id": "mrrg6y5rrtau",
+      "name": "합비 집 대출",
+      "currency": "CNY",
+      "amount": 6000,
+      "day": 20,
+      "payment": "체크카드(중국)",
+      "category": "대출상환"
+    },
+    {
+      "id": "mrrg7whaqc9q",
+      "name": "시아루 생활비",
+      "currency": "CNY",
+      "amount": 20000,
+      "day": 30,
+      "payment": "체크카드(중국)",
+      "category": "기타"
+    },
+    {
+      "id": "mrrg9fw2y5bf",
+      "name": "Google play",
+      "currency": "KRW",
+      "amount": 29000,
+      "day": 9,
+      "payment": "체크카드(한국)",
+      "category": "구독"
+    },
+    {
+      "id": "mrrga7l0annp",
+      "name": "카카오톡",
+      "currency": "KRW",
+      "amount": 3800,
+      "day": 8,
+      "payment": "신용카드(한국)",
+      "category": "구독"
+    },
+    {
+      "id": "mrrgbgtnsw1v",
+      "name": "SK 텔레콤",
+      "currency": "KRW",
+      "amount": 47990,
+      "day": 30,
+      "payment": "체크카드(한국)",
+      "category": "통신"
+    },
+    {
+      "id": "mrrgc4hyugad",
+      "name": "SK 텔레콤 시아루",
+      "currency": "KRW",
+      "amount": 30000,
+      "day": 31,
+      "payment": "체크카드(한국)",
+      "category": "통신"
+    },
+    {
+      "id": "mrrgdt4aml4l",
+      "name": "Deepl 번역",
+      "currency": "USD",
+      "amount": 44,
+      "day": 2,
+      "payment": "신용카드(한국)",
+      "category": "구독"
+    },
+    {
+      "id": "mrrghupnnbio",
+      "name": "개혁신당",
+      "currency": "KRW",
+      "amount": 10000,
+      "day": 15,
+      "payment": "체크카드(한국)",
+      "category": "기타"
+    },
+    {
+      "id": "mrrgi9a83mit",
+      "name": "온율 기부",
+      "currency": "KRW",
+      "amount": 10000,
+      "day": 15,
+      "payment": "체크카드(한국)",
+      "category": "기타"
+    }
+  ],
   "fixedStatus": {},
   "rates": {
     "usd": 1486,
     "cny": 219,
     "usdcny": 6.7892,
-    "updatedAt": "2026. 7. 19. 오전 10:04:10 (자동)"
+    "updatedAt": "2026. 7. 19. 오후 1:20:20 (자동)"
   },
-  "budget": 0,
+  "budget": 10000000,
   "assetSnapshots": [],
-  "stockTrades": [],
-  "exportedAt": "2026-07-19T01:41:05.638Z",
-  "version": "v2026071905"
+  "stockTrades": [
+    {
+      "id": "mrr616q4tnzi",
+      "type": "buy",
+      "market": "HK",
+      "ticker": "09908",
+      "name": "알리바바그룹홀딩스",
+      "qty": 100,
+      "price": 168.9,
+      "fee": 0,
+      "date": "2026-07-19",
+      "memo": "",
+      "currency": "USD"
+    },
+    {
+      "id": "mrr606spqxag",
+      "type": "buy",
+      "market": "HK",
+      "ticker": "00700",
+      "name": "텐센트",
+      "qty": 100,
+      "price": 606.5,
+      "fee": 0,
+      "date": "2026-07-19",
+      "memo": "",
+      "currency": "USD"
+    }
+  ],
+  "cryptos": [
+    {
+      "id": "mrr6n9p7pb5f",
+      "symbol": "BTC",
+      "name": "비트코인",
+      "cgid": "bitcoin",
+      "qty": 0.03849285,
+      "avg": 131556235,
+      "price": 96136480,
+      "exchange": "업비트"
+    }
+  ],
+  "exportedAt": "2026-07-19T08:24:53.859Z",
+  "version": "v2026071923"
 }
