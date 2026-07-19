@@ -247,6 +247,17 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 .more-item-sub { font-size:11px; color:var(--sub); margin-top:2px; }
 .more-arrow { font-size:20px; color:var(--border); font-weight:300; }
 
+
+/* MORE PAGE */
+.more-item{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;}
+.more-item:last-child{border-bottom:none;}
+.more-item:active{background:var(--bg);}
+.more-item-left{display:flex;align-items:center;gap:12px;}
+.more-item-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.more-item-title{font-size:15px;font-weight:700;color:var(--navy);}
+.more-item-sub{font-size:11px;color:var(--sub);margin-top:2px;}
+.more-arrow{font-size:20px;color:var(--border);}
+
 /* UPDATE BANNER */
 .update-banner { position: fixed; top: 0; left: 0; right: 0; background: var(--gold); color: var(--navy); padding: 12px 16px; z-index: 500; display: none; align-items: center; justify-content: space-between; padding-top: calc(env(safe-area-inset-top) + 12px); }
 .update-banner.show { display: flex; }
@@ -287,6 +298,24 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/wealthtrack/sw.js').then(reg=>{
+    reg.addEventListener('updatefound',()=>{
+      const nw=reg.installing;
+      nw.addEventListener('statechange',()=>{
+        if(nw.state==='installed'&&navigator.serviceWorker.controller){
+          const b=document.getElementById('update-banner');
+          if(b){
+            document.getElementById('update-banner-text').textContent='🆕 새 버전이 있습니다';
+            b.classList.add('show');
+          }
+        }
+      });
+    });
+  });
+}
+</script>
 </head>
 <body>
 
@@ -755,6 +784,36 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
   </div>
 </div>
 
+
+<!-- MORE -->
+<div id="page-more" class="page">
+  <div class="header"><h1>더보기</h1></div>
+  <div style="padding:16px;">
+    <div class="card" style="padding:0;">
+      <div class="more-item" onclick="showPage('accounts',null)">
+        <div class="more-item-left"><div class="more-item-icon" style="background:#e8f5e9;">🏦</div><div><div class="more-item-title">계좌 & 자산</div><div class="more-item-sub">계좌 잔액 · 신용카드 관리</div></div></div>
+        <div class="more-arrow">›</div>
+      </div>
+      <div class="more-item" onclick="showPage('fixed',null)">
+        <div class="more-item-left"><div class="more-item-icon" style="background:#fff3e0;">🔄</div><div><div class="more-item-title">고정지출</div><div class="more-item-sub" id="more-fixed-sub">월 정기지출 관리</div></div></div>
+        <div class="more-arrow">›</div>
+      </div>
+      <div class="more-item" onclick="showPage('analysis',null)">
+        <div class="more-item-left"><div class="more-item-icon" style="background:#e3f2fd;">📊</div><div><div class="more-item-title">분석</div><div class="more-item-sub">월별 수입/지출 · 자산 추이</div></div></div>
+        <div class="more-arrow">›</div>
+      </div>
+      <div class="more-item" onclick="showPage('settings',null)">
+        <div class="more-item-left"><div class="more-item-icon" style="background:#f3e5f5;">⚙️</div><div><div class="more-item-title">설정</div><div class="more-item-sub">환율 · 동기화 · 업데이트</div></div></div>
+        <div class="more-arrow">›</div>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:12px;">
+      <div class="mini-card"><div class="mc-label">🏦 계좌</div><div class="mc-val" id="more-acc-count" style="font-size:22px;">0개</div></div>
+      <div class="mini-card"><div class="mc-label">🔄 고정지출</div><div class="mc-val" id="more-fixed-total" style="font-size:18px;color:var(--red);">₩0</div></div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--sub);padding:20px 0;" id="more-version-text"></div>
+  </div>
+</div>
 <!-- SETTINGS -->
 <div id="page-settings" class="page">
   <div class="header">
@@ -814,6 +873,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
         </div>
         <button class="btn-primary" onclick="checkUpdate()" style="margin-top:8px;" id="btn-check-update">업데이트 확인</button>
         <button id="btn-do-update" class="btn-primary" onclick="doUpdate()" style="display:none;margin-top:8px;background:var(--green);">🆕 지금 업데이트</button>
+        <button class="btn-secondary" onclick="forceReload()" style="margin-top:8px;">🔄 강제 새로고침 (캐시 초기화)</button>
         <button class="btn-secondary" onclick="forceReload()" style="margin-top:8px;">🔄 강제 새로고침 (캐시 초기화)</button>
       </div>
     </div>
@@ -1245,7 +1305,7 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 </div>
 
 <script>
-const APP_VERSION = 'v2.1.0';
+const APP_VERSION = 'v2.6.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2862,33 +2922,14 @@ function saveBudget() {
   setData('budget', budget);
   showToast('예산 저장됨');
   renderDashboard();
+  // 앱 시작 시 자동 GitHub 동기화
+  setTimeout(() => ghAutoSync(), 1500);
   // 앱 시작 시 자동 환율 조회 (백그라운드)
-  setTimeout(fetchAutoRates, 2000);
+  setTimeout(fetchAutoRates, 3000);
   // 시작 시 업데이트 체크
   setTimeout(silentUpdateCheck, 3000);
   // 10분마다 자동 동기화
   setInterval(autoSync, 600000);
-  // SW 업데이트 감지 - 새 버전 있으면 자동 활성화
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/wealthtrack/sw.js').then(reg => {
-      reg.addEventListener('updatefound', () => {
-        const newSW = reg.installing;
-        newSW.addEventListener('statechange', () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            showUpdateBanner('새 버전');
-          }
-        });
-      });
-      // 이미 대기 중인 SW가 있으면 즉시 활성화
-      if (reg.waiting) {
-        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-      }
-    }).catch(() => {});
-    // SW가 활성화되면 자동 새로고침
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      window.location.reload();
-    });
-  }
 }
 
 
@@ -3160,6 +3201,23 @@ async function syncFromGH() {
 }
 
 
+async function forceReload() {
+  showToast('업데이트 적용 중...');
+  try {
+    if('serviceWorker' in navigator && navigator.serviceWorker.controller){
+      navigator.serviceWorker.controller.postMessage('SKIP_WAITING');
+      navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+    } else {
+      if('caches' in window){ const keys=await caches.keys(); await Promise.all(keys.map(k=>caches.delete(k))); }
+      location.reload(true);
+    }
+  } catch(e) { location.reload(true); }
+}
+async function doUpdate() {
+  if(!confirm('앱을 최신 버전으로 업데이트합니다. 데이터는 유지됩니다.')) return;
+  await forceReload();
+}
+
 async function silentUpdateCheck() {
   try {
     const res = await fetch(GH_RAW + '?t=' + Date.now());
@@ -3353,33 +3411,14 @@ function init() {
   }
 
   renderDashboard();
+  // 앱 시작 시 자동 GitHub 동기화
+  setTimeout(() => ghAutoSync(), 1500);
   // 앱 시작 시 자동 환율 조회 (백그라운드)
-  setTimeout(fetchAutoRates, 2000);
+  setTimeout(fetchAutoRates, 3000);
   // 시작 시 업데이트 체크
   setTimeout(silentUpdateCheck, 3000);
   // 10분마다 자동 동기화
   setInterval(autoSync, 600000);
-  // SW 업데이트 감지 - 새 버전 있으면 자동 활성화
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/wealthtrack/sw.js').then(reg => {
-      reg.addEventListener('updatefound', () => {
-        const newSW = reg.installing;
-        newSW.addEventListener('statechange', () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            showUpdateBanner('새 버전');
-          }
-        });
-      });
-      // 이미 대기 중인 SW가 있으면 즉시 활성화
-      if (reg.waiting) {
-        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-      }
-    }).catch(() => {});
-    // SW가 활성화되면 자동 새로고침
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      window.location.reload();
-    });
-  }
 }
 
 // Close modal on overlay click
