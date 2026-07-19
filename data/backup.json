@@ -488,7 +488,7 @@
       "currency": "CNY",
       "cost": 3270000,
       "value": 3270000,
-      "loan": 1400000
+      "loan": 1500000
     },
     {
       "id": "mrr9syreo09t",
@@ -726,6 +726,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-19T13:20:40.034Z",
+  "exportedAt": "2026-07-19T13:22:29.642Z",
   "version": "v2026071925"
 }
