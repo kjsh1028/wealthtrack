@@ -1291,7 +1291,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071902';
+const APP_VERSION = 'v2026071903';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -3065,13 +3065,17 @@ const _origRenderSettings = typeof renderSettings === 'function' ? renderSetting
 
 // ========== GITHUB SYNC ==========
 function saveGHToken() {
-  const token = document.getElementById('s-gh-token').value;
-  if (!token || token.includes('...')) { showToast('올바른 토큰을 입력하세요'); return; }
+  const inputVal = document.getElementById('s-gh-token').value;
+  // 마스킹된 값이면 기존 localStorage 토큰 그대로 사용
+  const token = inputVal.includes('...') ? localStorage.getItem('wt_gh_token') : inputVal;
+  if (!token) { showToast('토큰을 입력하세요'); return; }
   localStorage.setItem('wt_gh_token', token);
-  showToast('토큰 저장됨 - 데이터 불러오는 중...');
+  showToast('동기화 중...');
   updateSyncStatus();
-  // 토큰 저장 즉시 자동 merge 동기화
-  setTimeout(() => ghLoad(), 300);
+  ghLoad().then(ok => {
+    if(ok) { showToast('✓ 데이터 복원 완료'); renderDashboard(); }
+    else { showToast('동기화 준비됨'); }
+  });
 }
 
 function updateSyncStatus() {
@@ -3219,14 +3223,14 @@ async function ghLoad() {
     const d = await ghRequest('GET', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token);
     const raw = d.content.split('\n').join('');
     const gh = JSON.parse(decodeURIComponent(escape(atob(raw))));
-    const localCount = accounts.length + ledger.length + stocks.length;
     const ghCount = (gh.accounts||[]).length + (gh.ledger||[]).length + (gh.stocks||[]).length;
-    if(ghCount > localCount) {
-      // GitHub 데이터가 더 많음 - 적용
+    const localCount = accounts.length + ledger.length + stocks.length;
+    if(ghCount > 0 && ghCount >= localCount) {
+      // GitHub에 데이터 있으면 무조건 적용 (로컬이 비어있거나 같을 때)
       applyAllData(gh);
       renderDashboard();
-    } else if(localCount > 0) {
-      // 로컬이 같거나 많으면 GitHub에 저장
+    } else if(localCount > ghCount) {
+      // 로컬이 더 많으면 GitHub에 저장
       setTimeout(() => autoSync(), 2000);
     }
     const now = new Date().toLocaleString('ko-KR');
