@@ -316,7 +316,10 @@ if('serviceWorker' in navigator){
 </head>
 <body>
 
-
+<!-- UPDATE BANNER (LegalTrack 방식) -->
+<div id="update-banner" onclick="doUpdate()" style="display:none;background:#1d4ed8;color:#fff;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;position:fixed;top:0;left:0;right:0;z-index:9999;padding-top:calc(env(safe-area-inset-top)+12px)">
+  🔄 새 버전이 있습니다 — 탭하여 업데이트
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -444,8 +447,8 @@ if('serviceWorker' in navigator){
       <div id="dash-recent-list"><div class="empty-state"><div class="e-icon">📋</div><div class="e-text">거래 내역이 없습니다</div></div></div>
     </div>
   </div>
-  <div id="update-banner" onclick="doUpdate()" style="display:none;background:#f59e0b;color:#1a2744;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;text-align:center;margin-top:8px;border-radius:8px;">
-    🔄 새 버전이 있습니다 — 탭하여 업데이트
+  <div id="update-banner" onclick="doUpdate()" style="display:none;background:#f59e0b;color:#1a2744;padding:12px 16px;font-size:14px;font-weight:800;cursor:pointer;text-align:center;">
+    🔄 새 버전 있음 — 탭하여 업데이트
   </div>
 </div>
 
@@ -1291,7 +1294,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071905';
+const APP_VERSION = 'v2026071906';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1323,14 +1326,39 @@ function save(key, val) {
   if (key === 'realestate') realEstate = val;
   if (key === 'debts') debts = val;
   if (key === 'fixed') fixedExpenses = val;
-  // 데이터 있을 때만 자동 저장 (빈 데이터 덮어쓰기 방지)
-  if (key !== 'rates') {
-    const hasData = accounts.length > 0 || ledger.length > 0 || stocks.length > 0 || realEstate.length > 0;
-    if (hasData) {
-      clearTimeout(_autoSaveTimer);
-      _autoSaveTimer = setTimeout(() => autoSync(), 5000);
-    }
+  // 데이터 변경 후 3초 뒤 자동 GitHub 저장 (debounce)
+  if (key !== 'rates') { // 환율은 자동저장 제외
+    clearTimeout(_autoSaveTimer);
+    _autoSaveTimer = setTimeout(() => autoSync(), 3000);
   }
+}
+
+// ========== UTILS ==========
+const CURR_SYMBOL = { KRW: '₩', CNY: '¥', USD: '$' };
+function fmtNum(n) { return Math.abs(n).toLocaleString('ko-KR'); }
+function fmtCurr(n, curr) { return CURR_SYMBOL[curr] + fmtNum(n); }
+function toKRW(amount, curr) {
+  if (curr === 'KRW') return amount;
+  if (curr === 'CNY') return amount * rates.cny;
+  if (curr === 'USD') return amount * rates.usd;
+  if (curr === 'HKD') return amount * (rates.hkd || rates.usd / 7.8); // HKD≈USD/7.8
+  if (curr === 'JPY') return amount * (rates.jpy || rates.usd / 150); // JPY≈USD/150
+  return amount;
+}
+
+function getStockCurr(market) {
+  const map = { KR:'KRW', CN:'CNY', US:'USD', HK:'HKD', JP:'JPY' };
+  return map[market] || 'KRW';
+}
+
+function getMarketFlag(market) {
+  const map = { KR:'🇰🇷', CN:'🇨🇳', US:'🇺🇸', HK:'🇭🇰', JP:'🇯🇵' };
+  return map[market] || '🌐';
+}
+
+function getCurrSymbol(curr) {
+  const map = { KRW:'₩', CNY:'¥', USD:'$', HKD:'HK$', JPY:'¥' };
+  return map[curr] || curr;
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 function today() {
@@ -2891,17 +2919,6 @@ function saveBudget() {
   setTimeout(silentUpdateCheck, 3000);
   // 10분마다 자동 동기화
   setInterval(autoSync, 600000);
-  // 모달 오버레이 클릭시 닫기
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
-  });
-}
-
-// 앱 시작
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
 }
 
 
@@ -3065,17 +3082,15 @@ const _origRenderSettings = typeof renderSettings === 'function' ? renderSetting
 
 // ========== GITHUB SYNC ==========
 function saveGHToken() {
-  const inputVal = document.getElementById('s-gh-token').value;
-  const token = inputVal.includes('...') ? localStorage.getItem('wt_gh_token') : inputVal;
-  if (!token) { showToast('토큰을 입력하세요'); return; }
+  const token = document.getElementById('s-gh-token').value;
+  if (!token || token.includes('...')) { showToast('올바른 토큰을 입력하세요'); return; }
   localStorage.setItem('wt_gh_token', token);
-  showToast('동기화 중...');
+  showToast('토큰 저장됨 - 데이터 불러오는 중...');
   updateSyncStatus();
-  ghLoad().then(ok => {
-    if(ok) showToast('✓ 데이터 복원 완료');
-    else showToast('데이터 없음 또는 실패');
-  });
+  // 토큰 저장 즉시 자동 merge 동기화
+  setTimeout(() => ghLoad(), 300);
 }
+
 function updateSyncStatus() {
   const token = localStorage.getItem('wt_gh_token');
   const dot = document.getElementById('sync-dot');
@@ -3191,54 +3206,39 @@ async function doUpdate() {
   await forceReload();
 }
 
-function autoSync() {
-  const token = localStorage.getItem('wt_gh_token');
-  if (!token) return;
-  // 데이터 없으면 절대 업로드 안 함
-  const hasData = accounts.length > 0 || ledger.length > 0 || stocks.length > 0 || realEstate.length > 0;
-  if (!hasData) return;
-  const payload = JSON.stringify(getAllData(), null, 2);
-  const b64 = btoa(unescape(encodeURIComponent(payload)));
-  ghRequest('GET', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token)
-    .then(d => ghRequest('PUT', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token,
-      {message: 'auto-sync: ' + new Date().toISOString(), content: b64, sha: d.sha}))
-    .catch(() => ghRequest('PUT', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token,
-      {message: 'auto-sync: ' + new Date().toISOString(), content: b64}))
-    .then(() => {
-      localStorage.setItem('wt_sync_time', new Date().toLocaleString('ko-KR'));
-      updateSyncDot('ok', '✓ 동기화 완료');
-    })
-    .catch(() => {});
-}
-
-
 // ── GitHub 동기화 (LegalTrack 방식) ──
 async function ghLoad() {
   const token = localStorage.getItem('wt_gh_token');
   if(!token) return false;
-  updateSyncDot('sy', '데이터 불러오는 중...');
+  updateSyncDot('sy', 'GitHub 불러오는 중...');
   try {
     const d = await ghRequest('GET', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token);
-    const raw = d.content.replace(/[\r\n]/g, '');
+    const raw = d.content.split('\n').join('');
     const gh = JSON.parse(decodeURIComponent(escape(atob(raw))));
-    if(gh && ((gh.accounts||[]).length > 0 || (gh.ledger||[]).length > 0)) {
+    const localCount = accounts.length + ledger.length + stocks.length;
+    const ghCount = (gh.accounts||[]).length + (gh.ledger||[]).length + (gh.stocks||[]).length;
+    if(ghCount > localCount) {
       applyAllData(gh);
       renderDashboard();
-      const now = new Date().toLocaleString('ko-KR');
-      localStorage.setItem('wt_sync_time', now);
-      updateSyncDot('ok', '✓ 불러오기 완료 (' + (gh.accounts||[]).length + '개 계좌)');
-      const lastEl = document.getElementById('sync-last-time');
-      if(lastEl) lastEl.textContent = '마지막 동기화: ' + now;
-      return true;
-    } else {
-      updateSyncDot('ok', '동기화 준비됨');
-      return false;
+    } else if(localCount > 0 && localCount > ghCount) {
+      // 로컬이 더 많으면 GitHub에 저장
+      setTimeout(() => autoSync(), 500);
     }
+    const now = new Date().toLocaleString('ko-KR');
+    localStorage.setItem('wt_sync_time', now);
+    updateSyncDot('ok', '✓ 동기화 완료');
+    const lastEl = document.getElementById('sync-last-time');
+    if(lastEl) lastEl.textContent = '마지막 동기화: ' + now;
+    return true;
   } catch(e) {
-    updateSyncDot('err', '실패: ' + e.message.slice(0,30));
+    // 백업 없으면 현재 데이터 올리기
+    const hasData = accounts.length > 0 || ledger.length > 0;
+    if(hasData) setTimeout(() => autoSync(), 500);
+    updateSyncDot('ok', '동기화 준비됨');
     return false;
   }
 }
+
 function updateSyncDot(state, msg) {
   const dot = document.getElementById('sync-dot');
   const text = document.getElementById('sync-text');
@@ -3484,13 +3484,7 @@ async function init() {
   setInterval(autoSync, 600000);
 }
 
-
-// ========== START ==========
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
 </script>
 </body>
 </html>
