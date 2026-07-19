@@ -384,20 +384,6 @@ if('serviceWorker' in navigator){
 
 
 
-<!-- DETAIL OVERLAY & PANEL -->
-<div class="detail-overlay" id="detail-overlay" onclick="closeDetailPanel()"></div>
-<div class="detail-panel" id="detail-panel">
-  <div class="detail-panel-handle"></div>
-  <div class="detail-panel-header">
-    <div class="detail-panel-icon" id="dp-icon">💵</div>
-    <div>
-      <div class="detail-panel-title" id="dp-title">상세</div>
-      <div class="detail-panel-total" id="dp-total"></div>
-    </div>
-  </div>
-  <div class="detail-panel-body" id="dp-body"></div>
-</div>
-
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -412,7 +398,7 @@ if('serviceWorker' in navigator){
         <div class="header-sub" id="dash-date"></div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <button id="update-banner" onclick="doUpdate()" style="display:none;background:#f59e0b;color:#1a2744;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer;">🔄 업데이트</button>
+        
         <button class="btn-rate" onclick="openRateModal()" style="font-size:11px;">환율</button>
         <button onclick="showPage('settings', null)" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">⚙️</button>
       </div>
@@ -459,39 +445,25 @@ if('serviceWorker' in navigator){
       </div>
     </div>
 
-    <!-- 자산 카드 2x2 그리드 -->
+    <!-- 자산 카드 2x2 - 금액만 표시, 탭하면 해당 탭으로 이동 -->
     <div class="asset-grid" style="margin-bottom:12px;">
-      <!-- 현금/계좌 -->
-      <div class="asset-card" onclick="openDetailPanel('cash')">
-        <div class="ac-icon">💵</div>
-        <div class="ac-label">현금 / 계좌</div>
+      <div class="asset-card" onclick="showPage('more',null);setTimeout(()=>showPage('accounts',null),50)">
+        <div class="ac-label">💵 현금/계좌</div>
         <div class="ac-amount" id="dash-cash-total">₩0</div>
-        <div class="ac-sub" id="dash-cash-sub"></div>
-        <div class="tap-hint">탭하여 상세 ›</div>
       </div>
-      <!-- 주식 -->
-      <div class="asset-card" onclick="openDetailPanel('stock')">
-        <div class="ac-icon">📈</div>
-        <div class="ac-label">주식</div>
+      <div class="asset-card" onclick="showPage('invest',document.querySelectorAll('.nav-item')[3])">
+        <div class="ac-label">📈 주식</div>
         <div class="ac-amount" id="dash-stock-total">₩0</div>
-        <div class="ac-pl" id="dash-stock-pl"></div>
-        <div class="tap-hint">탭하여 상세 ›</div>
+        <div class="ac-pl" id="dash-stock-pl" style="font-size:12px;margin-top:2px;"></div>
       </div>
-      <!-- 가상자산 -->
-      <div class="asset-card" onclick="openDetailPanel('crypto')">
-        <div class="ac-icon">🪙</div>
-        <div class="ac-label">가상자산</div>
+      <div class="asset-card" onclick="showPage('invest',document.querySelectorAll('.nav-item')[3]);setTimeout(()=>setInvestTab(document.querySelector('#page-invest .inner-tab:nth-child(2)'),'crypto'),100)">
+        <div class="ac-label">🪙 가상자산</div>
         <div class="ac-amount" id="dash-crypto-total">₩0</div>
-        <div class="ac-pl" id="dash-crypto-pl"></div>
-        <div class="tap-hint">탭하여 상세 ›</div>
+        <div class="ac-pl" id="dash-crypto-pl" style="font-size:12px;margin-top:2px;"></div>
       </div>
-      <!-- 부동산 -->
-      <div class="asset-card" onclick="openDetailPanel('realestate')">
-        <div class="ac-icon">🏠</div>
-        <div class="ac-label">부동산 순자산</div>
+      <div class="asset-card" onclick="showPage('invest',document.querySelectorAll('.nav-item')[3]);setTimeout(()=>setInvestTab(document.querySelector('#page-invest .inner-tab:nth-child(3)'),'realestate'),100)">
+        <div class="ac-label">🏠 부동산</div>
         <div class="ac-amount" id="dash-re-total">₩0</div>
-        <div style="font-size:11px;color:var(--sub);margin-top:3px;" id="dash-re-sub"></div>
-        <div class="tap-hint">탭하여 상세 ›</div>
       </div>
     </div>
 
@@ -500,12 +472,10 @@ if('serviceWorker' in navigator){
       <div class="mini-card">
         <div class="mc-label">이번 달 수입</div>
         <div class="mc-val income" id="dash-income">₩0</div>
-        <div class="mc-sub">이번 달</div>
       </div>
       <div class="mini-card">
         <div class="mc-label">이번 달 지출</div>
         <div class="mc-val" style="color:var(--red)" id="dash-expense">₩0</div>
-        <div class="mc-sub">이번 달</div>
       </div>
     </div>
 
@@ -1459,7 +1429,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071913';
+const APP_VERSION = 'v2026071914';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1628,10 +1598,7 @@ function renderDashboard() {
     else cashOther += k;
   });
   document.getElementById('dash-cash-total').textContent = '₩' + fmtNum(Math.round(cashKRW));
-  const cashSubParts = [];
-  if (cashKR) cashSubParts.push('🇰🇷 ₩' + fmtNum(Math.round(cashKR)));
-  if (cashCN) cashSubParts.push('🇨🇳 ¥' + fmtNum(Math.round(cashCN)));
-  document.getElementById('dash-cash-sub').innerHTML = cashSubParts.join('<br>') || '계좌 없음';
+  // 현금 서브텍스트 제거됨
 
   // ── 주식 ──
   let stockKRW = 0, stockCostKRW = 0;
@@ -1651,8 +1618,7 @@ function renderDashboard() {
     plEl.textContent = (stockPL >= 0 ? '+' : '') + '₩' + fmtNum(Math.round(Math.abs(stockPL))) + ' (' + (stockPL >= 0 ? '+' : '') + stockPLPct + '%)';
     plEl.className = 'ac-pl ' + (stockPL >= 0 ? 'pos' : 'neg');
   } else { plEl.textContent = ''; }
-  const stockSubEl = document.getElementById('dash-stock-sub');
-  if(stockSubEl) stockSubEl.textContent = '';
+
   
   // 가상자산 대시보드 반영
   const cryptoKRW = cryptos.reduce((s,c) => s + c.qty * c.price, 0);
@@ -1670,8 +1636,7 @@ function renderDashboard() {
     reByOwner[owner] += (val - loan);
   });
   document.getElementById('dash-re-total').textContent = '₩' + fmtNum(Math.round(reNet));
-  const reSubEl = document.getElementById('dash-re-sub');
-  if(reSubEl) reSubEl.textContent = realEstate.length ? realEstate.length + '개 물건 · 대출 -₩' + fmtNum(Math.round(reLoan/100000000*10)/10) + '억' : '부동산 없음';
+
 
   // ── 총자산/부채 ──
   const grossAsset = cashKRW + stockKRW + reGross;
@@ -3629,8 +3594,8 @@ function updateSyncDot(state, msg) {
 const GH_RAW = 'https://raw.githubusercontent.com/kjsh1028/wealthtrack/main/index.html';
 
 function showUpdateBanner() {
-  const b = document.getElementById('update-banner');
-  if(b) b.style.display = 'block';
+  // 헤더 배너 제거됨 - 토스트로 알림
+  showToast('🆕 새 버전이 있습니다. 설정 → 업데이트 확인을 탭하세요.');
 }
 
 async function checkUpdate() {
