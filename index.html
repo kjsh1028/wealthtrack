@@ -306,10 +306,7 @@ if('serviceWorker' in navigator){
       nw.addEventListener('statechange',()=>{
         if(nw.state==='installed'&&navigator.serviceWorker.controller){
           const b=document.getElementById('update-banner');
-          if(b){
-            document.getElementById('update-banner-text').textContent='🆕 새 버전이 있습니다';
-            b.classList.add('show');
-          }
+          if(b)b.style.display='block';
         }
       });
     });
@@ -319,13 +316,9 @@ if('serviceWorker' in navigator){
 </head>
 <body>
 
-<!-- UPDATE BANNER -->
-<div class="update-banner" id="update-banner">
-  <div class="ub-text" id="update-banner-text">새 버전이 있습니다</div>
-  <div style="display:flex;align-items:center;gap:8px;">
-    <button class="ub-btn" onclick="doUpdate()">업데이트</button>
-    <span class="ub-close" onclick="document.getElementById('update-banner').classList.remove('show')">✕</span>
-  </div>
+<!-- UPDATE BANNER (LegalTrack 방식) -->
+<div id="update-banner" onclick="doUpdate()" style="display:none;background:#1d4ed8;color:#fff;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;position:fixed;top:0;left:0;right:0;z-index:9999;padding-top:calc(env(safe-area-inset-top)+12px)">
+  🔄 새 버전이 있습니다 — 탭하여 업데이트
 </div>
 
 <!-- TOAST -->
@@ -874,7 +867,7 @@ if('serviceWorker' in navigator){
         <button class="btn-primary" onclick="checkUpdate()" style="margin-top:8px;" id="btn-check-update">업데이트 확인</button>
         <button id="btn-do-update" class="btn-primary" onclick="doUpdate()" style="display:none;margin-top:8px;background:var(--green);">🆕 지금 업데이트</button>
         <button class="btn-secondary" onclick="forceReload()" style="margin-top:8px;">🔄 강제 새로고침 (캐시 초기화)</button>
-        <button class="btn-secondary" onclick="forceReload()" style="margin-top:8px;">🔄 강제 새로고침 (캐시 초기화)</button>
+        
       </div>
     </div>
 
@@ -1305,7 +1298,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2.6.0';
+const APP_VERSION = 'v2.7.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2923,7 +2916,7 @@ function saveBudget() {
   showToast('예산 저장됨');
   renderDashboard();
   // 앱 시작 시 자동 GitHub 동기화
-  setTimeout(() => ghAutoSync(), 1500);
+  
   // 앱 시작 시 자동 환율 조회 (백그라운드)
   setTimeout(fetchAutoRates, 3000);
   // 시작 시 업데이트 체크
@@ -3099,7 +3092,7 @@ function saveGHToken() {
   showToast('토큰 저장됨 - 데이터 불러오는 중...');
   updateSyncStatus();
   // 토큰 저장 즉시 자동 merge 동기화
-  setTimeout(() => ghAutoSync(), 300);
+  setTimeout(() => ghLoad(), 300);
 }
 
 function updateSyncStatus() {
@@ -3217,6 +3210,47 @@ async function doUpdate() {
   if(!confirm('앱을 최신 버전으로 업데이트합니다. 데이터는 유지됩니다.')) return;
   await forceReload();
 }
+
+// ── GitHub 동기화 (LegalTrack 방식) ──
+async function ghLoad() {
+  const token = localStorage.getItem('wt_gh_token');
+  if(!token) return false;
+  updateSyncDot('sy', 'GitHub 불러오는 중...');
+  try {
+    const d = await ghRequest('GET', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token);
+    const raw = d.content.split('\n').join('');
+    const gh = JSON.parse(decodeURIComponent(escape(atob(raw))));
+    const localCount = accounts.length + ledger.length + stocks.length;
+    const ghCount = (gh.accounts||[]).length + (gh.ledger||[]).length + (gh.stocks||[]).length;
+    if(ghCount > localCount) {
+      applyAllData(gh);
+      renderDashboard();
+    } else if(localCount > 0 && localCount > ghCount) {
+      // 로컬이 더 많으면 GitHub에 저장
+      setTimeout(() => autoSync(), 500);
+    }
+    const now = new Date().toLocaleString('ko-KR');
+    localStorage.setItem('wt_sync_time', now);
+    updateSyncDot('ok', '✓ 동기화 완료');
+    const lastEl = document.getElementById('sync-last-time');
+    if(lastEl) lastEl.textContent = '마지막 동기화: ' + now;
+    return true;
+  } catch(e) {
+    // 백업 없으면 현재 데이터 올리기
+    const hasData = accounts.length > 0 || ledger.length > 0;
+    if(hasData) setTimeout(() => autoSync(), 500);
+    updateSyncDot('ok', '동기화 준비됨');
+    return false;
+  }
+}
+
+function updateSyncDot(state, msg) {
+  const dot = document.getElementById('sync-dot');
+  const text = document.getElementById('sync-text');
+  if(dot) dot.className = 'sync-dot' + (state==='ok'?' ok':state==='sy'?' syncing':state==='err'?' err':'');
+  if(text) text.textContent = msg;
+}
+
 
 async function silentUpdateCheck() {
   try {
@@ -3399,34 +3433,19 @@ function doImport(e) {
 
 
 // ========== INIT ==========
-function init() {
+async function init() {
   const monInput = document.getElementById('ledger-month-filter');
   monInput.value = thisMonth();
-
-  // Monthly snapshot
-  const lastSnap = assetSnapshots[assetSnapshots.length-1];
-  const nowMon = thisMonth();
-  if (!lastSnap || !lastSnap.month.startsWith(nowMon)) {
-    // Will be saved end of month; for now just render
+  // LegalTrack 방식: 토큰 있으면 시작 시 바로 ghLoad
+  const token = localStorage.getItem('wt_gh_token');
+  if(token) {
+    await ghLoad();
   }
-
   renderDashboard();
-  // 앱 시작 시 자동 GitHub 동기화
-  setTimeout(() => ghAutoSync(), 1500);
-  // 앱 시작 시 자동 환율 조회 (백그라운드)
-  setTimeout(fetchAutoRates, 3000);
-  // 시작 시 업데이트 체크
+  // 환율 자동 조회
+  setTimeout(fetchAutoRates, 2000);
+  // 업데이트 체크
   setTimeout(silentUpdateCheck, 3000);
-  // 10분마다 자동 동기화
+  // 10분마다 자동 저장
   setInterval(autoSync, 600000);
 }
-
-// Close modal on overlay click
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
-});
-
-init();
-</script>
-</body>
-</html>
