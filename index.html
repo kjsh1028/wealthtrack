@@ -316,8 +316,8 @@ if('serviceWorker' in navigator){
 </head>
 <body>
 
-<!-- UPDATE BANNER (LegalTrack 방식) -->
-<div id="update-banner" onclick="doUpdate()" style="display:none;background:#1d4ed8;color:#fff;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;position:fixed;top:0;left:0;right:0;z-index:9999;padding-top:calc(env(safe-area-inset-top)+12px)">
+<!-- UPDATE BANNER -->
+<div id="update-banner" onclick="doUpdate()" style="display:none;background:#1d4ed8;color:#fff;padding:14px 16px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;position:fixed;top:0;left:0;right:0;z-index:99999;padding-top:calc(env(safe-area-inset-top)+14px)">
   🔄 새 버전이 있습니다 — 탭하여 업데이트
 </div>
 
@@ -1291,7 +1291,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2.8.0';
+const APP_VERSION = 'v2.9.0';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1323,39 +1323,14 @@ function save(key, val) {
   if (key === 'realestate') realEstate = val;
   if (key === 'debts') debts = val;
   if (key === 'fixed') fixedExpenses = val;
-  // 데이터 변경 후 3초 뒤 자동 GitHub 저장 (debounce)
-  if (key !== 'rates') { // 환율은 자동저장 제외
-    clearTimeout(_autoSaveTimer);
-    _autoSaveTimer = setTimeout(() => autoSync(), 3000);
+  // 데이터 있을 때만 자동 저장 (빈 데이터 덮어쓰기 방지)
+  if (key !== 'rates') {
+    const hasData = accounts.length > 0 || ledger.length > 0 || stocks.length > 0 || realEstate.length > 0;
+    if (hasData) {
+      clearTimeout(_autoSaveTimer);
+      _autoSaveTimer = setTimeout(() => autoSync(), 5000);
+    }
   }
-}
-
-// ========== UTILS ==========
-const CURR_SYMBOL = { KRW: '₩', CNY: '¥', USD: '$' };
-function fmtNum(n) { return Math.abs(n).toLocaleString('ko-KR'); }
-function fmtCurr(n, curr) { return CURR_SYMBOL[curr] + fmtNum(n); }
-function toKRW(amount, curr) {
-  if (curr === 'KRW') return amount;
-  if (curr === 'CNY') return amount * rates.cny;
-  if (curr === 'USD') return amount * rates.usd;
-  if (curr === 'HKD') return amount * (rates.hkd || rates.usd / 7.8); // HKD≈USD/7.8
-  if (curr === 'JPY') return amount * (rates.jpy || rates.usd / 150); // JPY≈USD/150
-  return amount;
-}
-
-function getStockCurr(market) {
-  const map = { KR:'KRW', CN:'CNY', US:'USD', HK:'HKD', JP:'JPY' };
-  return map[market] || 'KRW';
-}
-
-function getMarketFlag(market) {
-  const map = { KR:'🇰🇷', CN:'🇨🇳', US:'🇺🇸', HK:'🇭🇰', JP:'🇯🇵' };
-  return map[market] || '🌐';
-}
-
-function getCurrSymbol(curr) {
-  const map = { KRW:'₩', CNY:'¥', USD:'$', HKD:'HK$', JPY:'¥' };
-  return map[curr] || curr;
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 function today() {
@@ -3203,6 +3178,27 @@ async function doUpdate() {
   await forceReload();
 }
 
+function autoSync() {
+  const token = localStorage.getItem('wt_gh_token');
+  if (!token) return;
+  // 데이터 없으면 절대 업로드 안 함
+  const hasData = accounts.length > 0 || ledger.length > 0 || stocks.length > 0 || realEstate.length > 0;
+  if (!hasData) return;
+  const payload = JSON.stringify(getAllData(), null, 2);
+  const b64 = btoa(unescape(encodeURIComponent(payload)));
+  ghRequest('GET', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token)
+    .then(d => ghRequest('PUT', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token,
+      {message: 'auto-sync: ' + new Date().toISOString(), content: b64, sha: d.sha}))
+    .catch(() => ghRequest('PUT', '/repos/kjsh1028/wealthtrack/contents/data/backup.json', token,
+      {message: 'auto-sync: ' + new Date().toISOString(), content: b64}))
+    .then(() => {
+      localStorage.setItem('wt_sync_time', new Date().toLocaleString('ko-KR'));
+      updateSyncDot('ok', '✓ 동기화 완료');
+    })
+    .catch(() => {});
+}
+
+
 // ── GitHub 동기화 (LegalTrack 방식) ──
 async function ghLoad() {
   const token = localStorage.getItem('wt_gh_token');
@@ -3215,11 +3211,12 @@ async function ghLoad() {
     const localCount = accounts.length + ledger.length + stocks.length;
     const ghCount = (gh.accounts||[]).length + (gh.ledger||[]).length + (gh.stocks||[]).length;
     if(ghCount > localCount) {
+      // GitHub 데이터가 더 많음 - 적용
       applyAllData(gh);
       renderDashboard();
-    } else if(localCount > 0 && localCount > ghCount) {
-      // 로컬이 더 많으면 GitHub에 저장
-      setTimeout(() => autoSync(), 500);
+    } else if(localCount > 0) {
+      // 로컬이 같거나 많으면 GitHub에 저장
+      setTimeout(() => autoSync(), 2000);
     }
     const now = new Date().toLocaleString('ko-KR');
     localStorage.setItem('wt_sync_time', now);
