@@ -472,12 +472,10 @@ if('serviceWorker' in navigator){
       <div class="mini-card" onclick="goToLedger('income')" style="cursor:pointer;">
         <div class="mc-label">이번 달 수입</div>
         <div class="mc-val income" id="dash-income">₩0</div>
-        <div style="font-size:10px;color:var(--sub);margin-top:3px;">탭하여 상세 ›</div>
       </div>
       <div class="mini-card" onclick="goToLedger('expense')" style="cursor:pointer;">
         <div class="mc-label">이번 달 지출</div>
         <div class="mc-val" style="color:var(--red)" id="dash-expense">₩0</div>
-        <div style="font-size:10px;color:var(--sub);margin-top:3px;">탭하여 상세 ›</div>
       </div>
     </div>
 
@@ -1431,7 +1429,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071915';
+const APP_VERSION = 'v2026071916';
 
 // ========== DATA ==========
 function getData(key, def) {
