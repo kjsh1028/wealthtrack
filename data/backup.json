@@ -666,6 +666,15 @@
       "day": 15,
       "payment": "체크카드(한국)",
       "category": "기타"
+    },
+    {
+      "id": "mrrtnlxz9pmt",
+      "name": "중국 개인 사무실 임대",
+      "currency": "CNY",
+      "amount": 2500,
+      "day": 15,
+      "payment": "체크카드(중국)",
+      "category": "주거"
     }
   ],
   "fixedStatus": {},
@@ -717,6 +726,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-19T13:15:51.811Z",
+  "exportedAt": "2026-07-19T13:18:53.330Z",
   "version": "v2026071925"
 }
