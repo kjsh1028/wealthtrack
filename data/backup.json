@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mrtag96a6lrc",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 309703,
+      "date": "2026-07-15",
+      "category": "식비",
+      "payment": "신한카드SOL",
+      "memo": "",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": true
+    },
+    {
       "id": "mrt98pto7vsz",
       "type": "expense",
       "currency": "KRW",
@@ -788,6 +801,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T13:55:47.092Z",
+  "exportedAt": "2026-07-20T13:56:49.836Z",
   "version": "v2026072003"
 }
