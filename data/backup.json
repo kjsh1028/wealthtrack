@@ -435,6 +435,18 @@
       "number": "",
       "type": "crypto",
       "deposits": {}
+    },
+    {
+      "id": "mrt8kfz2a8m0",
+      "bank": "신한은행",
+      "name": "신한카드",
+      "currency": "KRW",
+      "balance": 0,
+      "number": "",
+      "type": "cc",
+      "deposits": {},
+      "paydate": "25",
+      "payAccountId": "mrq082m3mg2f"
     }
   ],
   "stocks": [
@@ -726,6 +738,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T13:01:10.753Z",
+  "exportedAt": "2026-07-20T13:04:06.041Z",
   "version": "v2026072008"
 }
