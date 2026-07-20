@@ -3716,10 +3716,10 @@ async function checkUpdate() {
     if(latestEl) latestEl.textContent = latest;
     if(btn) btn.textContent = '업데이트 확인';
     if(latest !== APP_VERSION) {
-      if(latestSub) latestSub.textContent = '🆕 새 버전 있음';
-      if(latestEl) latestEl.style.color = 'var(--green)';
-      showUpdateBanner();
-      showToast('🆕 새 버전 ' + latest + ' — 상단 배너를 탭하세요');
+      if(latestSub) latestSub.textContent = '🆕 새 버전 있음 — 업데이트 적용 중...';
+      if(latestEl) { latestEl.textContent = latest; latestEl.style.color = 'var(--green)'; }
+      showToast('🆕 새 버전 ' + latest + ' — 잠시 후 재시작됩니다');
+      setTimeout(() => forceReload(), 1500);
     } else {
       if(latestSub) latestSub.textContent = '✓ 최신 버전입니다';
       if(latestEl) latestEl.style.color = 'var(--green)';
