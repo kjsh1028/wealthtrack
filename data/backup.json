@@ -9,7 +9,7 @@
       "category": "기타",
       "payment": "신한카드",
       "memo": "",
-      "ccPaid": true,
+      "ccPaid": false,
       "linkedAccountId": "mrq082m3mg2f",
       "isCreditCard": true
     },
@@ -801,6 +801,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T14:14:30.179Z",
+  "exportedAt": "2026-07-20T14:15:56.870Z",
   "version": "v2026072006"
 }
