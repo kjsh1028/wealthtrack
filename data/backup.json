@@ -9,7 +9,7 @@
       "category": "식비",
       "payment": "신용카드(한국)",
       "memo": "",
-      "ccPaid": true,
+      "ccPaid": false,
       "linkedAccountId": "mrt8kfz2a8m0",
       "isCreditCard": true
     },
@@ -801,6 +801,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T13:27:35.702Z",
+  "exportedAt": "2026-07-20T13:27:39.654Z",
   "version": "v2026072009"
 }
