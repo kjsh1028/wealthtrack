@@ -1440,7 +1440,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071930';
+const APP_VERSION = 'v2026071931';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -4311,10 +4311,19 @@ function renderCCTab() {
         '<div class="li-title">' + t.category + (t.memo ? ' · ' + t.memo : '') + paidMark + '</div>' +
         '<div class="li-sub">' + t.payment + ' · ' + t.date + '</div>' +
       '</div>' +
-      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">' +
-        '<div class="li-amount expense">' + sym + fmtNum(t.amount) + '</div>' +
-        '<button onclick="event.stopPropagation();toggleCCPaid('' + t.id + '')" style="font-size:10px;padding:3px 8px;border-radius:8px;border:1px solid ' + (t.ccPaid ? 'var(--green)' : 'var(--border)') + ';background:' + (t.ccPaid ? '#e8f5e9' : '#fff') + ';color:' + (t.ccPaid ? 'var(--green)' : 'var(--sub)') + ';cursor:pointer;">' + (t.ccPaid ? '✓ 결제됨' : '미결제') + '</button>' +
-      '</div>';
+          // 오른쪽 영역 DOM으로 구성
+    const right = document.createElement('div');
+    right.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:4px;';
+    const amtEl = document.createElement('div');
+    amtEl.className = 'li-amount expense';
+    amtEl.textContent = sym + fmtNum(t.amount);
+    right.appendChild(amtEl);
+    const tBtn = document.createElement('button');
+    tBtn.style.cssText = 'font-size:10px;padding:3px 8px;border-radius:8px;cursor:pointer;border:1px solid ' + (t.ccPaid ? 'var(--green)' : 'var(--border)') + ';background:' + (t.ccPaid ? '#e8f5e9' : '#fff') + ';color:' + (t.ccPaid ? 'var(--green)' : 'var(--sub)') + ';';
+    tBtn.textContent = t.ccPaid ? '✓ 결제됨' : '미결제';
+    tBtn.onclick = (function(tid){ return function(e){ e.stopPropagation(); toggleCCPaid(tid); }; })(t.id);
+    right.appendChild(tBtn);
+    row.appendChild(right);
 
     row.onclick = function() { openLedgerModal(t.id); };
     card.appendChild(row);
