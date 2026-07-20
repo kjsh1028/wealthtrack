@@ -1103,6 +1103,24 @@ if('serviceWorker' in navigator){
     </div>
     <div class="form-group"><label class="form-label">현재 잔액</label><input class="form-input" type="text" inputmode="decimal" id="inp-acc-balance" placeholder="0"></div>
     <div class="form-group"><label class="form-label">계좌번호 (선택)</label><input class="form-input" id="inp-acc-num" placeholder="뒤 4자리 또는 메모용"></div>
+    <div class="form-group" id="acc-paydate-wrap" style="display:none;">
+      <label class="form-label">💳 카드 결제일</label>
+      <select class="form-input form-select" id="inp-acc-paydate">
+        <option value="">결제일 선택</option>
+        <option value="1">매월 1일</option>
+        <option value="5">매월 5일</option>
+        <option value="7">매월 7일</option>
+        <option value="10">매월 10일</option>
+        <option value="14">매월 14일</option>
+        <option value="15">매월 15일</option>
+        <option value="17">매월 17일</option>
+        <option value="20">매월 20일</option>
+        <option value="25">매월 25일</option>
+        <option value="27">매월 27일</option>
+        <option value="말일">말일</option>
+      </select>
+      <div style="font-size:11px;color:var(--sub);margin-top:4px;">전월 사용액 결제일</div>
+    </div>
     <input type="hidden" id="inp-acc-id">
     <button class="btn-primary" onclick="saveAccount()">저장</button>
     <button id="btn-delete-acc" class="btn-danger" onclick="deleteAccount()" style="display:none;">삭제</button>
@@ -1440,7 +1458,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071933';
+const APP_VERSION = 'v2026071934';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2106,7 +2124,8 @@ function saveAccount() {
   const existing = accounts.find(x => x.id === id);
   const typeEl2 = document.getElementById('inp-acc-type');
   const accType = typeEl2 ? typeEl2.value : 'bank';
-  const acc = { id, bank, name, currency: document.getElementById('inp-acc-curr').value, balance, number: document.getElementById('inp-acc-num').value, type: accType, deposits: existing ? (existing.deposits||{}) : {} };
+  const paydateEl2 = document.getElementById('inp-acc-paydate');
+  const acc = { id, bank, name, currency: document.getElementById('inp-acc-curr').value, balance, number: document.getElementById('inp-acc-num').value, type: accType, deposits: existing ? (existing.deposits||{}) : {}, paydate: paydateEl2 ? paydateEl2.value : '' };
   if (existing) accounts[accounts.indexOf(existing)] = acc;
   else accounts.push(acc);
   save('accounts', accounts);
@@ -4144,6 +4163,28 @@ function closeDetailPanel() {
 
 
 
+
+function getNextPaydate(isKR) {
+  var ccAccs = accounts.filter(function(a) {
+    return a.type === 'cc' && a.paydate &&
+           ((isKR && a.currency === 'KRW') || (!isKR && a.currency === 'CNY'));
+  });
+  if(!ccAccs.length) return '';
+  var today = new Date();
+  var results = ccAccs.map(function(a) {
+    var day = a.paydate === '말일'
+      ? new Date(today.getFullYear(), today.getMonth()+1, 0).getDate()
+      : parseInt(a.paydate);
+    var next = new Date(today.getFullYear(), today.getMonth(), day);
+    if(next <= today) next = new Date(today.getFullYear(), today.getMonth()+1, day);
+    var diff = Math.ceil((next - today) / (1000*60*60*24));
+    return { name: a.bank, date: next, diff: diff };
+  }).sort(function(a,b){ return a.diff - b.diff; });
+  var n = results[0];
+  var diffText = n.diff === 0 ? '오늘!' : n.diff === 1 ? '내일!' : n.diff + '일 후';
+  return '<div style="margin-top:6px;padding:8px 10px;background:#f0f4ff;border-radius:8px;font-size:12px;color:var(--navy);">📅 다음 결제일: ' + (n.date.getMonth()+1) + '/' + n.date.getDate() + ' (' + diffText + ') · ' + n.name + '</div>';
+}
+
 function goToDebt() {
   goToInvest('debt');
 }
@@ -4262,6 +4303,7 @@ function renderCCTab() {
             '<div style="font-size:12px;color:var(--sub);margin-bottom:4px;">이번 달 총 사용액</div>' +
             '<div style="font-size:26px;font-weight:800;color:var(--navy);">' + sym + fmtNum(total) + '</div>' +
             '<div style="font-size:11px;color:var(--sub);margin-top:2px;">' + txns.length + '건</div>' +
+            getNextPaydate(isKR) +
           '</div>' +
           '<div style="text-align:right;">' +
             '<div style="font-size:11px;color:var(--sub);">미결제</div>' +
