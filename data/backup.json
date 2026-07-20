@@ -6,7 +6,7 @@
       "currency": "KRW",
       "amount": 309703,
       "date": "2026-07-15",
-      "category": "식비",
+      "category": "기타",
       "payment": "신한카드",
       "memo": "",
       "ccPaid": false,
@@ -814,6 +814,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T14:13:31.302Z",
+  "exportedAt": "2026-07-20T14:13:59.911Z",
   "version": "v2026072006"
 }
