@@ -254,7 +254,7 @@
       "date": "2026-07-08",
       "category": "기타",
       "payment": "체크카드(한국)",
-      "memo": "정확히 뭔지 모르겠음. 한덕연 마스톤즈",
+      "memo": "집 커튼 등 한덕연 마스톤즈",
       "ccPaid": false,
       "linkedAccountId": null,
       "isCreditCard": false
@@ -739,6 +739,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T02:16:50.340Z",
+  "exportedAt": "2026-07-20T02:19:50.183Z",
   "version": "v2026071925"
 }
