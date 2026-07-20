@@ -1122,6 +1122,32 @@ if('serviceWorker' in navigator){
       </select>
       <div style="font-size:11px;color:var(--sub);margin-top:4px;">전월 사용액 결제일</div>
     </div>
+    <div id="cc-extra-wrap" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">📅 카드 결제일</label>
+        <select class="form-input form-select" id="inp-acc-paydate">
+          <option value="">선택</option>
+          <option value="1">매월 1일</option>
+          <option value="5">매월 5일</option>
+          <option value="7">매월 7일</option>
+          <option value="10">매월 10일</option>
+          <option value="14">매월 14일</option>
+          <option value="15">매월 15일</option>
+          <option value="17">매월 17일</option>
+          <option value="20">매월 20일</option>
+          <option value="25">매월 25일</option>
+          <option value="27">매월 27일</option>
+          <option value="말일">말일</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">🏦 결제 출금 계좌</label>
+        <select class="form-input form-select" id="inp-acc-payaccount">
+          <option value="">선택 안 함</option>
+        </select>
+        <div style="font-size:11px;color:var(--sub);margin-top:4px;">결제 완료 처리 시 이 계좌에서 자동 차감</div>
+      </div>
+    </div>
     <input type="hidden" id="inp-acc-id">
     <button class="btn-primary" onclick="saveAccount()">저장</button>
     <button id="btn-delete-acc" class="btn-danger" onclick="deleteAccount()" style="display:none;">삭제</button>
@@ -1459,7 +1485,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026072003';
+const APP_VERSION = 'v2026072004';
 
 // ========== DATA ==========
 function getData(key, def) {
