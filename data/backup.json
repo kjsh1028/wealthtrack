@@ -1,19 +1,6 @@
 {
   "ledger": [
     {
-      "id": "mrtai3sl5vvj",
-      "type": "expense",
-      "currency": "KRW",
-      "amount": 200000,
-      "date": "2026-07-20",
-      "category": "식비",
-      "payment": "Sol travel",
-      "memo": "",
-      "ccPaid": false,
-      "linkedAccountId": "mrq082m3mg2f",
-      "isCreditCard": true
-    },
-    {
       "id": "mrtag96a6lrc",
       "type": "expense",
       "currency": "KRW",
@@ -770,7 +757,7 @@
     "usd": 1487,
     "cny": 219,
     "usdcny": 6.7809,
-    "updatedAt": "2026. 7. 20. 오후 10:57:10 (자동)"
+    "updatedAt": "2026. 7. 20. 오후 11:12:47 (자동)"
   },
   "budget": 10000000,
   "assetSnapshots": [],
@@ -814,6 +801,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T13:58:16.174Z",
-  "version": "v2026072003"
+  "exportedAt": "2026-07-20T14:13:03.175Z",
+  "version": "v2026072006"
 }
