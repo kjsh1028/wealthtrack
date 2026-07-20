@@ -471,6 +471,18 @@
       "deposits": {},
       "paydate": "15",
       "payAccountId": ""
+    },
+    {
+      "id": "mrt943j0l1ya",
+      "bank": "초상카드",
+      "name": "초싱칻",
+      "currency": "CNY",
+      "balance": 0,
+      "number": "2341",
+      "type": "cc",
+      "deposits": {},
+      "paydate": "15",
+      "payAccountId": "mrq0aee0e0wp"
     }
   ],
   "stocks": [
@@ -762,6 +774,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T13:18:34.958Z",
+  "exportedAt": "2026-07-20T13:19:23.029Z",
   "version": "v2026072009"
 }
