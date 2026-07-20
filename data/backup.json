@@ -459,6 +459,18 @@
       "deposits": {},
       "paydate": "20",
       "payAccountId": "mrq082m3mg2f"
+    },
+    {
+      "id": "mrt8p1im99c6",
+      "bank": "초상은행",
+      "name": "초상카드",
+      "currency": "CNY",
+      "balance": 0,
+      "number": "2341",
+      "type": "cc",
+      "deposits": {},
+      "paydate": "15",
+      "payAccountId": ""
     }
   ],
   "stocks": [
@@ -750,6 +762,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T13:05:12.276Z",
+  "exportedAt": "2026-07-20T13:07:40.583Z",
   "version": "v2026072008"
 }
