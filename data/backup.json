@@ -61,7 +61,7 @@
       "category": "기타",
       "payment": "신용카드(한국)",
       "memo": "트레블 솔카드",
-      "ccPaid": false,
+      "ccPaid": true,
       "linkedAccountId": "mrq082m3mg2f",
       "isCreditCard": true
     },
@@ -74,7 +74,7 @@
       "category": "기타",
       "payment": "신용카드(한국)",
       "memo": "신한카드",
-      "ccPaid": false,
+      "ccPaid": true,
       "linkedAccountId": "mrq082m3mg2f",
       "isCreditCard": true
     },
@@ -726,6 +726,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T01:16:28.712Z",
+  "exportedAt": "2026-07-20T01:23:49.727Z",
   "version": "v2026071925"
 }
