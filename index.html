@@ -1464,7 +1464,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071936';
+const APP_VERSION = 'v2026071937';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2171,7 +2171,6 @@ function buildCCRow(t, sym) {
 async function init() {
   const monInput = document.getElementById('ledger-month-filter');
   monInput.value = thisMonth();
-  initCommaInputs();
   // LegalTrack 방식: 토큰 있으면 시작 시 바로 ghLoad
   const token = localStorage.getItem('wt_gh_token');
   if(token) {
