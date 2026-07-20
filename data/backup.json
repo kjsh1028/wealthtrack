@@ -591,7 +591,7 @@
       "name": "합비 집 대출",
       "currency": "CNY",
       "amount": 6000,
-      "day": 20,
+      "day": 11,
       "payment": "체크카드(중국)",
       "category": "대출상환"
     },
@@ -726,6 +726,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T06:57:23.102Z",
+  "exportedAt": "2026-07-20T06:57:49.279Z",
   "version": "v2026071933"
 }
