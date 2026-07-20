@@ -1050,12 +1050,11 @@ if('serviceWorker' in navigator){
     </div>
     <div class="form-group"><label class="form-label">결제수단</label>
       <select class="form-input form-select" id="inp-payment">
-        <option value="신한카드SOL">신한카드 SOL</option>
-        <option value="초상카드">초상카드 (招商银行)</option>
         <option value="체크카드(한국)">체크카드 (한국)</option>
-        <option value="신용카드(한국)">신용카드 (한국)</option>
         <option value="체크카드(중국)">체크카드 (중국)</option>
-        <option value="신용카드(중국)">신용카드 (중국)</option>
+        <option value="신한카드SOL">신한카드 SOL</option>
+        <option value="Sol travel">Sol travel</option>
+        <option value="초상카드">초상카드 (招商银行)</option>
         <option value="현금(KRW)">현금 (KRW)</option>
         <option value="현금(CNY)">현금 (CNY)</option>
         <option value="계좌이체">계좌이체</option>
@@ -1423,12 +1422,13 @@ if('serviceWorker' in navigator){
     <div class="form-group"><label class="form-label">결제일 (매월 몇 일)</label><input class="form-input" type="number" id="inp-fixed-day" placeholder="예: 15" min="1" max="31"></div>
     <div class="form-group"><label class="form-label">결제수단</label>
       <select class="form-input form-select" id="inp-fixed-payment">
-        <option value="신한카드SOL">신한카드 SOL</option>
-        <option value="초상카드">초상카드 (招商银行)</option>
         <option value="체크카드(한국)">체크카드 (한국)</option>
-        <option value="신용카드(한국)">신용카드 (한국)</option>
         <option value="체크카드(중국)">체크카드 (중국)</option>
-        <option value="신용카드(중국)">신용카드 (중국)</option>
+        <option value="신한카드SOL">신한카드 SOL</option>
+        <option value="Sol travel">Sol travel</option>
+        <option value="초상카드">초상카드 (招商银行)</option>
+        <option value="현금(KRW)">현금 (KRW)</option>
+        <option value="현금(CNY)">현금 (CNY)</option>
         <option value="자동이체">자동이체</option>
       </select>
     </div>
@@ -1460,7 +1460,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026072001';
+const APP_VERSION = 'v2026072002';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1505,7 +1505,7 @@ function save(key, val) {
 // ========== UTILS ==========
 const CURR_SYMBOL = { KRW: '₩', CNY: '¥', USD: '$', HKD: 'HK$', JPY: '¥', EUR: '€' };
 function fmtNum(n) { return Math.abs(n).toLocaleString('ko-KR'); }
-function isCreditPayment(p) { return p && (p.includes('신용카드') || p === '신한카드SOL' || p === '초상카드'); }
+function isCreditPayment(p) { return p && (p.includes('신용카드') || p === '신한카드SOL' || p === 'Sol travel' || p === '초상카드'); }
 function fmtCurr(n, curr) { return CURR_SYMBOL[curr] + fmtNum(n); }
 function toKRW(amount, curr) {
   if (curr === 'KRW') return amount;
