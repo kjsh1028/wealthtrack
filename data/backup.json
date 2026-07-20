@@ -438,11 +438,11 @@
     },
     {
       "id": "mrt8kfz2a8m0",
-      "bank": "신한은행",
+      "bank": "신한카드",
       "name": "신한카드",
       "currency": "KRW",
       "balance": 0,
-      "number": "",
+      "number": "9936",
       "type": "cc",
       "deposits": {},
       "paydate": "25",
@@ -774,6 +774,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T13:19:23.029Z",
+  "exportedAt": "2026-07-20T13:20:31.692Z",
   "version": "v2026072009"
 }
