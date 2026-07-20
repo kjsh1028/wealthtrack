@@ -363,18 +363,14 @@ body { font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-ser
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+// SW 완전 제거 - 항상 최신 버전 로드
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/wealthtrack/sw.js').then(reg=>{
-    reg.addEventListener('updatefound',()=>{
-      const nw=reg.installing;
-      nw.addEventListener('statechange',()=>{
-        if(nw.state==='installed'&&navigator.serviceWorker.controller){
-          const b=document.getElementById('update-banner');
-          if(b)b.style.display='block';
-        }
-      });
-    });
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(r=>r.unregister());
   });
+  if('caches' in window){
+    caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
+  }
 }
 </script>
 </head>
@@ -1460,7 +1456,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026072002';
+const APP_VERSION = 'v2026072003';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -3637,14 +3633,16 @@ async function syncFromGH() {
 async function forceReload() {
   showToast('업데이트 적용 중...');
   try {
-    if('serviceWorker' in navigator && navigator.serviceWorker.controller){
-      navigator.serviceWorker.controller.postMessage('SKIP_WAITING');
-      navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
-    } else {
-      if('caches' in window){ const keys=await caches.keys(); await Promise.all(keys.map(k=>caches.delete(k))); }
-      location.reload(true);
+    if('serviceWorker' in navigator){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
     }
-  } catch(e) { location.reload(true); }
+    if('caches' in window){
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k=>caches.delete(k)));
+    }
+  } catch(e) {}
+  location.reload(true);
 }
 async function doUpdate() {
   await forceReload();
