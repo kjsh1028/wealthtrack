@@ -1050,6 +1050,8 @@ if('serviceWorker' in navigator){
     </div>
     <div class="form-group"><label class="form-label">결제수단</label>
       <select class="form-input form-select" id="inp-payment">
+        <option value="신한카드SOL">신한카드 SOL</option>
+        <option value="초상카드">초상카드 (招商银行)</option>
         <option value="체크카드(한국)">체크카드 (한국)</option>
         <option value="신용카드(한국)">신용카드 (한국)</option>
         <option value="체크카드(중국)">체크카드 (중국)</option>
@@ -1421,6 +1423,8 @@ if('serviceWorker' in navigator){
     <div class="form-group"><label class="form-label">결제일 (매월 몇 일)</label><input class="form-input" type="number" id="inp-fixed-day" placeholder="예: 15" min="1" max="31"></div>
     <div class="form-group"><label class="form-label">결제수단</label>
       <select class="form-input form-select" id="inp-fixed-payment">
+        <option value="신한카드SOL">신한카드 SOL</option>
+        <option value="초상카드">초상카드 (招商银行)</option>
         <option value="체크카드(한국)">체크카드 (한국)</option>
         <option value="신용카드(한국)">신용카드 (한국)</option>
         <option value="체크카드(중국)">체크카드 (중국)</option>
@@ -1456,7 +1460,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026072010';
+const APP_VERSION = 'v2026072001';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1501,6 +1505,7 @@ function save(key, val) {
 // ========== UTILS ==========
 const CURR_SYMBOL = { KRW: '₩', CNY: '¥', USD: '$', HKD: 'HK$', JPY: '¥', EUR: '€' };
 function fmtNum(n) { return Math.abs(n).toLocaleString('ko-KR'); }
+function isCreditPayment(p) { return p && (p.includes('신용카드') || p === '신한카드SOL' || p === '초상카드'); }
 function fmtCurr(n, curr) { return CURR_SYMBOL[curr] + fmtNum(n); }
 function toKRW(amount, curr) {
   if (curr === 'KRW') return amount;
@@ -1671,7 +1676,7 @@ function renderDashboard() {
   let totalDebt = reLoan;
   debts.forEach(d => { totalDebt += toKRW(d.amount, d.currency); });
   let ccUnpaid = 0;
-  ledger.filter(t => t.type === 'expense' && t.date.startsWith(mon) && t.payment && t.payment.includes('신용카드') && !t.ccPaid)
+  ledger.filter(t => t.type === 'expense' && t.date.startsWith(mon) && t.payment && isCreditPayment(t.payment) && !t.ccPaid)
         .forEach(t => { ccUnpaid += toKRW(t.amount, t.currency); });
   const netAsset = cashKRW + stockKRW + reNet - debts.reduce((s,d) => s+toKRW(d.amount,d.currency),0) - ccUnpaid;
 
@@ -1824,7 +1829,7 @@ function updateLinkedAccPreview() {
   if (!acc) { preview.textContent = ''; return; }
   const amount = parseFloat(document.getElementById('inp-amount').value) || 0;
   const isIncome = ledgerType === 'income';
-  const isCreditCard = document.getElementById('inp-payment').value.includes('신용카드');
+  const isCreditCard = isCreditPayment(document.getElementById('inp-payment').value);
   if (isCreditCard) {
     preview.textContent = '💳 신용카드: 결제일에 차감 (즉시 반영 안 됨)';
     preview.style.color = 'var(--gold)';
@@ -1933,7 +1938,7 @@ function applyAccountBalance(accId, amount, type, reverse) {
   const acc = accounts.find(a => a.id === accId);
   if (!acc) return;
   const isCreditCard = document.getElementById('inp-payment') ?
-    document.getElementById('inp-payment').value.includes('신용카드') : false;
+    isCreditPayment(document.getElementById('inp-payment').value) : false;
   if (isCreditCard) return; // 신용카드는 즉시 반영 안 함
 
   const sign = (type === 'income' ? 1 : -1) * (reverse ? -1 : 1);
@@ -1950,7 +1955,7 @@ function saveLedger() {
   const existing = ledger.find(x => x.id === id);
   const linkedAccountId = document.getElementById('inp-linked-account').value;
   const payment = document.getElementById('inp-payment').value;
-  const isCreditCard = payment.includes('신용카드');
+  const isCreditCard = isCreditPayment(payment);
 
   // 수정 시: 이전 계좌 반영 롤백
   if (existing) {
@@ -2077,7 +2082,7 @@ function renderAccounts() {
 
   // CC unpaid
   const mon = thisMonth();
-  const ccItems = ledger.filter(t => t.type === 'expense' && t.date.startsWith(mon) && t.payment && t.payment.includes('신용카드') && !t.ccPaid);
+  const ccItems = ledger.filter(t => t.type === 'expense' && t.date.startsWith(mon) && t.payment && isCreditPayment(t.payment) && !t.ccPaid);
   const krCC = ccItems.filter(t => t.payment.includes('한국'));
   const cnCC = ccItems.filter(t => t.payment.includes('중국'));
   const krTotal = krCC.reduce((s,t) => s + t.amount, 0);
@@ -2087,7 +2092,7 @@ function renderAccounts() {
 
 function markCCPaid(country) {
   var mon=thisMonth(),kw=country==='KR'?'한국':'중국';
-  var unpaid=ledger.filter(function(t){return t.type==='expense'&&t.date.startsWith(mon)&&t.payment&&t.payment.includes('신용카드')&&t.payment.includes(kw)&&!t.ccPaid;});
+  var unpaid=ledger.filter(function(t){return t.type==='expense'&&t.date.startsWith(mon)&&t.payment&&isCreditPayment(t.payment)&&t.payment.includes(kw)&&!t.ccPaid;});
   var total=unpaid.reduce(function(s,t){return s+t.amount;},0);
   unpaid.forEach(function(t){t.ccPaid=true;});
   save('ledger',ledger);
@@ -3851,7 +3856,7 @@ function exportExcel() {
   let reKRW = realEstate.reduce((s,r) => s + toKRW(r.value - (r.loan||0), r.currency), 0);
   let debtKRW = debts.reduce((s,d) => s + toKRW(d.amount, d.currency), 0);
   const mon = thisMonth();
-  let ccKRW = ledger.filter(t => t.type==='expense' && t.date.startsWith(mon) && t.payment && t.payment.includes('신용카드') && !t.ccPaid).reduce((s,t) => s + toKRW(t.amount, t.currency), 0);
+  let ccKRW = ledger.filter(t => t.type==='expense' && t.date.startsWith(mon) && t.payment && isCreditPayment(t.payment) && !t.ccPaid).reduce((s,t) => s + toKRW(t.amount, t.currency), 0);
   const totalAsset = cashKRW + stockKRW + reKRW;
   const netAsset = totalAsset - debtKRW - ccKRW;
   const summaryData = [
@@ -4263,7 +4268,7 @@ function renderCCTab() {
     .filter(function(t) {
       return t.type === 'expense' &&
              t.date && t.date.startsWith(mon) &&
-             t.payment && t.payment.includes('신용카드') && t.payment.includes(keyword);
+             t.payment && isCreditPayment(t.payment) && t.payment.includes(keyword);
     })
     .sort(function(a,b) { return b.date.localeCompare(a.date); });
 
@@ -4427,3 +4432,4 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 </script>
 </body>
 </html>
+
