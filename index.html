@@ -1456,7 +1456,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026072003';
+const APP_VERSION = 'v2026072004';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2079,16 +2079,21 @@ function renderAccounts() {
   // CC unpaid
   const mon = thisMonth();
   const ccItems = ledger.filter(t => t.type === 'expense' && t.date.startsWith(mon) && t.payment && isCreditPayment(t.payment) && !t.ccPaid);
-  const krCC = ccItems.filter(t => t.payment.includes('한국'));
-  const cnCC = ccItems.filter(t => t.payment.includes('중국'));
+  const KR_CARDS_D = ['신한카드SOL','Sol travel','체크카드(한국)','신용카드(한국)'];
+  const CN_CARDS_D = ['초상카드','체크카드(중국)','신용카드(중국)'];
+  const krCC = ccItems.filter(t => KR_CARDS_D.includes(t.payment));
+  const cnCC = ccItems.filter(t => CN_CARDS_D.includes(t.payment));
   const krTotal = krCC.reduce((s,t) => s + t.amount, 0);
   const cnTotal = cnCC.reduce((s,t) => s + t.amount, 0);
 
   renderCCTab();}
 
 function markCCPaid(country) {
-  var mon=thisMonth(),kw=country==='KR'?'한국':'중국';
-  var unpaid=ledger.filter(function(t){return t.type==='expense'&&t.date.startsWith(mon)&&t.payment&&isCreditPayment(t.payment)&&t.payment.includes(kw)&&!t.ccPaid;});
+  var mon=thisMonth();
+  var KR_CARDS=['신한카드SOL','Sol travel','체크카드(한국)','신용카드(한국)'];
+  var CN_CARDS=['초상카드','체크카드(중국)','신용카드(중국)'];
+  var cards=country==='KR'?KR_CARDS:CN_CARDS;
+  var unpaid=ledger.filter(function(t){return t.type==='expense'&&t.date.startsWith(mon)&&t.payment&&isCreditPayment(t.payment)&&cards.includes(t.payment)&&!t.ccPaid;});
   var total=unpaid.reduce(function(s,t){return s+t.amount;},0);
   unpaid.forEach(function(t){t.ccPaid=true;});
   save('ledger',ledger);
@@ -4260,13 +4265,15 @@ function renderCCTab() {
   const mon = thisMonth();
   const isKR = ccFilter === 'KR';
   const sym = isKR ? '₩' : '¥';
-  const keyword = isKR ? '한국' : '중국';
+  const KR_CARDS = ['신한카드SOL','Sol travel','체크카드(한국)','신용카드(한국)'];
+  const CN_CARDS = ['초상카드','체크카드(중국)','신용카드(중국)'];
 
   const txns = ledger
     .filter(function(t) {
       return t.type === 'expense' &&
              t.date && t.date.startsWith(mon) &&
-             t.payment && isCreditPayment(t.payment) && t.payment.includes(keyword);
+             t.payment && isCreditPayment(t.payment) &&
+             (isKR ? KR_CARDS.includes(t.payment) : CN_CARDS.includes(t.payment));
     })
     .sort(function(a,b) { return b.date.localeCompare(a.date); });
 
