@@ -447,6 +447,18 @@
       "deposits": {},
       "paydate": "25",
       "payAccountId": "mrq082m3mg2f"
+    },
+    {
+      "id": "mrt8lv2x4ko4",
+      "bank": "신한은행",
+      "name": "Sol travel",
+      "currency": "KRW",
+      "balance": 0,
+      "number": "5210",
+      "type": "cc",
+      "deposits": {},
+      "paydate": "20",
+      "payAccountId": "mrq082m3mg2f"
     }
   ],
   "stocks": [
@@ -738,6 +750,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T13:04:06.041Z",
+  "exportedAt": "2026-07-20T13:05:12.276Z",
   "version": "v2026072008"
 }
