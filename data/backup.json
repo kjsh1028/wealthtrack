@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mrtb1pwrtcl7",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 309703,
+      "date": "2026-07-15",
+      "category": "식비",
+      "payment": "신한카드",
+      "memo": "",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": true
+    },
+    {
       "id": "mrtag96a6lrc",
       "type": "expense",
       "currency": "KRW",
@@ -801,6 +814,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T14:13:03.175Z",
+  "exportedAt": "2026-07-20T14:13:31.302Z",
   "version": "v2026072006"
 }
