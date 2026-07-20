@@ -549,21 +549,21 @@ if('serviceWorker' in navigator){
       <div id="cn-accounts-list"></div>
     </div>
     <div id="acc-cc" style="display:none;">
-      <div class="sec-header"><span class="sec-title">신용카드 미결제</span></div>
-      <div id="cc-unpaid-list"></div>
-      <div style="margin-top:16px;" class="sec-header"><span class="sec-title">카드 결제 처리</span></div>
-      <div id="cc-payment-section"></div>
-      <!-- 이번 달 카드 사용 내역 -->
-      <div style="margin-top:16px;">
-        <div class="sec-header">
-          <span class="sec-title">이번 달 사용 내역</span>
-          <div style="display:flex;gap:8px;">
-            <span class="sec-action" id="cc-filter-kr" onclick="setCCFilter('KR')" style="background:var(--navy);color:#fff;border-radius:12px;padding:3px 10px;">🇰🇷 한국</span>
-            <span class="sec-action" id="cc-filter-cn" onclick="setCCFilter('CN')" style="border-radius:12px;padding:3px 10px;">🇨🇳 중국</span>
-          </div>
-        </div>
-        <div id="cc-txn-list"></div>
+      <!-- 한국/중국 카드 선택 -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button id="cc-tab-kr" onclick="setCCFilter('KR')"
+          style="flex:1;padding:10px;border-radius:12px;border:2px solid var(--navy);background:var(--navy);color:#fff;font-weight:700;font-size:14px;cursor:pointer;">
+          🇰🇷 한국 카드
+        </button>
+        <button id="cc-tab-cn" onclick="setCCFilter('CN')"
+          style="flex:1;padding:10px;border-radius:12px;border:2px solid var(--border);background:#fff;color:var(--sub);font-weight:700;font-size:14px;cursor:pointer;">
+          🇨🇳 중국 카드
+        </button>
       </div>
+      <!-- 카드 현황 -->
+      <div id="cc-summary-card"></div>
+      <!-- 거래 내역 -->
+      <div id="cc-txn-list" style="margin-top:12px;"></div>
     </div>
   </div>
   <div class="fab" onclick="openAccountModal('')">+</div>
@@ -1440,7 +1440,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026071925';
+const APP_VERSION = 'v2026071926';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2067,19 +2067,7 @@ function renderAccounts() {
   const krTotal = krCC.reduce((s,t) => s + t.amount, 0);
   const cnTotal = cnCC.reduce((s,t) => s + t.amount, 0);
 
-  document.getElementById('cc-unpaid-list').innerHTML = `
-    <div class="cc-bar"><div class="cc-bar-title">🇰🇷 한국 신용카드 미결제</div><div class="cc-bar-val">₩${fmtNum(krTotal)}</div></div>
-    <div class="cc-bar" style="border-color:var(--cny)"><div class="cc-bar-title">🇨🇳 중국 신용카드 미결제</div><div class="cc-bar-val">¥${fmtNum(cnTotal)}</div></div>`;
-
-  document.getElementById('cc-payment-section').innerHTML = `
-    <div class="card">
-      <div class="stat-row"><div class="stat-label">이번달 한국카드 사용액</div><div class="stat-val" style="color:var(--red)">₩${fmtNum(krTotal)}</div></div>
-      <div class="stat-row"><div class="stat-label">이번달 중국카드 사용액</div><div class="stat-val" style="color:var(--cny)">¥${fmtNum(cnTotal)}</div></div>
-      <button class="btn-secondary" style="margin-top:8px;" onclick="markCCPaid('KR')">한국 카드 결제 처리</button>
-      <button class="btn-secondary" style="margin-top:8px;" onclick="markCCPaid('CN')">중국 카드 결제 처리</button>
-    </div>`;
-
-  renderCCTransactions();}
+  renderCCTab();}
 
 function markCCPaid(country) {
   const mon = thisMonth();
@@ -4193,69 +4181,121 @@ function goToLedger(filter) {
 }
 
 
-// ========== 신용카드 거래 내역 ==========
+
+// ========== 신용카드 탭 (개선) ==========
 let ccFilter = 'KR';
 
 function setCCFilter(region) {
   ccFilter = region;
-  // 필터 버튼 스타일
-  ['KR','CN'].forEach(r => {
-    const el = document.getElementById('cc-filter-' + r.toLowerCase());
-    if(el) {
-      el.style.background = r === region ? 'var(--navy)' : '';
-      el.style.color = r === region ? '#fff' : '';
-    }
-  });
-  renderCCTransactions();
+  // 탭 버튼 스타일
+  const krBtn = document.getElementById('cc-tab-kr');
+  const cnBtn = document.getElementById('cc-tab-cn');
+  if(krBtn) {
+    krBtn.style.background = region==='KR' ? 'var(--navy)' : '#fff';
+    krBtn.style.color = region==='KR' ? '#fff' : 'var(--sub)';
+    krBtn.style.borderColor = region==='KR' ? 'var(--navy)' : 'var(--border)';
+  }
+  if(cnBtn) {
+    cnBtn.style.background = region==='CN' ? 'var(--red)' : '#fff';
+    cnBtn.style.color = region==='CN' ? '#fff' : 'var(--sub)';
+    cnBtn.style.borderColor = region==='CN' ? 'var(--red)' : 'var(--border)';
+  }
+  renderCCTab();
 }
 
-function renderCCTransactions() {
-  const el = document.getElementById('cc-txn-list');
-  if(!el) return;
-
+function renderCCTab() {
   const mon = thisMonth();
-  const payMethods = ccFilter === 'KR'
-    ? ['신용카드(한국)', '체크카드(한국)']
-    : ['신용카드(중국)', '체크카드(중국)'];
+  const isKR = ccFilter === 'KR';
+  const sym = isKR ? '₩' : '¥';
+  const curr = isKR ? 'KRW' : 'CNY';
+  const keyword = isKR ? '한국' : '중국';
 
+  // 이번 달 카드 거래
   const txns = ledger
     .filter(t => t.type === 'expense' &&
                  t.date && t.date.startsWith(mon) &&
-                 payMethods.some(p => t.payMethod && t.payMethod.includes(p.split('(')[0]) && t.payMethod.includes(ccFilter === 'KR' ? '한국' : '중국')))
+                 t.payMethod && t.payMethod.includes(keyword))
     .sort((a,b) => b.date.localeCompare(a.date));
 
-  if(!txns.length) {
-    el.innerHTML = '<div class="empty-state"><div class="e-icon">💳</div><div class="e-text">이번 달 카드 사용 내역이 없습니다</div></div>';
-    return;
-  }
+  const total = txns.reduce((s,t) => s + t.amount, 0);
+  const paidTxns = txns.filter(t => t.ccPaid);
+  const unpaidTxns = txns.filter(t => !t.ccPaid);
+  const unpaidTotal = unpaidTxns.reduce((s,t) => s + t.amount, 0);
+  const paidTotal = paidTxns.reduce((s,t) => s + t.amount, 0);
 
   // 카테고리별 소계
-  const catTotals = {};
-  txns.forEach(t => { catTotals[t.category] = (catTotals[t.category]||0) + t.amount; });
-  const curr = ccFilter === 'KR' ? 'KRW' : 'CNY';
-  const sym = CURR_SYMBOL[curr];
+  const catMap = {};
+  txns.forEach(t => { catMap[t.category] = (catMap[t.category]||0) + t.amount; });
+  const catChips = Object.entries(catMap).sort((a,b)=>b[1]-a[1])
+    .map(([c,a]) => '<span class="chip" style="font-size:11px;">'+c+' '+sym+fmtNum(a)+'</span>').join('');
 
-  const catSummary = Object.entries(catTotals)
-    .sort((a,b) => b[1]-a[1])
-    .map(([cat,amt]) => '<span class="chip" style="font-size:11px;">' + cat + ' ' + sym + fmtNum(amt) + '</span>')
-    .join('');
-
-  el.innerHTML =
-    '<div style="padding:12px 0 8px;">' + catSummary + '</div>' +
-    '<div class="card" style="padding:0;">' +
-    txns.map(t => {
-      const catIcon = {'식비':'🍜','교통':'🚌','숙박':'🏨','업무':'💼','의료':'🏥','쇼핑':'🛍️','공과금':'📋','기타':'📌'}[t.category] || '📌';
-      return '<div class="ledger-item" onclick="openLedgerModal(\'' + t.id + '\')">' +
-        '<div class="li-icon">' + catIcon + '</div>' +
-        '<div class="li-info">' +
-          '<div class="li-title">' + t.category + (t.memo ? ' · ' + t.memo : '') + '</div>' +
-          '<div class="li-sub">' + t.payMethod + ' · ' + t.date + '</div>' +
+  // 요약 카드
+  const summaryEl = document.getElementById('cc-summary-card');
+  if(summaryEl) summaryEl.innerHTML =
+    '<div class="card" style="padding:16px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">' +
+        '<div>' +
+          '<div style="font-size:12px;color:var(--sub);margin-bottom:4px;">이번 달 총 사용액</div>' +
+          '<div style="font-size:26px;font-weight:800;color:var(--navy);">' + sym + fmtNum(total) + '</div>' +
+          '<div style="font-size:11px;color:var(--sub);margin-top:2px;">' + txns.length + '건</div>' +
         '</div>' +
-        '<div class="li-amount expense">' + sym + fmtNum(t.amount) + '</div>' +
-      '</div>';
+        '<div style="text-align:right;">' +
+          '<div style="font-size:11px;color:var(--sub);">미결제</div>' +
+          '<div style="font-size:18px;font-weight:800;color:var(--red);">' + sym + fmtNum(unpaidTotal) + '</div>' +
+          (paidTotal > 0 ? '<div style="font-size:11px;color:var(--green);">결제완료 ' + sym + fmtNum(paidTotal) + '</div>' : '') +
+        '</div>' +
+      '</div>' +
+      (catChips ? '<div style="margin-bottom:12px;">' + catChips + '</div>' : '') +
+      (unpaidTotal > 0 ?
+        buildCCPayBtn(unpaidTotal, sym)
+        : '<div style="text-align:center;padding:8px;color:var(--green);font-weight:700;">✓ 이번 달 결제 완료</div>') +
+    '</div>';
+
+  // 거래 내역
+  const listEl = document.getElementById('cc-txn-list');
+  if(!listEl) return;
+  if(!txns.length) {
+    listEl.innerHTML = '<div class="empty-state"><div class="e-icon">💳</div><div class="e-text">이번 달 카드 사용 내역이 없습니다</div></div>';
+    return;
+  }
+  const catIcons = {'식비':'🍜','교통':'🚌','숙박':'🏨','업무':'💼','의료':'🏥','쇼핑':'🛍️','공과금':'📋','기타':'📌'};
+  listEl.innerHTML = '<div class="card" style="padding:0;">' +
+    txns.map(t => {
+      const icon = catIcons[t.category] || '📌';
+      const paid = t.ccPaid;
+      return buildCCRow(t, sym);
     }).join('') +
+    '</div>';
+}
+
+
+
+
+
+function buildCCPayBtn(amount, sym) {
+  const btn = document.createElement('button');
+  btn.style.cssText = 'width:100%;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;';
+  btn.textContent = '💳 ' + sym + fmtNum(amount) + ' 결제 완료 처리';
+  btn.onclick = function() { markCCPaid(ccFilter); };
+  return btn.outerHTML;
+}
+
+function buildCCRow(t, sym) {
+  const catIcons = {'식비':'🍜','교통':'🚌','숙박':'🏨','업무':'💼','의료':'🏥','쇼핑':'🛍️','공과금':'📋','기타':'📌'};
+  const icon = catIcons[t.category] || '📌';
+  const paid = t.ccPaid;
+  const el = document.createElement('div');
+  el.className = 'ledger-item';
+  el.style.opacity = paid ? '0.5' : '1';
+  el.onclick = function() { openLedgerModal(t.id); };
+  el.innerHTML =
+    '<div class="li-icon">' + icon + '</div>' +
+    '<div class="li-info">' +
+      '<div class="li-title">' + t.category + (t.memo ? ' · ' + t.memo : '') + (paid ? ' ✓' : '') + '</div>' +
+      '<div class="li-sub">' + t.payMethod + ' · ' + t.date + '</div>' +
     '</div>' +
-    '<div style="text-align:right;padding:10px 0;font-size:13px;font-weight:700;color:var(--navy);">합계: ' + sym + fmtNum(txns.reduce((s,t)=>s+t.amount,0)) + ' (' + txns.length + '건)</div>';
+    '<div class="li-amount expense">' + sym + fmtNum(t.amount) + '</div>';
+  return el.outerHTML;
 }
 
 // ========== INIT ==========
