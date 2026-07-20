@@ -69,7 +69,7 @@
       "id": "mrrfqck2om0d",
       "type": "expense",
       "currency": "KRW",
-      "amount": 308631,
+      "amount": 309703,
       "date": "2026-07-19",
       "category": "기타",
       "payment": "신용카드(한국)",
@@ -726,6 +726,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-20T11:16:53.826Z",
+  "exportedAt": "2026-07-20T11:20:40.560Z",
   "version": "v2026071933"
 }
