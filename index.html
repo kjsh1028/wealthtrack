@@ -1048,7 +1048,7 @@ if('serviceWorker' in navigator){
       <select class="form-input form-select" id="inp-payment">
         <option value="체크카드(한국)">체크카드 (한국)</option>
         <option value="체크카드(중국)">체크카드 (중국)</option>
-        <option value="신한카드SOL">신한카드 SOL</option>
+        <option value="신한카드">신한카드 SOL</option>
         <option value="Sol travel">Sol travel</option>
         <option value="초상카드">초상카드 (招商银行)</option>
         <option value="현금(KRW)">현금 (KRW)</option>
@@ -1420,7 +1420,7 @@ if('serviceWorker' in navigator){
       <select class="form-input form-select" id="inp-fixed-payment">
         <option value="체크카드(한국)">체크카드 (한국)</option>
         <option value="체크카드(중국)">체크카드 (중국)</option>
-        <option value="신한카드SOL">신한카드 SOL</option>
+        <option value="신한카드">신한카드 SOL</option>
         <option value="Sol travel">Sol travel</option>
         <option value="초상카드">초상카드 (招商银行)</option>
         <option value="현금(KRW)">현금 (KRW)</option>
@@ -1456,7 +1456,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026072004';
+const APP_VERSION = 'v2026072005';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1501,7 +1501,7 @@ function save(key, val) {
 // ========== UTILS ==========
 const CURR_SYMBOL = { KRW: '₩', CNY: '¥', USD: '$', HKD: 'HK$', JPY: '¥', EUR: '€' };
 function fmtNum(n) { return Math.abs(n).toLocaleString('ko-KR'); }
-function isCreditPayment(p) { return p && (p.includes('신용카드') || p === '신한카드SOL' || p === 'Sol travel' || p === '초상카드'); }
+function isCreditPayment(p) { return p && (p.includes('신용카드') || p === '신한카드' || p === 'Sol travel' || p === '초상카드'); }
 function fmtCurr(n, curr) { return CURR_SYMBOL[curr] + fmtNum(n); }
 function toKRW(amount, curr) {
   if (curr === 'KRW') return amount;
@@ -2079,7 +2079,7 @@ function renderAccounts() {
   // CC unpaid
   const mon = thisMonth();
   const ccItems = ledger.filter(t => t.type === 'expense' && t.date.startsWith(mon) && t.payment && isCreditPayment(t.payment) && !t.ccPaid);
-  const KR_CARDS_D = ['신한카드SOL','Sol travel','체크카드(한국)','신용카드(한국)'];
+  const KR_CARDS_D = ['신한카드','Sol travel','체크카드(한국)','신용카드(한국)'];
   const CN_CARDS_D = ['초상카드','체크카드(중국)','신용카드(중국)'];
   const krCC = ccItems.filter(t => KR_CARDS_D.includes(t.payment));
   const cnCC = ccItems.filter(t => CN_CARDS_D.includes(t.payment));
@@ -2090,7 +2090,7 @@ function renderAccounts() {
 
 function markCCPaid(country) {
   var mon=thisMonth();
-  var KR_CARDS=['신한카드SOL','Sol travel','체크카드(한국)','신용카드(한국)'];
+  var KR_CARDS=['신한카드','Sol travel','체크카드(한국)','신용카드(한국)'];
   var CN_CARDS=['초상카드','체크카드(중국)','신용카드(중국)'];
   var cards=country==='KR'?KR_CARDS:CN_CARDS;
   var unpaid=ledger.filter(function(t){return t.type==='expense'&&t.date.startsWith(mon)&&t.payment&&isCreditPayment(t.payment)&&cards.includes(t.payment)&&!t.ccPaid;});
@@ -4265,7 +4265,7 @@ function renderCCTab() {
   const mon = thisMonth();
   const isKR = ccFilter === 'KR';
   const sym = isKR ? '₩' : '¥';
-  const KR_CARDS = ['신한카드SOL','Sol travel','체크카드(한국)','신용카드(한국)'];
+  const KR_CARDS = ['신한카드','Sol travel','체크카드(한국)','신용카드(한국)'];
   const CN_CARDS = ['초상카드','체크카드(중국)','신용카드(중국)'];
 
   const txns = ledger
