@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mruoh4519n6p",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 41960,
+      "date": "2026-07-21",
+      "category": "쇼핑",
+      "payment": "체크카드(한국)",
+      "memo": "쿠팡 세탁기세제 훌라등 ",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mrul00lqh2zx",
       "type": "expense",
       "currency": "KRW",
@@ -460,7 +473,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 69805782,
+      "balance": 69763822,
       "number": "7321",
       "adjustments": [
         {
@@ -827,6 +840,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-21T13:16:37.662Z",
+  "exportedAt": "2026-07-21T13:17:10.767Z",
   "version": "v2026072110"
 }
