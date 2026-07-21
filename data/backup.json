@@ -111,7 +111,7 @@
       "amount": 605460,
       "date": "2026-07-19",
       "category": "기타",
-      "payment": "신용카드(한국)",
+      "payment": "Sol travel",
       "memo": "트레블 솔카드",
       "ccPaid": false,
       "linkedAccountId": "mrq082m3mg2f",
@@ -801,6 +801,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-21T10:51:24.296Z",
+  "exportedAt": "2026-07-21T10:52:20.976Z",
   "version": "v2026072006"
 }
