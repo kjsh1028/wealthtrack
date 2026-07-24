@@ -1,6 +1,18 @@
 {
   "ledger": [
     {
+      "id": "mryhq900amza",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 547216,
+      "date": "2026-07-24",
+      "category": "잔액조정",
+      "payment": "미래에셋증권계좌(증권계좌)",
+      "memo": "잔액불일치 조정 (조정 전: ₩2,469,484 → ₩1,922,268)",
+      "isAdjustment": true,
+      "ccPaid": false
+    },
+    {
       "id": "mryho4s0f1fa",
       "type": "income",
       "currency": "KRW",
@@ -590,10 +602,20 @@
       "bank": "미래에셋증권계좌",
       "name": "증권계좌",
       "currency": "KRW",
-      "balance": 2469484,
+      "balance": 1922268,
       "number": "",
       "type": "stock",
-      "deposits": {}
+      "deposits": {},
+      "adjustments": [
+        {
+          "date": "2026-07-24",
+          "reason": "잔액불일치 조정",
+          "oldBalance": 2469484,
+          "newBalance": 1922268,
+          "diff": -547216,
+          "id": "mryhq8zz2lju"
+        }
+      ]
     },
     {
       "id": "mrr7jrpghxb2",
@@ -931,6 +953,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-24T05:17:45.578Z",
+  "exportedAt": "2026-07-24T05:19:24.363Z",
   "version": "v2026072110"
 }
