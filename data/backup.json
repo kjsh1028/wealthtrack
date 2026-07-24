@@ -606,16 +606,8 @@
       "number": "",
       "type": "stock",
       "deposits": {},
-      "adjustments": [
-        {
-          "date": "2026-07-24",
-          "reason": "잔액불일치 조정",
-          "oldBalance": 2469484,
-          "newBalance": 1922268,
-          "diff": -547216,
-          "id": "mryhq8zz2lju"
-        }
-      ]
+      "paydate": "",
+      "payAccountId": ""
     },
     {
       "id": "mrr7jrpghxb2",
@@ -953,6 +945,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-24T05:19:24.363Z",
+  "exportedAt": "2026-07-24T05:19:31.238Z",
   "version": "v2026072110"
 }
