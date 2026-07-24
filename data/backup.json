@@ -761,6 +761,14 @@
       "amount": 80000000,
       "rate": 0,
       "due": ""
+    },
+    {
+      "id": "mryo0ekoadp7",
+      "name": "정재훈 대출 ",
+      "currency": "KRW",
+      "amount": 150000000,
+      "rate": 0,
+      "due": ""
     }
   ],
   "fixedExpenses": [
@@ -958,6 +966,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-24T08:14:30.961Z",
+  "exportedAt": "2026-07-24T08:15:15.843Z",
   "version": "v2026072110"
 }
