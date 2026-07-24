@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mrynzfy0llrm",
+      "type": "income",
+      "currency": "KRW",
+      "amount": 150000000,
+      "date": "2026-07-24",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "정재훈 대출",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mryhq900amza",
       "type": "expense",
       "currency": "KRW",
@@ -576,7 +589,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 159750582,
+      "balance": 309750582,
       "number": "7321",
       "adjustments": [
         {
@@ -945,6 +958,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-24T08:14:03.261Z",
+  "exportedAt": "2026-07-24T08:14:30.961Z",
   "version": "v2026072110"
 }
