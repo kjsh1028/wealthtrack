@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mryhnasnmb2e",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 90000000,
+      "date": "2026-07-24",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "신한은행 이체",
+      "ccPaid": false,
+      "linkedAccountId": "mrr7gtucry5p",
+      "isCreditCard": false
+    },
+    {
       "id": "mrxi612g1v5s",
       "type": "expense",
       "currency": "KRW",
@@ -564,7 +577,7 @@
       "bank": "미래에셋증권계좌",
       "name": "증권계좌",
       "currency": "KRW",
-      "balance": 92469484,
+      "balance": 2469484,
       "number": "",
       "type": "stock",
       "deposits": {}
@@ -905,6 +918,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-24T05:10:30.246Z",
+  "exportedAt": "2026-07-24T05:17:06.721Z",
   "version": "v2026072110"
 }
