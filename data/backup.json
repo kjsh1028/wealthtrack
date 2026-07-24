@@ -769,6 +769,14 @@
       "amount": 150000000,
       "rate": 0,
       "due": ""
+    },
+    {
+      "id": "mryo2s4bxcai",
+      "name": "정재훈 모다모다 대출",
+      "currency": "KRW",
+      "amount": 300000000,
+      "rate": 0,
+      "due": ""
     }
   ],
   "fixedExpenses": [
@@ -966,6 +974,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-24T08:15:15.843Z",
+  "exportedAt": "2026-07-24T08:28:07.693Z",
   "version": "v2026072110"
 }
