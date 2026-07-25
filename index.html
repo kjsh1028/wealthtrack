@@ -566,6 +566,26 @@ if('serviceWorker' in navigator){
   <div class="fab" onclick="openAccountModal('')">+</div>
 </div>
 
+<!-- ACCOUNT DETAIL -->
+<div id="page-acc-detail" class="page">
+  <div class="header">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onclick="showPage('accounts',null)" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;">‹</button>
+        <h1 id="acc-detail-title">계좌 상세</h1>
+      </div>
+      <button id="acc-detail-edit-btn" onclick="openAccountModalFromDetail()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;">수정</button>
+    </div>
+  </div>
+  <div style="padding:16px;">
+    <div id="acc-detail-card"></div>
+    <div style="margin-top:16px;">
+      <div class="sec-title" style="margin-bottom:8px;">거래 내역</div>
+      <div id="acc-detail-txn-list"></div>
+    </div>
+  </div>
+</div>
+
 <!-- INVESTMENTS -->
 <div id="page-invest" class="page">
   <div class="header"><h1>📈 투자자산</h1></div>
@@ -1576,7 +1596,98 @@ function showPage(name, el) {
   if (name === 'analysis') renderAnalysis();
   if (name === 'settings') renderSettings();
   if (name === 'more') renderMore();
+  if (name === 'acc-detail') renderAccDetail();
 }
+
+var currentAccDetailId = null;
+
+function openAccDetail(accId) {
+  currentAccDetailId = accId;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const moreTab = document.querySelector('.nav-item:last-child');
+  if (moreTab) moreTab.classList.add('active');
+  const pageEl = document.getElementById('page-acc-detail');
+  if (pageEl) pageEl.classList.add('active');
+  renderAccDetail();
+}
+
+function openAccountModalFromDetail() {
+  openAccountModal('', currentAccDetailId);
+}
+
+function renderAccDetail() {
+  const accId = currentAccDetailId;
+  if (!accId) return;
+  const a = accounts.find(x => x.id === accId);
+  if (!a) return;
+
+  // Header title
+  document.getElementById('acc-detail-title').textContent = a.name;
+
+  // Balance card
+  const balDisplay = fmtCurr(a.balance, a.currency);
+  const krwDisplay = fmtNum(Math.round(toKRW(a.balance, a.currency)));
+  const isStock = a.type === 'stock';
+  const depDetail = isStock && a.deposits
+    ? Object.entries(a.deposits||{}).filter(e=>e[1]>0).map(e=>e[0]+' '+fmtNum(e[1])).join(' · ') : '';
+  const cardColor = a.currency==='KRW' ? 'linear-gradient(135deg,#1a3a2a,#27ae60)' : a.currency==='CNY' ? 'linear-gradient(135deg,#7f0000,#d32f2f)' : 'linear-gradient(135deg,var(--navy),#2d4a8a)';
+  document.getElementById('acc-detail-card').innerHTML =
+    '<div style="background:' + cardColor + ';color:#fff;border-radius:14px;padding:20px;margin-bottom:4px;">'
+    + '<div style="font-size:12px;opacity:0.7;">' + a.bank + (isStock?' 📈':'') + '</div>'
+    + '<div style="font-size:22px;font-weight:800;margin:6px 0;">' + balDisplay + '</div>'
+    + (a.number ? '<div style="font-size:11px;opacity:0.6;">****' + a.number + '</div>' : '')
+    + (depDetail ? '<div style="font-size:11px;opacity:0.7;margin-top:4px;">' + depDetail + '</div>' : '')
+    + '<div style="font-size:11px;opacity:0.6;margin-top:4px;">≈ ₩' + krwDisplay + '</div>'
+    + ((a.adjustments||[]).length ? '<div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.2);padding-top:8px;font-size:11px;opacity:0.7;">최근 조정: ' + (a.adjustments||[]).slice(-1)[0].date + '</div>' : '')
+    + '</div>';
+
+  // Transactions linked to this account
+  const txns = ledger.filter(t =>
+    (t.linkedAccountId === accId) ||
+    (t.type === 'transfer' && (t.transferFrom === accId || t.transferTo === accId))
+  ).sort((a,b) => b.date.localeCompare(a.date));
+
+  const listEl = document.getElementById('acc-detail-txn-list');
+  if (!txns.length) {
+    listEl.innerHTML = '<div class="empty-state"><div class="e-icon">📋</div><div class="e-text">이 계좌의 거래 내역이 없습니다</div></div>';
+    return;
+  }
+
+  // Group by date
+  const byDate = {};
+  txns.forEach(t => { if (!byDate[t.date]) byDate[t.date] = []; byDate[t.date].push(t); });
+  listEl.innerHTML = Object.keys(byDate).sort((a,b) => b.localeCompare(a)).map(date =>
+    '<div style="margin-bottom:4px;font-size:12px;font-weight:700;color:var(--sub);padding:8px 0 4px;">' + date + '</div>'
+    + '<div class="card" style="padding:0 16px;">'
+    + byDate[date].map(t => {
+        const isTransfer = t.type === 'transfer';
+        const isIncome = t.type === 'income';
+        const isFrom = isTransfer && t.transferFrom === accId;
+        const color = isTransfer ? (isFrom ? 'var(--red)' : 'var(--green)') : (isIncome ? 'var(--green)' : 'var(--red)');
+        const sign = isTransfer ? (isFrom ? '-' : '+') : (isIncome ? '+' : '-');
+        const subText = isTransfer
+          ? (isFrom
+            ? '→ ' + (accounts.find(x=>x.id===t.transferTo)?.name||'?')
+            : '← ' + (accounts.find(x=>x.id===t.transferFrom)?.name||'?'))
+          : t.payment;
+        const icon = isTransfer ? '↔️' : getCatIcon(t.category);
+        const iconBg = isTransfer ? '#e8eaf6' : (isIncome ? '#e8f5e9' : '#fff0f0');
+        return '<div class="list-item" onclick="openLedgerDetail(' + "'" + t.id + "'" + ')">'
+          + '<div class="li-icon" style="background:' + iconBg + '">' + icon + '</div>'
+          + '<div class="li-main">'
+            + '<div class="li-title">' + (isTransfer ? '이체' : t.category) + (t.memo ? ' · ' + t.memo : '') + '</div>'
+            + '<div class="li-sub">' + subText + '</div>'
+          + '</div>'
+          + '<div class="li-right">'
+            + '<div class="li-amount" style="color:' + color + '">' + sign + fmtCurr(t.amount, t.currency) + '</div>'
+          + '</div>'
+          + '</div>';
+      }).join('')
+    + '</div>'
+  ).join('');
+}
+
 
 function renderMore() {
   // 계좌 요약
@@ -2156,7 +2267,7 @@ function renderAccounts() {
       const accClass = a.currency==='KRW' ? 'account-card kr' : a.currency==='CNY' ? 'account-card cn' : 'account-card';
       return '<div class="' + accClass + '">'
         + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-          + '<div onclick="openAccountModal(\'\',' + "'" + a.id + "'" + ')" style="flex:1;">'
+          + '<div onclick="openAccDetail(\'' + a.id + '\')" style="flex:1;">'
             + '<div class="acc-bank">' + a.bank + typeIcon + '</div>'
             + '<div class="acc-name">' + a.name + '</div>'
             + '<div class="acc-balance">' + balDisplay + '</div>'
@@ -2247,6 +2358,7 @@ function saveAccount() {
   closeModal('modal-account');
   renderAccounts();
   renderDashboard();
+  if (currentAccDetailId) renderAccDetail();
   showToast('저장되었습니다');
 }
 
