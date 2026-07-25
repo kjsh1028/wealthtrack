@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mrzquimmfigj",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 4300000,
+      "date": "2026-07-25",
+      "category": "의료",
+      "payment": "체크카드(한국)",
+      "memo": "시아루 피부 치료",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mrzm2ygk8kvl",
       "type": "income",
       "currency": "KRW",
@@ -642,7 +655,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 309043472,
+      "balance": 304743472,
       "number": "7321",
       "adjustments": [
         {
@@ -1045,6 +1058,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-25T02:22:01.133Z",
+  "exportedAt": "2026-07-25T02:22:26.184Z",
   "version": "v202607250147"
 }
