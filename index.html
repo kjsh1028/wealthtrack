@@ -1016,6 +1016,7 @@ if('serviceWorker' in navigator){
     <div class="seg-ctrl">
       <div class="seg-btn active" onclick="setLedgerType('income',this)">수입</div>
       <div class="seg-btn" onclick="setLedgerType('expense',this)">지출</div>
+      <div class="seg-btn" onclick="setLedgerType('transfer',this)">이체</div>
     </div>
     <div class="currency-tabs">
       <div class="curr-btn krw active" onclick="setLedgerCurr('KRW',this)">₩ KRW</div>
@@ -1024,6 +1025,10 @@ if('serviceWorker' in navigator){
     </div>
     <div class="form-group"><label class="form-label">금액</label><input class="form-input" type="text" inputmode="decimal" id="inp-amount" placeholder="0"></div>
     <div class="form-group"><label class="form-label">날짜</label><input class="form-input" type="date" id="inp-date"></div>
+    <div id="transfer-fields" style="display:none;">
+      <div class="form-group"><label class="form-label">출금 계좌</label><select class="form-input form-select" id="inp-transfer-from"></select></div>
+      <div class="form-group"><label class="form-label">입금 계좌</label><select class="form-input form-select" id="inp-transfer-to"></select></div>
+    </div>
     <div class="form-group"><label class="form-label">카테고리</label>
       <div class="cat-grid" id="cat-grid-expense">
         <div class="cat-btn active" data-cat="식비" onclick="selectCat(this)"><div class="c-icon">🍜</div><div class="c-label">식비</div></div>
@@ -1456,7 +1461,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v2026072110';
+const APP_VERSION = 'v2026072501';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1698,7 +1703,7 @@ function renderDashboard() {
 
   // ── 이달 수입/지출 ──
   let monthIncome = 0, monthExpense = 0;
-  ledger.filter(t => t.date.startsWith(mon)).forEach(t => {
+  ledger.filter(t => t.date.startsWith(mon) && t.type !== 'transfer').forEach(t => {
     const krw = toKRW(t.amount, t.currency);
     if (t.type === 'income') monthIncome += krw; else monthExpense += krw;
   });
@@ -1731,19 +1736,19 @@ function renderDashboard() {
   if (!recent.length) { el.innerHTML = '<div class="empty-state"><div class="e-icon">📋</div><div class="e-text">거래 내역이 없습니다</div></div>'; return; }
   el.innerHTML = recent.map(t => `
     <div class="list-item" onclick="openLedgerDetail('${t.id}')">
-      <div class="li-icon" style="background:${t.type==='income'?'#e8f5e9':'#fff0f0'}">${getCatIcon(t.category)}</div>
+      <div class="li-icon" style="background:${t.type==='transfer'?'#e8eaf6':t.type==='income'?'#e8f5e9':'#fff0f0'}">${t.type==='transfer'?'↔️':getCatIcon(t.category)}</div>
       <div class="li-main">
-        <div class="li-title">${t.category}${t.memo?' · '+t.memo:''}</div>
-        <div class="li-sub">${t.payment}${t.linkedAccountId ? ' · 🏦' + (accounts.find(a=>a.id===t.linkedAccountId)?.name||'') : ''} · ${t.date}</div>
+        <div class="li-title">${t.type==='transfer'?'이체'+(t.memo?' · '+t.memo:''):t.category+(t.memo?' · '+t.memo:'')}</div>
+        <div class="li-sub">${t.type==='transfer'?((accounts.find(a=>a.id===t.transferFrom)?.name||'?')+' → '+(accounts.find(a=>a.id===t.transferTo)?.name||'?')):t.payment+(t.linkedAccountId?' · 🏦'+(accounts.find(a=>a.id===t.linkedAccountId)?.name||''):'')} · ${t.date}</div>
       </div>
       <div class="li-right">
-        <div class="li-amount ${t.type}">${t.type==='income'?'+':'-'}${fmtCurr(t.amount, t.currency)}</div>
+        <div class="li-amount" style="color:${t.type==='transfer'?'#7986cb':t.type==='income'?'var(--green)':'var(--red)'}">${t.type==='transfer'?'':t.type==='income'?'+':'-'}${fmtCurr(t.amount, t.currency)}</div>
       </div>
     </div>`).join('');
 }
 
 function getCatIcon(cat) {
-  const m = {식비:'🍜',교통:'🚌',숙박:'🏨',업무:'💼',의료:'🏥',쇼핑:'🛍️',공과금:'📋',기타:'📌',급여:'💰',수수료:'🤝',배당:'📈',임대:'🏠',이자:'🏦',잔액조정:'⚖️'};
+  const m = {식비:'🍜',교통:'🚌',숙박:'🏨',업무:'💼',의료:'🏥',쇼핑:'🛍️',공과금:'📋',기타:'📌',급여:'💰',수수료:'🤝',배당:'📈',임대:'🏠',이자:'🏦',잔액조정:'⚖️',이체:'↔️'};
   return m[cat] || '📌';
 }
 
@@ -1766,10 +1771,12 @@ function renderLedger() {
   let items = ledger.filter(t => t.date.startsWith(mon));
   if (ledgerFilter === 'income') items = items.filter(t => t.type === 'income');
   else if (ledgerFilter === 'expense') items = items.filter(t => t.type === 'expense');
+  else if (ledgerFilter === 'transfer') items = items.filter(t => t.type === 'transfer');
   else if (['KRW','CNY','USD'].includes(ledgerFilter)) items = items.filter(t => t.currency === ledgerFilter);
 
   let inc = 0, exp = 0;
   items.forEach(t => {
+    if (t.type === 'transfer') return;
     if (t.type === 'income') inc += toKRW(t.amount, t.currency);
     else exp += toKRW(t.amount, t.currency);
   });
@@ -1793,13 +1800,13 @@ function renderLedger() {
     <div class="card" style="padding:0 16px;">
       ${byDate[date].map(t => `
         <div class="list-item" onclick="openLedgerDetail('${t.id}')">
-          <div class="li-icon" style="background:${t.type==='income'?'#e8f5e9':'#fff0f0'}">${getCatIcon(t.category)}</div>
+          <div class="li-icon" style="background:${t.type==='transfer'?'#e8eaf6':t.type==='income'?'#e8f5e9':'#fff0f0'}">${t.type==='transfer'?'↔️':getCatIcon(t.category)}</div>
           <div class="li-main">
-            <div class="li-title">${t.category}${t.memo?' · '+t.memo:''}</div>
-            <div class="li-sub">${t.payment}<span class="chip ${t.currency.toLowerCase()}" style="margin-left:4px;">${t.currency}</span>${t.linkedAccountId ? '<span style="font-size:10px;color:var(--green);margin-left:4px;">🏦 ' + (accounts.find(a=>a.id===t.linkedAccountId)?.name||'?') + '</span>' : ''}</div>
+            <div class="li-title">${t.type==='transfer'?'이체' + (t.memo?' · '+t.memo:''):t.category+(t.memo?' · '+t.memo:'')}</div>
+            <div class="li-sub">${t.type==='transfer'?((accounts.find(a=>a.id===t.transferFrom)?.name||'?')+' → '+(accounts.find(a=>a.id===t.transferTo)?.name||'?')):t.payment}<span class="chip ${t.currency.toLowerCase()}" style="margin-left:4px;">${t.currency}</span>${t.type!=='transfer'&&t.linkedAccountId ? '<span style="font-size:10px;color:var(--green);margin-left:4px;">🏦 ' + (accounts.find(a=>a.id===t.linkedAccountId)?.name||'?') + '</span>' : ''}</div>
           </div>
           <div class="li-right">
-            <div class="li-amount ${t.type}">${t.type==='income'?'+':'-'}${fmtCurr(t.amount, t.currency)}</div>
+            <div class="li-amount" style="color:${t.type==='transfer'?'#7986cb':t.type==='income'?'var(--green)':'var(--red)'}">${t.type==='transfer'?'':t.type==='income'?'+':'-'}${fmtCurr(t.amount, t.currency)}</div>
           </div>
         </div>`).join('')}
     </div>`).join('');
@@ -1856,12 +1863,18 @@ function openLedgerModal(id) {
     document.getElementById('inp-amount').value = numToComma(t.amount);
     document.getElementById('inp-date').value = t.date;
     document.getElementById('inp-memo').value = t.memo || '';
-    document.getElementById('inp-payment').value = t.payment;
+    if (t.type !== 'transfer') document.getElementById('inp-payment').value = t.payment;
     // 수정 시 이전 계좌/금액 기억 (롤백용)
     document.getElementById('inp-ledger-prev-acc').value = t.linkedAccountId || '';
     document.getElementById('inp-ledger-prev-amount').value = t.amount || '';
     document.getElementById('inp-ledger-prev-type').value = t.type || '';
-    populateAccountSelect(t.linkedAccountId || '', t.currency);
+    if (t.type === 'transfer') {
+      populateTransferAccounts();
+      document.getElementById('inp-transfer-from').value = t.transferFrom || '';
+      document.getElementById('inp-transfer-to').value = t.transferTo || '';
+    } else {
+      populateAccountSelect(t.linkedAccountId || '', t.currency);
+    }
   } else {
     document.getElementById('inp-amount').value = '';
     document.getElementById('inp-date').value = today();
@@ -1890,7 +1903,27 @@ function openLedgerModal(id) {
   document.getElementById('inp-linked-account').onchange = updateLinkedAccPreview;
   document.getElementById('inp-payment').onchange = updateLinkedAccPreview;
 
-  document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.textContent === (ledgerType==='income'?'수입':'지출')));
+  var typeLabel = ledgerType==='income'?'수입':ledgerType==='transfer'?'이체':'지출';
+  document.querySelectorAll('#modal-ledger .seg-btn').forEach(b => b.classList.toggle('active', b.textContent === typeLabel));
+  if (ledgerType === 'transfer') {
+    var tFields = document.getElementById('transfer-fields');
+    if (tFields) tFields.style.display = 'block';
+    document.querySelectorAll('#modal-ledger .form-group').forEach(function(fg) {
+      var lbl = fg.querySelector('.form-label');
+      if (!lbl) return;
+      var txt = lbl.textContent.trim();
+      if (txt === '카테고리' || txt === '결제수단' || txt.includes('연결 계좌')) fg.style.display = 'none';
+    });
+  } else {
+    var tFields2 = document.getElementById('transfer-fields');
+    if (tFields2) tFields2.style.display = 'none';
+    document.querySelectorAll('#modal-ledger .form-group').forEach(function(fg) {
+      var lbl = fg.querySelector('.form-label');
+      if (!lbl) return;
+      var txt = lbl.textContent.trim();
+      if (txt === '카테고리' || txt === '결제수단' || txt.includes('연결 계좌')) fg.style.display = '';
+    });
+  }
   document.querySelectorAll('.curr-btn').forEach(b => b.classList.toggle('active', b.classList.contains(ledgerCurr.toLowerCase())));
   updateCatGrid();
   openModal('modal-ledger');
@@ -1902,7 +1935,33 @@ function setLedgerType(type, el) {
   ledgerType = type;
   document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+  var isTransfer = type === 'transfer';
+  // transfer 모드: 출금/입금 계좌 필드 표시, 카테고리/결제수단/연결계좌 숨김
+  var tFields = document.getElementById('transfer-fields');
+  if (tFields) tFields.style.display = isTransfer ? 'block' : 'none';
+  var catEl = document.querySelector('#modal-ledger .form-group:has(#cat-grid-expense)');
+  // 카테고리 섹션 찾기
+  document.querySelectorAll('#modal-ledger .form-group').forEach(function(fg) {
+    var lbl = fg.querySelector('.form-label');
+    if (!lbl) return;
+    var txt = lbl.textContent.trim();
+    if (txt === '카테고리' || txt === '결제수단') fg.style.display = isTransfer ? 'none' : '';
+    if (txt.includes('연결 계좌')) fg.style.display = isTransfer ? 'none' : '';
+  });
+  // 통화탭 (이체 시에도 표시)
+  if (isTransfer) populateTransferAccounts();
   updateCatGrid();
+}
+
+function populateTransferAccounts() {
+  var curr = ledgerCurr;
+  var fromSel = document.getElementById('inp-transfer-from');
+  var toSel = document.getElementById('inp-transfer-to');
+  if (!fromSel || !toSel) return;
+  var opts = accounts.filter(function(a){ return a.type !== 'cc'; })
+    .map(function(a){ return '<option value="' + a.id + '">' + a.bank + ' · ' + a.name + ' (' + fmtCurr(a.balance, a.currency) + ')</option>'; }).join('');
+  fromSel.innerHTML = '<option value="">출금 계좌 선택</option>' + opts;
+  toSel.innerHTML = '<option value="">입금 계좌 선택</option>' + opts;
 }
 
 function setLedgerCurr(curr, el) {
@@ -1949,6 +2008,41 @@ function saveLedger() {
 
   const id = document.getElementById('inp-ledger-id').value || uid();
   const existing = ledger.find(x => x.id === id);
+
+  // ── 이체 처리 ──
+  if (ledgerType === 'transfer') {
+    const fromId = document.getElementById('inp-transfer-from').value;
+    const toId = document.getElementById('inp-transfer-to').value;
+    if (!fromId || !toId) { showToast('출금/입금 계좌를 선택하세요'); return; }
+    if (fromId === toId) { showToast('출금과 입금 계좌가 같습니다'); return; }
+    // 수정 시 이전 이체 롤백
+    if (existing && existing.type === 'transfer') {
+      const pFrom = accounts.find(a => a.id === existing.transferFrom);
+      const pTo = accounts.find(a => a.id === existing.transferTo);
+      if (pFrom) { pFrom.balance += existing.amount; pFrom.balance = Math.round(pFrom.balance*100)/100; }
+      if (pTo)   { pTo.balance   -= existing.amount; pTo.balance   = Math.round(pTo.balance*100)/100; }
+    }
+    const fromAcc = accounts.find(a => a.id === fromId);
+    const toAcc   = accounts.find(a => a.id === toId);
+    if (fromAcc) { fromAcc.balance -= amount; fromAcc.balance = Math.round(fromAcc.balance*100)/100; }
+    if (toAcc)   { toAcc.balance   += amount; toAcc.balance   = Math.round(toAcc.balance*100)/100; }
+    save('accounts', accounts);
+    const tx = {
+      id, type: 'transfer', currency: ledgerCurr, amount, date,
+      category: '이체', payment: '계좌이체',
+      memo: document.getElementById('inp-memo').value,
+      transferFrom: fromId, transferTo: toId,
+      ccPaid: false, linkedAccountId: null, isCreditCard: false
+    };
+    if (existing) ledger[ledger.indexOf(existing)] = tx;
+    else ledger.unshift(tx);
+    save('ledger', ledger);
+    closeModal('modal-ledger');
+    renderLedger(); renderDashboard(); renderAccounts();
+    showToast('이체 완료 · ' + (fromAcc?.name||'') + ' → ' + (toAcc?.name||''));
+    return;
+  }
+
   const linkedAccountId = document.getElementById('inp-linked-account').value;
   const payment = document.getElementById('inp-payment').value;
   const isCreditCard = isCreditPayment(payment);
@@ -1959,10 +2053,9 @@ function saveLedger() {
     const prevAmount = parseFloat(document.getElementById('inp-ledger-prev-amount').value) || 0;
     const prevType = document.getElementById('inp-ledger-prev-type').value;
     if (prevAccId && prevAmount && !existing.isCreditCard) {
-      // 이전 거래 효과 롤백
       const prevAcc = accounts.find(a => a.id === prevAccId);
       if (prevAcc) {
-        const sign = prevType === 'income' ? -1 : 1; // 반대로
+        const sign = prevType === 'income' ? -1 : 1;
         prevAcc.balance += sign * prevAmount;
         prevAcc.balance = Math.round(prevAcc.balance * 100) / 100;
       }
@@ -2005,11 +2098,18 @@ function deleteLedger() {
   const id = document.getElementById('inp-ledger-id').value;
   const tx = ledger.find(x => x.id === id);
 
-  // 계좌 잔액 롤백 (연결된 계좌가 있고 신용카드가 아닐 때)
-  if (tx && tx.linkedAccountId && !tx.isCreditCard) {
+  if (tx && tx.type === 'transfer') {
+    // 이체 롤백
+    const fromAcc = accounts.find(a => a.id === tx.transferFrom);
+    const toAcc   = accounts.find(a => a.id === tx.transferTo);
+    if (fromAcc) { fromAcc.balance += tx.amount; fromAcc.balance = Math.round(fromAcc.balance*100)/100; }
+    if (toAcc)   { toAcc.balance   -= tx.amount; toAcc.balance   = Math.round(toAcc.balance*100)/100; }
+    save('accounts', accounts);
+  } else if (tx && tx.linkedAccountId && !tx.isCreditCard) {
+    // 일반 거래 잔액 롤백
     const acc = accounts.find(a => a.id === tx.linkedAccountId);
     if (acc) {
-      const sign = tx.type === 'income' ? -1 : 1; // 반대 방향으로 롤백
+      const sign = tx.type === 'income' ? -1 : 1;
       acc.balance += sign * tx.amount;
       acc.balance = Math.round(acc.balance * 100) / 100;
       save('accounts', accounts);
@@ -2020,8 +2120,8 @@ function deleteLedger() {
   closeModal('modal-ledger');
   renderLedger();
   renderDashboard();
-  if (tx?.linkedAccountId && !tx?.isCreditCard) renderAccounts();
-  showToast('삭제됨' + (tx?.linkedAccountId && !tx?.isCreditCard ? ' · 계좌 잔액 롤백됨' : ''));
+  renderAccounts();
+  showToast('삭제됨 · 잔액 롤백됨');
 }
 
 // ========== ACCOUNTS ==========
@@ -3160,6 +3260,7 @@ function renderMonthlyChart() {
     let inc = 0, exp = 0;
     ledger.filter(t => t.date.startsWith(mon)).forEach(t => {
       const k = toKRW(t.amount, t.currency);
+      if (t.type === 'transfer') return;
       if (t.type === 'income') inc += k;
       else exp += k;
     });
@@ -3757,7 +3858,7 @@ function exportExcel() {
   const ledgerHeader = ['날짜','유형','통화','금액','원화환산','카테고리','결제수단','메모'];
   const ledgerRows = [...ledger].sort((a,b) => b.date.localeCompare(a.date)).map(t => [
     t.date,
-    t.type === 'income' ? '수입' : '지출',
+    t.type === 'transfer' ? '이체' : t.type === 'income' ? '수입' : '지출',
     t.currency,
     t.amount,
     Math.round(toKRW(t.amount, t.currency)),
