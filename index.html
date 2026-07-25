@@ -1530,7 +1530,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v202607250241';
+const APP_VERSION = 'v202607250247';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -3262,12 +3262,14 @@ function renderDebtList() {
     const repayList = (repayments||[]).slice(-3).reverse();
 
     const repayBtnId = isRe ? "openReRepayModal('" + reId + "')" : "openRepayModal('" + id + "')";
-    const editBtn = isRe ? '' : '<button onclick="event.stopPropagation();openDebtModal(' + "'" + id + "'" + ')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:3px 10px;font-size:11px;color:var(--sub);cursor:pointer;">수정</button>';
+    const editBtn = isRe ? '<button onclick="event.stopPropagation();openREModal(' + "'" + reId + "'" + ')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:3px 10px;font-size:11px;color:var(--sub);cursor:pointer;">수정</button>' : '<button onclick="event.stopPropagation();openDebtModal(' + "'" + id + "'" + ')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:3px 10px;font-size:11px;color:var(--sub);cursor:pointer;">수정</button>';
 
+    const detailId = 'debt-detail-' + (isRe ? 're-' + reId : id);
+    const toggleDetail = 'toggleDebtDetail(' + "'" + detailId + "'" + ')';
     return '<div style="padding:12px 0;border-bottom:1px solid var(--border);">'
       + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">'
         + '<div style="flex:1;">'
-          + '<div style="font-size:14px;font-weight:700;color:var(--text);">' + name + '</div>'
+          + '<div onclick="' + toggleDetail + '" style="font-size:14px;font-weight:700;color:var(--text);cursor:pointer;">' + name + '</div>'
           + '<div style="font-size:11px;color:var(--sub);margin-top:2px;">금리 ' + rateStr + ' · 만기 ' + dueStr + (accName ? ' · 🏦 '+accName : '') + '</div>'
         + '</div>'
         + '<div style="text-align:right;">'
@@ -3300,6 +3302,30 @@ function renderDebtList() {
           ).join('')
         + '</div>'
       ) : '')
+      + '<div id="' + detailId + '" style="display:none;margin-top:10px;background:#f0f4ff;border-radius:10px;padding:12px;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
+      + '<div style="font-size:11px;font-weight:700;color:var(--navy);">📋 대출 상세</div>'
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">'
+      + '<div style="background:#fff;border-radius:8px;padding:8px;"><div style="color:var(--sub);font-size:10px;">원금</div><div style="font-weight:700;margin-top:2px;">' + (principal>0?fmtCurr(principal,currency):'-') + '</div></div>'
+      + '<div style="background:#fff;border-radius:8px;padding:8px;"><div style="color:var(--sub);font-size:10px;">현재 잔액</div><div style="font-weight:700;color:var(--red);margin-top:2px;">' + fmtCurr(amount,currency) + '</div></div>'
+      + '<div style="background:#fff;border-radius:8px;padding:8px;"><div style="color:var(--sub);font-size:10px;">금리</div><div style="font-weight:700;margin-top:2px;">' + rateStr + '</div></div>'
+      + '<div style="background:#fff;border-radius:8px;padding:8px;"><div style="color:var(--sub);font-size:10px;">만기일</div><div style="font-weight:700;margin-top:2px;">' + dueStr + '</div></div>'
+      + '<div style="background:#fff;border-radius:8px;padding:8px;"><div style="color:var(--sub);font-size:10px;">연동 계좌</div><div style="font-weight:700;margin-top:2px;">' + (accName||'-') + '</div></div>'
+      + '<div style="background:#fff;border-radius:8px;padding:8px;"><div style="color:var(--sub);font-size:10px;">총 상환액</div><div style="font-weight:700;color:var(--green);margin-top:2px;">' + fmtCurr(paidAmt>0?paidAmt:0,currency) + '</div></div>'
+      + '</div>'
+      + (repayments&&repayments.length ? (
+        '<div style="margin-top:10px;border-top:1px solid #dde3f5;padding-top:8px;">'
+        + '<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px;">전체 상환 내역 (' + repayments.length + '건)</div>'
+        + [...repayments].reverse().map(function(rr){
+            return '<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid #eef;">'
+              + '<span style="color:var(--sub);">' + rr.date + ' <span style="background:#e8eaf6;border-radius:4px;padding:1px 5px;font-size:10px;">' + (rr.type||'상환') + '</span>' + (rr.memo?' · '+rr.memo:'') + '</span>'
+              + '<span style="color:var(--green);font-weight:700;">-' + fmtCurr(rr.amount,currency) + '</span>'
+            + '</div>';
+          }).join('')
+        + '</div>'
+      ) : '<div style="margin-top:8px;font-size:12px;color:var(--sub);">상환 내역이 없습니다</div>')
+      + '</div>'
     + '</div>';
   }
 
@@ -3325,6 +3351,12 @@ function renderDebtList() {
   + '</div>';
 
   el.innerHTML = html;
+}
+
+function toggleDebtDetail(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
 function openDebtModal(id) {
