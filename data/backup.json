@@ -104,15 +104,17 @@
     },
     {
       "id": "mryhnasnmb2e",
-      "type": "expense",
+      "type": "transfer",
       "currency": "KRW",
       "amount": 90000000,
       "date": "2026-07-24",
-      "category": "기타",
-      "payment": "체크카드(한국)",
+      "category": "이체",
+      "payment": "계좌이체",
       "memo": "신한은행 이체",
+      "transferFrom": "mrr7gtucry5p",
+      "transferTo": "mrq082m3mg2f",
       "ccPaid": false,
-      "linkedAccountId": "mrr7gtucry5p",
+      "linkedAccountId": null,
       "isCreditCard": false
     },
     {
@@ -653,7 +655,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 309043472,
+      "balance": 399043472,
       "number": "7321",
       "adjustments": [
         {
@@ -687,7 +689,7 @@
       "bank": "미래에셋증권계좌",
       "name": "증권계좌",
       "currency": "KRW",
-      "balance": 1922268,
+      "balance": -88077732,
       "number": "",
       "type": "stock",
       "deposits": {},
@@ -1002,7 +1004,7 @@
     "usd": 1463,
     "cny": 216,
     "usdcny": 6.7819,
-    "updatedAt": "2026. 7. 25. 오전 9:05:46 (자동)"
+    "updatedAt": "2026. 7. 25. 오전 10:04:40 (자동)"
   },
   "budget": 10000000,
   "assetSnapshots": [],
@@ -1046,6 +1048,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-25T01:04:25.444Z",
-  "version": "v2026072110"
+  "exportedAt": "2026-07-25T01:05:25.130Z",
+  "version": "v2026072501"
 }
