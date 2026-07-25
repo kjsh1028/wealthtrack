@@ -1401,7 +1401,15 @@ if('serviceWorker' in navigator){
     </div>
     <div class="form-group"><label class="form-label">취득가</label><input class="form-input" type="text" inputmode="decimal" id="inp-re-cost" placeholder="0"></div>
     <div class="form-group"><label class="form-label">현재 추정가</label><input class="form-input" type="text" inputmode="decimal" id="inp-re-value" placeholder="0"></div>
-    <div class="form-group"><label class="form-label">담보대출 잔액</label><input class="form-input" type="text" inputmode="decimal" id="inp-re-loan" placeholder="0 (없으면 0)"></div>
+    <div class="form-group"><label class="form-label">담보대출 원금 (최초)</label><input class="form-input" type="text" inputmode="decimal" id="inp-re-loan-principal" placeholder="0 (없으면 0)"></div>
+    <div class="form-group"><label class="form-label">담보대출 현재 잔액</label><input class="form-input" type="text" inputmode="decimal" id="inp-re-loan" placeholder="0 (없으면 0)"></div>
+    <div class="form-group"><label class="form-label">금리 (연 %)</label><input class="form-input" type="number" id="inp-re-loan-rate" placeholder="예: 3.5"></div>
+    <div class="form-group"><label class="form-label">만기일 (선택)</label><input class="form-input" type="date" id="inp-re-loan-due"></div>
+    <div class="form-group"><label class="form-label">상환 연동 계좌</label>
+      <select class="form-input form-select" id="inp-re-loan-acc">
+        <option value="">계좌 미연결</option>
+      </select>
+    </div>
     <input type="hidden" id="inp-re-id">
     <button class="btn-primary" onclick="saveRE()">저장</button>
     <button id="btn-delete-re" class="btn-danger" onclick="deleteRE()" style="display:none;">삭제</button>
@@ -1422,13 +1430,48 @@ if('serviceWorker' in navigator){
         <option value="USD">$ USD</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label">잔액</label><input class="form-input" type="text" inputmode="decimal" id="inp-debt-amount" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">대출 원금 (최초 금액)</label><input class="form-input" type="text" inputmode="decimal" id="inp-debt-principal" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">현재 잔액</label><input class="form-input" type="text" inputmode="decimal" id="inp-debt-amount" placeholder="0"></div>
     <div class="form-group"><label class="form-label">금리 (연 %)</label><input class="form-input" type="number" id="inp-debt-rate" placeholder="예: 4.5"></div>
     <div class="form-group"><label class="form-label">만기일 (선택)</label><input class="form-input" type="date" id="inp-debt-due"></div>
+    <div class="form-group"><label class="form-label">연동 계좌 <span style="color:var(--sub);font-weight:400;">(상환 시 자동 차감)</span></label>
+      <select class="form-input form-select" id="inp-debt-acc">
+        <option value="">계좌 미연결</option>
+      </select>
+    </div>
     <input type="hidden" id="inp-debt-id">
     <button class="btn-primary" onclick="saveDebt()">저장</button>
     <button id="btn-delete-debt" class="btn-danger" onclick="deleteDebt()" style="display:none;">삭제</button>
     <button class="btn-secondary" onclick="closeModal('modal-debt')">취소</button>
+  </div>
+</div>
+
+<!-- Debt Repayment Modal -->
+<div class="modal-overlay" id="modal-debt-repay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="repay-modal-title">상환 입력</div>
+    <div class="form-group"><label class="form-label">상환 금액</label><input class="form-input" type="text" inputmode="decimal" id="inp-repay-amount" placeholder="0"></div>
+    <div class="form-group"><label class="form-label">날짜</label><input class="form-input" type="date" id="inp-repay-date"></div>
+    <div class="form-group"><label class="form-label">구분</label>
+      <select class="form-input form-select" id="inp-repay-type">
+        <option value="원금+이자">원금+이자</option>
+        <option value="원금">원금만</option>
+        <option value="이자">이자만</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">연동 계좌 <span style="color:var(--sub);font-weight:400;">(차감할 계좌)</span></label>
+      <select class="form-input form-select" id="inp-repay-acc">
+        <option value="">계좌 미연결</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">메모 (선택)</label><input class="form-input" type="text" id="inp-repay-memo" placeholder="예: 3월 정기상환"></div>
+    <div id="repay-acc-preview" style="font-size:12px;color:var(--sub);margin-bottom:12px;"></div>
+    <input type="hidden" id="inp-repay-debt-id">
+    <input type="hidden" id="inp-repay-debt-type">
+    <input type="hidden" id="inp-repay-re-id">
+    <button class="btn-primary" onclick="saveRepayment()">상환 저장</button>
+    <button class="btn-secondary" onclick="closeModal('modal-debt-repay')">취소</button>
   </div>
 </div>
 
@@ -1487,7 +1530,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v202607250147';
+const APP_VERSION = 'v202607250241';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -3149,7 +3192,16 @@ function openREModal(id) {
   document.getElementById('inp-re-curr').value = r ? r.currency : 'KRW';
   document.getElementById('inp-re-cost').value = r ? r.cost : '';
   document.getElementById('inp-re-value').value = r ? r.value : '';
-  document.getElementById('inp-re-loan').value = r ? (r.loan||0) : '';
+  document.getElementById('inp-re-loan-principal').value = r ? numToComma(r.loanPrincipal||r.loan||0) : '';
+  document.getElementById('inp-re-loan').value = r ? numToComma(r.loan||0) : '';
+  document.getElementById('inp-re-loan-rate').value = r ? (r.loanRate||'') : '';
+  document.getElementById('inp-re-loan-due').value = r ? (r.loanDue||'') : '';
+  var accSel = document.getElementById('inp-re-loan-acc');
+  accSel.innerHTML = '<option value="">계좌 미연결</option>' +
+    accounts.filter(a => a.type !== 'cc').map(a =>
+      '<option value="' + a.id + '">' + a.bank + ' · ' + a.name + ' (' + fmtCurr(a.balance, a.currency) + ')</option>'
+    ).join('');
+  if (r && r.loanAccId) accSel.value = r.loanAccId;
   document.getElementById('btn-delete-re').style.display = id ? 'block' : 'none';
   openModal('modal-re');
 }
@@ -3159,11 +3211,18 @@ function saveRE() {
   if (!name) { showToast('물건명을 입력하세요'); return; }
   const id = document.getElementById('inp-re-id').value || uid();
   const existing = realEstate.find(x => x.id === id);
+  const loanAmt = commaToNum(document.getElementById('inp-re-loan').value);
   const r = { id, name, location: document.getElementById('inp-re-location').value,
     owner: document.getElementById('inp-re-owner').value, currency: document.getElementById('inp-re-curr').value,
     cost: commaToNum(document.getElementById('inp-re-cost').value),
     value: commaToNum(document.getElementById('inp-re-value').value),
-    loan: commaToNum(document.getElementById('inp-re-loan').value) };
+    loan: loanAmt,
+    loanPrincipal: commaToNum(document.getElementById('inp-re-loan-principal').value) || loanAmt,
+    loanRate: parseFloat(document.getElementById('inp-re-loan-rate').value)||0,
+    loanDue: document.getElementById('inp-re-loan-due').value,
+    loanAccId: document.getElementById('inp-re-loan-acc').value,
+    loanRepayments: existing ? (existing.loanRepayments||[]) : []
+  };
   if (existing) realEstate[realEstate.indexOf(existing)] = r;
   else realEstate.push(r);
   save('realestate', realEstate);
@@ -3184,11 +3243,7 @@ function deleteRE() {
 
 function renderDebtList() {
   const el = document.getElementById('debt-list');
-
-  // 부동산 담보대출 (loan > 0인 항목만)
   const reLoans = realEstate.filter(r => (r.loan || 0) > 0);
-
-  // 수동 등록 부채 + 부동산 담보대출 합산
   const totalManual = debts.reduce((s,d) => s + toKRW(d.amount, d.currency), 0);
   const totalReLoan = reLoans.reduce((s,r) => s + toKRW(r.loan, r.currency), 0);
   const grandTotal = totalManual + totalReLoan;
@@ -3198,37 +3253,76 @@ function renderDebtList() {
     return;
   }
 
+  function debtItemHTML(id, name, amount, currency, rate, due, principal, repayments, linkedAccId, isRe, reId) {
+    const pct = principal > 0 ? Math.min(100, Math.round((1 - amount/principal)*100)) : 0;
+    const paidAmt = principal > 0 ? (principal - amount) : 0;
+    const rateStr = rate ? rate + '%' : '-';
+    const dueStr = due || '-';
+    const accName = linkedAccId ? (accounts.find(a=>a.id===linkedAccId)?.name||'') : '';
+    const repayList = (repayments||[]).slice(-3).reverse();
+
+    const repayBtnId = isRe ? "openReRepayModal('" + reId + "')" : "openRepayModal('" + id + "')";
+    const editBtn = isRe ? '' : '<button onclick="event.stopPropagation();openDebtModal(' + "'" + id + "'" + ')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:3px 10px;font-size:11px;color:var(--sub);cursor:pointer;">수정</button>';
+
+    return '<div style="padding:12px 0;border-bottom:1px solid var(--border);">'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">'
+        + '<div style="flex:1;">'
+          + '<div style="font-size:14px;font-weight:700;color:var(--text);">' + name + '</div>'
+          + '<div style="font-size:11px;color:var(--sub);margin-top:2px;">금리 ' + rateStr + ' · 만기 ' + dueStr + (accName ? ' · 🏦 '+accName : '') + '</div>'
+        + '</div>'
+        + '<div style="text-align:right;">'
+          + '<div style="font-size:15px;font-weight:800;color:var(--red);">' + fmtCurr(amount, currency) + '</div>'
+          + (principal > 0 ? '<div style="font-size:10px;color:var(--sub);">원금 ' + fmtCurr(principal, currency) + '</div>' : '')
+        + '</div>'
+      + '</div>'
+      + (principal > 0 ? (
+        '<div style="margin-bottom:8px;">'
+          + '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--sub);margin-bottom:3px;">'
+            + '<span>상환 진행률</span><span>' + pct + '% (' + fmtCurr(paidAmt, currency) + ' 상환)</span>'
+          + '</div>'
+          + '<div style="height:6px;background:#eee;border-radius:3px;overflow:hidden;">'
+            + '<div style="height:100%;width:' + pct + '%;background:var(--green);border-radius:3px;transition:width 0.3s;"></div>'
+          + '</div>'
+        + '</div>'
+      ) : '')
+      + '<div style="display:flex;gap:6px;align-items:center;">'
+        + '<button onclick="event.stopPropagation();' + repayBtnId + '" style="flex:1;background:var(--navy);color:#fff;border:none;border-radius:8px;padding:7px;font-size:12px;font-weight:700;cursor:pointer;">💸 상환 입력</button>'
+        + editBtn
+      + '</div>'
+      + (repayList.length ? (
+        '<div style="margin-top:8px;background:#f8f9fa;border-radius:8px;padding:8px 10px;">'
+          + '<div style="font-size:10px;font-weight:700;color:var(--sub);margin-bottom:4px;">최근 상환 내역</div>'
+          + repayList.map(r =>
+            '<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;">'
+              + '<span style="color:var(--sub);">' + r.date + ' · ' + (r.type||'상환') + (r.memo ? ' · '+r.memo : '') + '</span>'
+              + '<span style="color:var(--green);font-weight:700;">-' + fmtCurr(r.amount, currency) + '</span>'
+            + '</div>'
+          ).join('')
+        + '</div>'
+      ) : '')
+    + '</div>';
+  }
+
   let html = '';
 
-  // 부동산 담보대출 (읽기 전용 - 부동산에서 관리)
   if (reLoans.length) {
-    html += '<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;padding:0 2px;">🏠 부동산 담보대출</div>';
-    html += reLoans.map(r => `
-      <div class="stat-row" onclick="setInvestTab(document.querySelector('#invest-main-tabs .inner-tab:nth-child(3)'),\'realestate\')">
-        <div>
-          <div class="stat-label">${r.name} 담보대출</div>
-          <div style="font-size:11px;color:var(--sub);">부동산 탭에서 관리 · ${r.currency} · ≈ ₩${fmtNum(Math.round(toKRW(r.loan, r.currency)))}</div>
-        </div>
-        <div class="stat-val" style="color:var(--red);">${fmtCurr(r.loan, r.currency)}</div>
-      </div>`).join('');
+    html += '<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;padding:0 2px;">🏠 부동산 담보대출</div>';
+    html += reLoans.map(r => {
+      const principal = r.loanPrincipal || r.loan;
+      return debtItemHTML(r.id, r.name + ' 담보대출', r.loan, r.currency, r.loanRate||0, r.loanDue||'', principal, r.loanRepayments||[], r.loanAccId||'', true, r.id);
+    }).join('');
   }
 
-  // 수동 등록 부채
   if (debts.length) {
-    if (reLoans.length) html += '<div style="height:12px;"></div>';
-    html += '<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;padding:0 2px;">💳 대출 / 부채</div>';
-    html += debts.map(d => `
-      <div class="stat-row" onclick="openDebtModal('${d.id}')">
-        <div><div class="stat-label">${d.name}</div><div style="font-size:11px;color:var(--sub);">금리 ${d.rate||0}% · 만기 ${d.due||'-'}</div></div>
-        <div class="stat-val" style="color:var(--red);">${fmtCurr(d.amount, d.currency)}</div>
-      </div>`).join('');
+    if (reLoans.length) html += '<div style="height:16px;"></div>';
+    html += '<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;padding:0 2px;">💳 대출 / 부채</div>';
+    html += debts.map(d => debtItemHTML(d.id, d.name, d.amount, d.currency, d.rate||0, d.due||'', d.principal||0, d.repayments||[], d.linkedAccId||'', false, null)).join('');
   }
 
-  // 합계
-  html += `<div style="margin-top:12px;padding:12px;background:rgba(220,53,69,0.06);border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
-    <div style="font-size:13px;font-weight:700;color:var(--red);">총 부채 합계</div>
-    <div style="font-size:16px;font-weight:800;color:var(--red);">-₩${fmtNum(Math.round(grandTotal))}</div>
-  </div>`;
+  html += '<div style="margin-top:16px;padding:12px;background:rgba(220,53,69,0.06);border-radius:10px;display:flex;justify-content:space-between;align-items:center;">'
+    + '<div style="font-size:13px;font-weight:700;color:var(--red);">총 부채 합계</div>'
+    + '<div style="font-size:16px;font-weight:800;color:var(--red);">-₩' + fmtNum(Math.round(grandTotal)) + '</div>'
+  + '</div>';
 
   el.innerHTML = html;
 }
@@ -3239,9 +3333,15 @@ function openDebtModal(id) {
   document.getElementById('inp-debt-id').value = id || '';
   document.getElementById('inp-debt-name').value = d ? d.name : '';
   document.getElementById('inp-debt-curr').value = d ? d.currency : 'KRW';
-  document.getElementById('inp-debt-amount').value = d ? d.amount : '';
+  document.getElementById('inp-debt-principal').value = d ? numToComma(d.principal||0) : '';
+  document.getElementById('inp-debt-amount').value = d ? numToComma(d.amount) : '';
   document.getElementById('inp-debt-rate').value = d ? (d.rate||'') : '';
   document.getElementById('inp-debt-due').value = d ? (d.due||'') : '';
+  // 계좌 드롭다운
+  var accSel = document.getElementById('inp-debt-acc');
+  accSel.innerHTML = '<option value="">계좌 미연결</option>' +
+    accounts.filter(a => a.type !== 'cc').map(a => '<option value="' + a.id + '">' + a.bank + ' · ' + a.name + ' (' + fmtCurr(a.balance, a.currency) + ')</option>').join('');
+  if (d && d.linkedAccId) accSel.value = d.linkedAccId;
   document.getElementById('btn-delete-debt').style.display = id ? 'block' : 'none';
   openModal('modal-debt');
 }
@@ -3251,10 +3351,18 @@ function saveDebt() {
   if (!name) { showToast('항목명을 입력하세요'); return; }
   const id = document.getElementById('inp-debt-id').value || uid();
   const existing = debts.find(x => x.id === id);
-  const d = { id, name, currency: document.getElementById('inp-debt-curr').value,
-    amount: commaToNum(document.getElementById('inp-debt-amount').value),
+  const principal = commaToNum(document.getElementById('inp-debt-principal').value) || 0;
+  const amount = commaToNum(document.getElementById('inp-debt-amount').value);
+  const d = {
+    id, name,
+    currency: document.getElementById('inp-debt-curr').value,
+    principal: principal || amount, // 원금 없으면 잔액을 원금으로
+    amount,
     rate: parseFloat(document.getElementById('inp-debt-rate').value)||0,
-    due: document.getElementById('inp-debt-due').value };
+    due: document.getElementById('inp-debt-due').value,
+    linkedAccId: document.getElementById('inp-debt-acc').value,
+    repayments: existing ? (existing.repayments||[]) : []
+  };
   if (existing) debts[debts.indexOf(existing)] = d;
   else debts.push(d);
   save('debts', debts);
@@ -3271,6 +3379,123 @@ function deleteDebt() {
   renderDebtList();
   renderDashboard();
   showToast('삭제되었습니다');
+}
+
+function populateRepayAccSel(linkedAccId) {
+  var sel = document.getElementById('inp-repay-acc');
+  sel.innerHTML = '<option value="">계좌 미연결</option>' +
+    accounts.filter(a => a.type !== 'cc').map(a =>
+      '<option value="' + a.id + '">' + a.bank + ' · ' + a.name + ' (' + fmtCurr(a.balance, a.currency) + ')</option>'
+    ).join('');
+  if (linkedAccId) sel.value = linkedAccId;
+  sel.onchange = updateRepayPreview;
+}
+
+function updateRepayPreview() {
+  const accId = document.getElementById('inp-repay-acc').value;
+  const amount = commaToNum(document.getElementById('inp-repay-amount').value) || 0;
+  const prev = document.getElementById('repay-acc-preview');
+  if (!accId || !prev) { if(prev) prev.textContent=''; return; }
+  const acc = accounts.find(a => a.id === accId);
+  if (!acc) return;
+  const newBal = acc.balance - amount;
+  prev.innerHTML = '차감 후 잔액: <b>' + fmtCurr(acc.balance, acc.currency) + '</b> → <b style="color:var(--red)">' + fmtCurr(newBal, acc.currency) + '</b>';
+}
+
+function openRepayModal(debtId) {
+  const d = debts.find(x => x.id === debtId);
+  if (!d) return;
+  document.getElementById('repay-modal-title').textContent = d.name + ' 상환';
+  document.getElementById('inp-repay-debt-id').value = debtId;
+  document.getElementById('inp-repay-re-id').value = '';
+  document.getElementById('inp-repay-debt-type').value = 'manual';
+  document.getElementById('inp-repay-amount').value = '';
+  document.getElementById('inp-repay-date').value = today();
+  document.getElementById('inp-repay-type').value = '원금+이자';
+  document.getElementById('inp-repay-memo').value = '';
+  document.getElementById('repay-acc-preview').textContent = '';
+  populateRepayAccSel(d.linkedAccId || '');
+  // 금액 변경 시 미리보기
+  document.getElementById('inp-repay-amount').oninput = function() {
+    var raw = this.value.replace(/[^0-9.]/g,'');
+    var parts = raw.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');
+    this.value = parts.join('.');
+    updateRepayPreview();
+  };
+  openModal('modal-debt-repay');
+}
+
+function openReRepayModal(reId) {
+  const r = realEstate.find(x => x.id === reId);
+  if (!r) return;
+  document.getElementById('repay-modal-title').textContent = r.name + ' 담보대출 상환';
+  document.getElementById('inp-repay-debt-id').value = '';
+  document.getElementById('inp-repay-re-id').value = reId;
+  document.getElementById('inp-repay-debt-type').value = 're';
+  document.getElementById('inp-repay-amount').value = '';
+  document.getElementById('inp-repay-date').value = today();
+  document.getElementById('inp-repay-type').value = '원금+이자';
+  document.getElementById('inp-repay-memo').value = '';
+  document.getElementById('repay-acc-preview').textContent = '';
+  populateRepayAccSel(r.loanAccId || '');
+  document.getElementById('inp-repay-amount').oninput = function() {
+    var raw = this.value.replace(/[^0-9.]/g,'');
+    var parts = raw.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');
+    this.value = parts.join('.');
+    updateRepayPreview();
+  };
+  openModal('modal-debt-repay');
+}
+
+function saveRepayment() {
+  const amount = commaToNum(document.getElementById('inp-repay-amount').value);
+  const date = document.getElementById('inp-repay-date').value;
+  if (!amount || !date) { showToast('금액과 날짜를 입력하세요'); return; }
+  const repayType = document.getElementById('inp-repay-type').value;
+  const memo = document.getElementById('inp-repay-memo').value;
+  const accId = document.getElementById('inp-repay-acc').value;
+  const debtType = document.getElementById('inp-repay-debt-type').value;
+  const record = { id: uid(), date, amount, type: repayType, memo };
+
+  if (debtType === 'manual') {
+    const debtId = document.getElementById('inp-repay-debt-id').value;
+    const d = debts.find(x => x.id === debtId);
+    if (!d) return;
+    if (!d.repayments) d.repayments = [];
+    d.repayments.push(record);
+    // 원금상환인 경우 잔액 차감
+    if (repayType !== '이자') {
+      d.amount = Math.max(0, d.amount - amount);
+    }
+    save('debts', debts);
+  } else {
+    const reId = document.getElementById('inp-repay-re-id').value;
+    const r = realEstate.find(x => x.id === reId);
+    if (!r) return;
+    if (!r.loanRepayments) r.loanRepayments = [];
+    r.loanRepayments.push(record);
+    if (repayType !== '이자') {
+      r.loan = Math.max(0, (r.loan||0) - amount);
+    }
+    save('realEstate', realEstate);
+  }
+
+  // 연동 계좌 잔액 차감
+  if (accId) {
+    const acc = accounts.find(a => a.id === accId);
+    if (acc) {
+      acc.balance = Math.max(0, acc.balance - amount);
+      save('accounts', accounts);
+      renderAccounts();
+    }
+  }
+
+  closeModal('modal-debt-repay');
+  renderDebtList();
+  renderDashboard();
+  showToast('상환 완료' + (accId ? ' · 계좌 잔액 차감됨' : ''));
 }
 
 // ========== FIXED ==========
