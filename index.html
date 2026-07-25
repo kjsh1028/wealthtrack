@@ -1084,7 +1084,7 @@ if('serviceWorker' in navigator){
 <div class="modal-overlay" id="modal-account">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">계좌 추가</div>
+    <div class="modal-title" id="acc-modal-title">계좌 추가</div>
     <div class="form-group"><label class="form-label">은행/기관명</label><input class="form-input" id="inp-acc-bank" placeholder="예: 신한은행, 招商银行"></div>
     <div class="form-group"><label class="form-label">계좌 별명</label><input class="form-input" id="inp-acc-name" placeholder="예: 급여통장, 생활비"></div>
     <div class="form-group"><label class="form-label">계좌 종류</label>
@@ -2208,6 +2208,7 @@ function markCCPaid(country) {
 
 function openAccountModal(defaultCurr, id) {
   const a = id ? accounts.find(x => x.id === id) : null;
+  document.getElementById('acc-modal-title').textContent = id ? '계좌 수정' : '계좌 추가';
   document.getElementById('inp-acc-id').value = id || '';
   document.getElementById('inp-acc-bank').value = a ? a.bank : '';
   document.getElementById('inp-acc-name').value = a ? a.name : '';
