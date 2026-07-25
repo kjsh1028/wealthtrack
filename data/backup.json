@@ -1,6 +1,18 @@
 {
   "ledger": [
     {
+      "id": "mrzm2ygk8kvl",
+      "type": "income",
+      "currency": "KRW",
+      "amount": 27000,
+      "date": "2026-07-25",
+      "category": "잔액조정",
+      "payment": "신한은행(급여 생활비)",
+      "memo": "잔액불일치 조정 (조정 전: ₩309,016,472 → ₩309,043,472)",
+      "isAdjustment": true,
+      "ccPaid": false
+    },
+    {
       "id": "mrzm0gp1e61y",
       "type": "income",
       "currency": "KRW",
@@ -641,7 +653,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 309016472,
+      "balance": 309043472,
       "number": "7321",
       "adjustments": [
         {
@@ -651,6 +663,14 @@
           "newBalance": 70230612,
           "diff": -100,
           "id": "mrra4ltwfvpw"
+        },
+        {
+          "date": "2026-07-25",
+          "reason": "잔액불일치 조정",
+          "oldBalance": 309016472,
+          "newBalance": 309043472,
+          "diff": 27000,
+          "id": "mrzm2ygkwr0v"
         }
       ]
     },
@@ -1026,6 +1046,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-25T00:07:05.535Z",
+  "exportedAt": "2026-07-25T00:09:01.871Z",
   "version": "v2026072110"
 }
