@@ -996,7 +996,12 @@
       "currency": "KRW",
       "cost": 500000000,
       "value": 800000000,
-      "loan": 200000000
+      "loan": 167474635,
+      "loanPrincipal": 200000000,
+      "loanRate": 0,
+      "loanDue": "",
+      "loanAccId": "",
+      "loanRepayments": []
     },
     {
       "id": "mrr9rp98zugh",
@@ -1268,6 +1273,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-26T09:33:42.036Z",
+  "exportedAt": "2026-07-26T09:36:28.091Z",
   "version": "v202607250247"
 }
