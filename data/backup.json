@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "ms1tr801wd2t",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 83160,
+      "date": "2026-07-26",
+      "category": "쇼핑",
+      "payment": "체크카드(한국)",
+      "memo": "쿠팡 두유기 훌라",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "ms1loz89jmdn",
       "type": "expense",
       "currency": "KRW",
@@ -849,7 +862,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 304381307,
+      "balance": 304298147,
       "number": "7321",
       "adjustments": [
         {
@@ -1273,6 +1286,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-26T13:18:57.651Z",
+  "exportedAt": "2026-07-26T13:19:23.643Z",
   "version": "v202607250247"
 }
