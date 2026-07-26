@@ -934,7 +934,12 @@
       "currency": "CNY",
       "cost": 3270000,
       "value": 3270000,
-      "loan": 1500000
+      "loan": 1489549,
+      "loanPrincipal": 2270000,
+      "loanRate": 3,
+      "loanDue": "2056-05-26",
+      "loanAccId": "mrq0aee0e0wp",
+      "loanRepayments": []
     },
     {
       "id": "mrr9syreo09t",
@@ -1188,6 +1193,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-26T04:37:15.258Z",
+  "exportedAt": "2026-07-26T04:40:24.235Z",
   "version": "v202607250247"
 }
