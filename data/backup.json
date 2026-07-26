@@ -1,19 +1,6 @@
 {
   "ledger": [
     {
-      "id": "ms1lgm41iq4l",
-      "type": "expense",
-      "currency": "KRW",
-      "amount": 4700,
-      "date": "2026-07-26",
-      "category": "식비",
-      "payment": "체크카드(한국)",
-      "memo": "파리바게트",
-      "ccPaid": false,
-      "linkedAccountId": "mrq082m3mg2f",
-      "isCreditCard": false
-    },
-    {
       "id": "ms1lejdn5j3h",
       "type": "expense",
       "currency": "KRW",
@@ -824,7 +811,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 304387810,
+      "balance": 304392510,
       "number": "7321",
       "adjustments": [
         {
@@ -1235,6 +1222,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-26T09:27:43.104Z",
+  "exportedAt": "2026-07-26T09:28:05.638Z",
   "version": "v202607250247"
 }
