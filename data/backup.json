@@ -997,7 +997,7 @@
       "cost": 500000000,
       "value": 800000000,
       "loan": 167474635,
-      "loanPrincipal": 200000000,
+      "loanPrincipal": 167474635,
       "loanRate": 0,
       "loanDue": "",
       "loanAccId": "",
@@ -1273,6 +1273,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-26T09:36:43.803Z",
+  "exportedAt": "2026-07-26T09:37:11.360Z",
   "version": "v202607250247"
 }
