@@ -983,11 +983,14 @@
     },
     {
       "id": "mryo0ekoadp7",
-      "name": "정재훈 대출 ",
+      "name": "정재훈 화양 아파트 대출 ",
       "currency": "KRW",
+      "principal": 150000000,
       "amount": 150000000,
       "rate": 0,
-      "due": ""
+      "due": "",
+      "linkedAccId": "",
+      "repayments": []
     },
     {
       "id": "mryo2s4bxcai",
@@ -1193,6 +1196,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-26T04:44:47.580Z",
+  "exportedAt": "2026-07-26T04:45:33.822Z",
   "version": "v202607250247"
 }
