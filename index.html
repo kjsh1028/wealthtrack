@@ -578,9 +578,11 @@ if('serviceWorker' in navigator){
             </div>
           </div>
           <div id="cc-cat-chips" style="margin-bottom:12px;"></div>
-          <button id="cc-pay-btn" style="width:100%;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;display:none;">💳 결제 완료 처리</button>
           <div id="cc-paid-done" style="text-align:center;padding:8px;color:var(--green);font-weight:700;display:none;">✓ 이번 달 결제 완료</div>
         </div>
+      </div>
+      <div id="cc-pay-btn-wrap" style="display:none;margin-top:8px;">
+        <button onclick="window.ccPayNow()" style="width:100%;padding:14px;background:var(--navy);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;" id="cc-pay-btn">💳 결제 완료 처리</button>
       </div>
       <!-- 거래 내역 -->
       <div id="cc-txn-list" style="margin-top:12px;"></div>
@@ -1563,7 +1565,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v202607271342';
+const APP_VERSION = 'v202607271345';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2382,6 +2384,7 @@ function renderAccounts() {
   renderCCTab();}
 
 function doCCPayment() { markCCPaid(ccFilter); }
+window.ccPayNow = function() { markCCPaid(ccFilter); };
 
 
 
@@ -4883,13 +4886,10 @@ function renderCCTab() {
   }
   if(ccCatChips) ccCatChips.innerHTML = catChips || '';
   if(ccPayBtn) {
-    if(unpaidTotal > 0) {
-      ccPayBtn.textContent = '💳 ' + sym + fmtNum(unpaidTotal) + ' 결제 완료 처리';
-      ccPayBtn.style.display = 'block';
-    } else {
-      ccPayBtn.style.display = 'none';
-    }
+    ccPayBtn.textContent = '💳 ' + sym + fmtNum(unpaidTotal) + ' 결제 완료 처리';
   }
+  var ccPayWrap = document.getElementById('cc-pay-btn-wrap');
+  if(ccPayWrap) ccPayWrap.style.display = unpaidTotal > 0 ? 'block' : 'none';
   if(ccPaidDone) ccPaidDone.style.display = (unpaidTotal === 0) ? 'block' : 'none';
 
   // 거래 내역
@@ -4990,9 +4990,7 @@ async function init() {
   const monInput = document.getElementById('ledger-month-filter');
   monInput.value = thisMonth();
   initCommaInputs();
-  // cc-pay-btn 클릭 이벤트 등록
-  var ccBtn = document.getElementById('cc-pay-btn');
-  if(ccBtn) ccBtn.addEventListener('click', function() { doCCPayment(); });
+
   // LegalTrack 방식: 토큰 있으면 시작 시 바로 ghLoad
   const token = localStorage.getItem('wt_gh_token');
   if(token) {
