@@ -1530,7 +1530,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v202607271300';
+const APP_VERSION = 'v202607271302';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -4189,7 +4189,6 @@ async function syncFromGH() {
 
 
 async function forceReload() {
-  showToast('업데이트 적용 중...');
   try {
     if('serviceWorker' in navigator){
       const regs = await navigator.serviceWorker.getRegistrations();
@@ -4200,12 +4199,13 @@ async function forceReload() {
       await Promise.all(keys.map(k=>caches.delete(k)));
     }
   } catch(e) {}
-  // iOS Safari: location.reload(true) doesn't bypass cache
-  // Use timestamp query param to force fresh load
-  const url = location.href.split('?')[0] + '?t=' + Date.now();
-  location.replace(url);
+  // iOS Safari 캐시 완전 우회: timestamp URL로 교체
+  const base = location.href.split('?')[0].split('#')[0];
+  location.replace(base + '?nocache=' + Date.now());
 }
 async function doUpdate() {
+  showToast('업데이트 적용 중...');
+  await new Promise(r => setTimeout(r, 300));
   await forceReload();
 }
 
@@ -4293,12 +4293,19 @@ async function checkUpdate() {
 
 async function silentUpdateCheck() {
   try {
-    const res = await fetch(GH_RAW + '?t=' + Date.now());
+    const res = await fetch(GH_RAW + '?t=' + Date.now(), {cache:'no-store'});
     const html = await res.text();
-    const match = html.match(/APP_VERSION = '(v[\d.]+)'/);
-    if(match && match[1] !== APP_VERSION) {
+    const match = html.match(/APP_VERSION = '(v[\d]+)'/);
+    if(!match) return;
+    const latest = match[1];
+    if(latest !== APP_VERSION) {
       const b = document.getElementById('update-banner');
-      if(b) b.style.display = 'flex';
+      if(b) { b.style.display = 'flex'; }
+      // 버전 표시 업데이트
+      const el = document.getElementById('latest-ver-display');
+      const sub = document.getElementById('latest-ver-sub');
+      if(el) { el.textContent = latest; el.style.color = 'var(--green)'; }
+      if(sub) sub.textContent = '🆕 새 버전 있음';
     }
   } catch(e) {}
 }
