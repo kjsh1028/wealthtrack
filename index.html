@@ -1530,7 +1530,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v202607271302';
+const APP_VERSION = 'v202607271314';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2380,47 +2380,32 @@ function markCCPaid(country) {
 }
 
 function _showCCPayAccModal(unpaid, total, sym, country) {
-  // 기존 모달 제거
-  var old=document.getElementById('cc-pay-acc-modal');
-  if(old) old.remove();
-
-  var krwAccs=accounts.filter(function(a){return a.type!=='cc'&&a.currency==='KRW';});
-  var opts=krwAccs.map(function(a){
-    return '<option value="'+a.id+'">'+a.bank+' · '+a.name+' (₩'+fmtNum(Math.round(a.balance))+')</option>';
-  }).join('');
-
-  var modal=document.createElement('div');
-  modal.id='cc-pay-acc-modal';
-  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:flex-end;';
-  modal.innerHTML='<div style="background:#fff;width:100%;border-radius:20px 20px 0 0;padding:24px;padding-bottom:40px;">'
-    +'<div style="font-size:16px;font-weight:800;margin-bottom:4px;">결제 출금 계좌 선택</div>'
-    +'<div style="font-size:13px;color:#666;margin-bottom:16px;">'+sym+fmtNum(Math.round(total))+'을 차감할 계좌를 선택하세요</div>'
-    +'<select id="cc-pay-acc-sel" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:16px;">'+opts+'</select>'
-    +'<button onclick="_confirmCCPay()" style="width:100%;padding:14px;background:#0a2342;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">결제 완료 처리</button>'
-    +'<button onclick="_closeCCPayModal()" style="width:100%;padding:12px;background:none;border:none;color:#999;font-size:14px;cursor:pointer;margin-top:8px;">취소</button>'
-    +'</div>';
-
-  // 미결제 거래 임시 저장
-  window._ccPayUnpaid=unpaid;
-  window._ccPayTotal=total;
-  window._ccPaySym=sym;
-
-  document.body.appendChild(modal);
+  var krwAccs = accounts.filter(function(a){ return a.type !== 'cc' && a.currency === 'KRW'; });
+  var sel = document.getElementById('cc-pay-acc-sel');
+  var desc = document.getElementById('cc-pay-modal-desc');
+  if(desc) desc.textContent = sym + fmtNum(Math.round(total)) + '을 차감할 계좌를 선택하세요';
+  if(sel) {
+    sel.innerHTML = krwAccs.map(function(a){
+      return '<option value="' + a.id + '">' + a.bank + ' · ' + a.name + ' (₩' + fmtNum(Math.round(a.balance)) + ')</option>';
+    }).join('');
+  }
+  window._ccPayUnpaid = unpaid;
+  window._ccPayTotal = total;
+  window._ccPaySym = sym;
+  openModal('modal-cc-pay');
 }
 
-function _closeCCPayModal() {
-  var m=document.getElementById('cc-pay-acc-modal');
-  if(m) m.remove();
-}
+function _closeCCPayModal() { closeModal('modal-cc-pay'); }
 
 function _confirmCCPay() {
-  var sel=document.getElementById('cc-pay-acc-sel');
-  if(!sel||!sel.value){showToast('계좌를 선택하세요');return;}
-  var accId=sel.value;
-  var modal=document.getElementById('cc-pay-acc-modal');
-  if(modal) modal.remove();
+  var sel = document.getElementById('cc-pay-acc-sel');
+  if(!sel || !sel.value){ showToast('계좌를 선택하세요'); return; }
+  var accId = sel.value;
+  closeModal('modal-cc-pay');
   _doCCPaid(window._ccPayUnpaid, accId, window._ccPayTotal, window._ccPaySym);
 }
+
+function confirmCCPayFromModal() { _confirmCCPay(); }
 
 function _doCCPaid(unpaid, accId, total, sym) {
   // 계좌 잔액 차감
