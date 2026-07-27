@@ -1475,6 +1475,21 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 
+<!-- CC Pay Account Modal -->
+<div class="modal-overlay" id="modal-cc-pay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">결제 출금 계좌</div>
+    <div id="cc-pay-modal-desc" style="font-size:13px;color:var(--sub);margin-bottom:16px;"></div>
+    <div class="form-group">
+      <label class="form-label">차감할 계좌 선택</label>
+      <select class="form-input form-select" id="cc-pay-acc-sel"></select>
+    </div>
+    <button class="btn-primary" onclick="_confirmCCPay()">결제 완료 처리</button>
+    <button class="btn-secondary" onclick="closeModal('modal-cc-pay')">취소</button>
+  </div>
+</div>
+
 <!-- Fixed Expense Modal -->
 <div class="modal-overlay" id="modal-fixed">
   <div class="modal">
@@ -1530,7 +1545,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v202607271320';
+const APP_VERSION = 'v202607271323';
 
 // ========== DATA ==========
 function getData(key, def) {
