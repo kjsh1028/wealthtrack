@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "ms2vpmjvb4j3",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 178000000,
+      "date": "2026-07-27",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "화양 그랜드 1 차계약금",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "ms2vp2zt254j",
       "type": "expense",
       "currency": "KRW",
@@ -900,7 +913,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 304293347,
+      "balance": 126293347,
       "number": "7321",
       "adjustments": [
         {
@@ -1334,6 +1347,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-27T07:01:29.250Z",
+  "exportedAt": "2026-07-27T07:01:54.597Z",
   "version": "v202607250247"
 }
