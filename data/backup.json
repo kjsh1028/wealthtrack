@@ -540,7 +540,7 @@
       "category": "기타",
       "payment": "신한카드",
       "memo": "",
-      "ccPaid": true,
+      "ccPaid": false,
       "linkedAccountId": "mrq082m3mg2f",
       "isCreditCard": true
     },
@@ -1355,7 +1355,7 @@
     "usd": 1460,
     "cny": 215,
     "usdcny": 6.7777,
-    "updatedAt": "2026. 7. 27. 오후 11:04:54 (자동)"
+    "updatedAt": "2026. 7. 27. 오후 10:59:42 (자동)"
   },
   "budget": 10000000,
   "assetSnapshots": [],
@@ -1399,6 +1399,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-27T14:05:18.347Z",
+  "exportedAt": "2026-07-27T14:12:30.419Z",
   "version": "v202607271352"
 }
