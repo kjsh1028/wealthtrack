@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "ms36jlqmtueh",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 2800,
+      "date": "2026-07-27",
+      "category": "기타",
+      "payment": "체크카드(중국)",
+      "memo": "이자 합비 중하이",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "ms339trq1veg",
       "type": "expense",
       "currency": "KRW",
@@ -973,7 +986,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 291951.21,
+      "balance": 289151.21,
       "number": "2273",
       "adjustments": [
         {
@@ -1373,6 +1386,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-27T12:03:32.026Z",
+  "exportedAt": "2026-07-27T12:05:09.384Z",
   "version": "v202607250247"
 }
