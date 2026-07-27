@@ -1565,7 +1565,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v202607271352';
+const APP_VERSION = 'v202607271402';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -2400,22 +2400,27 @@ function markCCPaid(country) {
 
   // 차감 가능한 계좌 목록
   var krwAccs = accounts.filter(function(a){ return a.type !== 'cc' && a.currency === 'KRW'; });
-  
+
   if(krwAccs.length === 0) {
-    // 계좌 없으면 ccPaid만 처리
     unpaid.forEach(function(t){t.ccPaid=true;});
     save('ledger',ledger);
     renderCCTab(); renderDashboard();
     showToast('✓ 결제완료 (연동 계좌 없음)');
     return;
   }
-  
-  // 계좌가 1개면 바로, 여러 개면 선택 모달
-  if(krwAccs.length === 1) {
-    _doCCPaid(unpaid, krwAccs[0].id, total, sym);
-  } else {
-    _showCCPayAccModal(unpaid, total, sym, country);
+
+  // prompt()로 계좌 선택 - iOS Safari에서 가장 확실한 방법
+  var promptMsg = sym + fmtNum(Math.round(total)) + ' 결제 - 차감할 계좌 번호 입력:\n';
+  krwAccs.forEach(function(a, i) {
+    promptMsg += (i+1) + '. ' + a.bank + ' ' + a.name + ' (₩' + fmtNum(Math.round(a.balance)) + ')\n';
+  });
+  var ans = prompt(promptMsg, '1');
+  if(!ans) return; // 취소
+  var idx = parseInt(ans) - 1;
+  if(isNaN(idx) || idx < 0 || idx >= krwAccs.length) {
+    showToast('올바른 번호를 입력하세요'); return;
   }
+  _doCCPaid(unpaid, krwAccs[idx].id, total, sym);
 }
 
 function _showCCPayAccModal(unpaid, total, sym, country) {
