@@ -1565,7 +1565,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v202607271402';
+const APP_VERSION = 'v202607272310';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -1620,6 +1620,18 @@ function toKRW(amount, curr) {
   if (curr === 'JPY') return amount * (rates.jpy || rates.usd / 150); // JPY≈USD/150
   if (curr === 'EUR') return amount * (rates.eur || rates.usd * 1.08); // EUR≈USD*1.08
   return amount;
+}
+
+function convertCurr(amount, fromCurr, toCurr) {
+  if (fromCurr === toCurr) return amount;
+  var krw = toKRW(amount, fromCurr);
+  if (toCurr === 'KRW') return krw;
+  if (toCurr === 'CNY') return krw / (rates.cny || 1);
+  if (toCurr === 'USD') return krw / (rates.usd || 1);
+  if (toCurr === 'HKD') return krw / (rates.hkd || (rates.usd / 7.8) || 1);
+  if (toCurr === 'JPY') return krw / (rates.jpy || (rates.usd / 150) || 1);
+  if (toCurr === 'EUR') return krw / (rates.eur || (rates.usd * 1.08) || 1);
+  return krw;
 }
 
 function getStockCurr(market) {
@@ -2396,31 +2408,44 @@ function markCCPaid(country) {
   var sym=country==='KR'?'₩':'¥';
   var unpaid=ledger.filter(function(t){return t.type==='expense'&&t.date.startsWith(mon)&&t.payment&&isCreditPayment(t.payment)&&cards.includes(t.payment)&&!t.ccPaid;});
   if(!unpaid.length){showToast('미결제 항목이 없습니다');return;}
-  var total=unpaid.reduce(function(s,t){return s+toKRW(t.amount,t.currency);},0);
 
-  // 차감 가능한 계좌 목록
+  // 1) 거래별로 연결계좌가 지정되어 있으면 그 계좌에서 바로 차감
+  var withLinked = unpaid.filter(function(t){ return t.linkedAccountId && accounts.find(function(a){return a.id===t.linkedAccountId;}); });
+  var withoutLinked = unpaid.filter(function(t){ return !(t.linkedAccountId && accounts.find(function(a){return a.id===t.linkedAccountId;})); });
+  var linkedDeductedTotal = 0, linkedSym = '';
+
+  withLinked.forEach(function(t) {
+    var acc = accounts.find(function(a){return a.id===t.linkedAccountId;});
+    var amtInAcc = convertCurr(t.amount, t.currency, acc.currency);
+    acc.balance = Math.round((acc.balance - amtInAcc) * 100) / 100;
+    t.ccPaid = true;
+    linkedDeductedTotal += toKRW(t.amount, t.currency);
+    linkedSym = CURR_SYMBOL[acc.currency] || sym;
+  });
+  if (withLinked.length) { save('accounts', accounts); renderAccounts(); }
+
+  if (!withoutLinked.length) {
+    save('ledger', ledger);
+    renderCCTab(); renderDashboard();
+    showToast('✓ 결제완료 · 연결계좌에서 차감됨');
+    return;
+  }
+
+  var total = withoutLinked.reduce(function(s,t){return s+toKRW(t.amount,t.currency);},0);
+
+  // 2) 연결계좌가 없는 나머지는 계좌 선택 모달로 처리
   var krwAccs = accounts.filter(function(a){ return a.type !== 'cc' && a.currency === 'KRW'; });
 
   if(krwAccs.length === 0) {
-    unpaid.forEach(function(t){t.ccPaid=true;});
+    withoutLinked.forEach(function(t){t.ccPaid=true;});
     save('ledger',ledger);
     renderCCTab(); renderDashboard();
     showToast('✓ 결제완료 (연동 계좌 없음)');
     return;
   }
 
-  // prompt()로 계좌 선택 - iOS Safari에서 가장 확실한 방법
-  var promptMsg = sym + fmtNum(Math.round(total)) + ' 결제 - 차감할 계좌 번호 입력:\n';
-  krwAccs.forEach(function(a, i) {
-    promptMsg += (i+1) + '. ' + a.bank + ' ' + a.name + ' (₩' + fmtNum(Math.round(a.balance)) + ')\n';
-  });
-  var ans = prompt(promptMsg, '1');
-  if(!ans) return; // 취소
-  var idx = parseInt(ans) - 1;
-  if(isNaN(idx) || idx < 0 || idx >= krwAccs.length) {
-    showToast('올바른 번호를 입력하세요'); return;
-  }
-  _doCCPaid(unpaid, krwAccs[idx].id, total, sym);
+  save('ledger', ledger); // withLinked 처리분 우선 저장
+  _showCCPayAccModal(withoutLinked, total, sym, country);
 }
 
 function _showCCPayAccModal(unpaid, total, sym, country) {
@@ -4972,11 +4997,30 @@ function renderCCTab() {
 function toggleCCPaid(id) {
   const t = ledger.find(x => x.id === id);
   if(!t) return;
-  t.ccPaid = !t.ccPaid;
+  const wasPaid = t.ccPaid;
+  t.ccPaid = !wasPaid;
+  var deductMsg = '';
+  if (t.linkedAccountId) {
+    var acc = accounts.find(a => a.id === t.linkedAccountId);
+    if (acc) {
+      var amtInAcc = convertCurr(t.amount, t.currency, acc.currency);
+      if (!wasPaid && t.ccPaid) {
+        // 미결제 -> 결제완료: 연결계좌에서 차감
+        acc.balance = Math.round((acc.balance - amtInAcc) * 100) / 100;
+        deductMsg = ' · ' + (CURR_SYMBOL[acc.currency] || '') + fmtNum(Math.round(amtInAcc)) + ' 차감 (' + acc.name + ')';
+      } else if (wasPaid && !t.ccPaid) {
+        // 결제완료 -> 미결제: 차감 취소(환입)
+        acc.balance = Math.round((acc.balance + amtInAcc) * 100) / 100;
+        deductMsg = ' · 차감 취소 (' + acc.name + ')';
+      }
+      save('accounts', accounts);
+      renderAccounts();
+    }
+  }
   save('ledger', ledger);
   renderCCTab();
   renderDashboard();
-  showToast(t.ccPaid ? '✓ 결제 완료로 표시' : '미결제로 변경');
+  showToast((t.ccPaid ? '✓ 결제 완료로 표시' : '미결제로 변경') + deductMsg);
 }
 
 function buildCCPayBtn(amount, sym) {
