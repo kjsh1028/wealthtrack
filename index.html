@@ -740,6 +740,7 @@ if('serviceWorker' in navigator){
 
     <div id="inv-re" style="display:none;">
       <div class="sec-header"><span class="sec-title">보유 부동산</span><span class="sec-action" onclick="openREModal()">+ 추가</span></div>
+      <div id="re-summary"></div>
       <div id="re-list"></div>
     </div>
     <div id="inv-debt" style="display:none;">
@@ -1565,7 +1566,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <script>
-const APP_VERSION = 'v202607272310';
+const APP_VERSION = 'v202607281538';
 
 // ========== DATA ==========
 function getData(key, def) {
@@ -3297,6 +3298,31 @@ function deleteStock() {
 
 function renderREList() {
   const el = document.getElementById('re-list');
+  const sumEl = document.getElementById('re-summary');
+
+  if (sumEl) {
+    if (!realEstate.length) {
+      sumEl.innerHTML = '';
+    } else {
+      const totalValueKRW = realEstate.reduce((s,r) => s + toKRW(r.value, r.currency), 0);
+      const totalCostKRW = realEstate.reduce((s,r) => s + toKRW(r.cost, r.currency), 0);
+      const totalLoanKRW = realEstate.reduce((s,r) => s + toKRW(r.loan||0, r.currency), 0);
+      const totalEquityKRW = totalValueKRW - totalLoanKRW;
+      const ltv = totalValueKRW > 0 ? (totalLoanKRW / totalValueKRW * 100) : 0;
+      sumEl.innerHTML = `<div class="re-card" style="background:var(--navy);color:#fff;">
+        <div class="re-name" style="color:#fff;">🏠 전체 부동산 합계 (${realEstate.length}건)</div>
+        <div class="re-row"><div class="re-key" style="color:rgba(255,255,255,.7)">총 현재 추정가</div><div class="re-val" style="color:#fff;">₩${fmtNum(Math.round(totalValueKRW))}</div></div>
+        <div class="re-row"><div class="re-key" style="color:rgba(255,255,255,.7)">총 취득가</div><div class="re-val" style="color:#fff;">₩${fmtNum(Math.round(totalCostKRW))}</div></div>
+        <div class="re-row"><div class="re-key" style="color:rgba(255,255,255,.7)">총 담보대출 잔액</div><div class="re-val" style="color:#ff8a80;">₩${fmtNum(Math.round(totalLoanKRW))}</div></div>
+        <div class="re-row"><div class="re-key" style="color:rgba(255,255,255,.7)">전체 LTV (대출비율)</div><div class="re-val" style="color:#fff;">${ltv.toFixed(1)}%</div></div>
+        <div class="re-equity" style="background:rgba(255,255,255,.12);">
+          <div class="re-equity-label" style="color:rgba(255,255,255,.8)">총 순자산 (실질)</div>
+          <div class="re-equity-val" style="color:#a5d6a7;">₩${fmtNum(Math.round(totalEquityKRW))}</div>
+        </div>
+      </div>`;
+    }
+  }
+
   if (!realEstate.length) { el.innerHTML = '<div class="empty-state"><div class="e-icon">🏠</div><div class="e-text">부동산을 추가하세요</div></div>'; return; }
   el.innerHTML = realEstate.map(r => {
     const equity = r.value - (r.loan || 0);
