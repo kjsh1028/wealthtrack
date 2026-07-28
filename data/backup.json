@@ -1243,6 +1243,21 @@
       "cost": 20000000,
       "value": 100000000,
       "loan": 0
+    },
+    {
+      "id": "ms4a7eaa8oa0",
+      "name": "서울 화양동 그랜드파크 지역주택조함",
+      "location": "서울 광진구 화양동 489번지 일대 103 동 1505 84 평방미터",
+      "owner": "본인",
+      "currency": "KRW",
+      "cost": 155500000,
+      "value": 0,
+      "loan": 0,
+      "loanPrincipal": 0,
+      "loanRate": 0,
+      "loanDue": "",
+      "loanAccId": "",
+      "loanRepayments": []
     }
   ],
   "debts": [
@@ -1469,6 +1484,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-28T06:29:35.084Z",
+  "exportedAt": "2026-07-28T06:35:24.493Z",
   "version": "v202607272310"
 }
