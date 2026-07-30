@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "ms6wqye1m390",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 17900,
+      "date": "2026-07-30",
+      "category": "쇼핑",
+      "payment": "체크카드(한국)",
+      "memo": "쿠팡 니플패치",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "ms61ti7hrv9d",
       "type": "expense",
       "currency": "KRW",
@@ -1069,7 +1082,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 122639629,
+      "balance": 122621729,
       "number": "7321",
       "adjustments": [
         {
@@ -1523,6 +1536,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-30T02:41:43.653Z",
+  "exportedAt": "2026-07-30T02:42:00.915Z",
   "version": "v202607281538"
 }
