@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "ms8x9jqsuao6",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 4000000,
+      "date": "2026-07-31",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "시아루 생활비",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "ms8w4xkwna3w",
       "type": "income",
       "currency": "KRW",
@@ -1146,7 +1159,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 130787630,
+      "balance": 126787630,
       "number": "7321",
       "adjustments": [
         {
@@ -1608,6 +1621,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-31T12:00:25.786Z",
+  "exportedAt": "2026-07-31T12:32:00.751Z",
   "version": "v202607281538"
 }
