@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "ms89k1s7maf5",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 3990,
+      "date": "2026-07-31",
+      "category": "쇼핑",
+      "payment": "체크카드(한국)",
+      "memo": "쿠팡 호텔 슬리퍼",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "ms7fh2ohyga9",
       "type": "expense",
       "currency": "KRW",
@@ -1107,7 +1120,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 124813534,
+      "balance": 124809544,
       "number": "7321",
       "adjustments": [
         {
@@ -1569,6 +1582,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-07-31T01:27:58.590Z",
+  "exportedAt": "2026-07-31T01:28:19.905Z",
   "version": "v202607281538"
 }
