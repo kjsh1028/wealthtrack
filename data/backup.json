@@ -1609,6 +1609,15 @@
       "day": 15,
       "payment": "체크카드(중국)",
       "category": "주거"
+    },
+    {
+      "id": "ms9qkcg9nces",
+      "name": "쿠팡 월 회원비",
+      "currency": "KRW",
+      "amount": 7890,
+      "day": 1,
+      "payment": "체크카드(한국)",
+      "category": "기타"
     }
   ],
   "fixedStatus": {},
@@ -1660,6 +1669,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-01T02:11:02.699Z",
+  "exportedAt": "2026-08-01T02:12:13.378Z",
   "version": "v202607281538"
 }
