@@ -1657,6 +1657,15 @@
       "day": 1,
       "payment": "체크카드(한국)",
       "category": "기타"
+    },
+    {
+      "id": "msaf5kflxkm6",
+      "name": "SK 바로 로밍",
+      "currency": "KRW",
+      "amount": 39000,
+      "day": 31,
+      "payment": "자동이체",
+      "category": "통신"
     }
   ],
   "fixedStatus": {},
@@ -1708,6 +1717,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-01T13:38:58.755Z",
+  "exportedAt": "2026-08-01T13:40:34.284Z",
   "version": "v202607281538"
 }
