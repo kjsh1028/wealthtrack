@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msaf3iq1u6p3",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 29730,
+      "date": "2026-08-01",
+      "category": "쇼핑",
+      "payment": "체크카드(한국)",
+      "memo": "쿠팡 물 세제",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "msa7sd62yrne",
       "type": "expense",
       "currency": "KRW",
@@ -1224,7 +1237,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 126734440,
+      "balance": 126704710,
       "number": "7321",
       "adjustments": [
         {
@@ -1695,6 +1708,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-01T13:38:39.467Z",
+  "exportedAt": "2026-08-01T13:38:58.755Z",
   "version": "v202607281538"
 }
