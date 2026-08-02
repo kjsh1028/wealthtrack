@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msble4jpaoaw",
+      "type": "expense",
+      "currency": "USD",
+      "amount": 43.98,
+      "date": "2026-08-02",
+      "category": "기타",
+      "payment": "신한카드",
+      "memo": "Deepl ",
+      "ccPaid": false,
+      "linkedAccountId": null,
+      "isCreditCard": true
+    },
+    {
       "id": "msben6tgkj17",
       "type": "expense",
       "currency": "KRW",
@@ -1756,6 +1769,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-02T09:21:20.848Z",
+  "exportedAt": "2026-08-02T09:22:57.472Z",
   "version": "v202607281538"
 }
