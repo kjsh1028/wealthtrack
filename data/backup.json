@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mscel6f04ril",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 88000,
+      "date": "2026-08-03",
+      "category": "기타",
+      "payment": "신한카드",
+      "memo": "캠스캐너 일년 구독",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": true
+    },
+    {
       "id": "msbtd3l8rjhf",
       "type": "expense",
       "currency": "KRW",
@@ -1782,6 +1795,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-02T22:58:17.986Z",
+  "exportedAt": "2026-08-02T23:00:15.350Z",
   "version": "v202607281538"
 }
