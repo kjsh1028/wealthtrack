@@ -1621,7 +1621,7 @@
       "currency": "CNY",
       "amount": 88,
       "day": 2,
-      "payment": "신용카드(중국)",
+      "payment": "체크카드(한국)",
       "category": "구독"
     },
     {
@@ -1782,6 +1782,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-02T13:06:06.501Z",
+  "exportedAt": "2026-08-02T13:06:58.002Z",
   "version": "v202607281538"
 }
