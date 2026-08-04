@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msepkd0ujszh",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 54170,
+      "date": "2026-08-04",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "쿠팡 벌꿀 카놀리유 매직펑펑",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "msep590b4vsk",
       "type": "expense",
       "currency": "KRW",
@@ -1380,7 +1393,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 126254626,
+      "balance": 126200456,
       "number": "7321",
       "adjustments": [
         {
@@ -1860,6 +1873,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-04T13:42:22.968Z",
+  "exportedAt": "2026-08-04T13:43:05.384Z",
   "version": "v202607281538"
 }
