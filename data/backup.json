@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msff656q0ie2",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 9000,
+      "date": "2026-08-05",
+      "category": "기타",
+      "payment": "신한카드",
+      "memo": "개혁신당 당비",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": true
+    },
+    {
       "id": "msepkd0ujszh",
       "type": "expense",
       "currency": "KRW",
@@ -1873,6 +1886,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-05T01:39:29.133Z",
+  "exportedAt": "2026-08-05T01:39:52.059Z",
   "version": "v202607281538"
 }
