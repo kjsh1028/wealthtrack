@@ -1939,6 +1939,15 @@
       "day": 31,
       "payment": "자동이체",
       "category": "통신"
+    },
+    {
+      "id": "msg3gklguihi",
+      "name": "Claude apple 계정",
+      "currency": "KRW",
+      "amount": 33000,
+      "day": 6,
+      "payment": "신한카드",
+      "category": "구독"
     }
   ],
   "fixedStatus": {},
@@ -1990,6 +1999,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-05T12:59:06.184Z",
+  "exportedAt": "2026-08-05T12:59:49.373Z",
   "version": "v202607281538"
 }
