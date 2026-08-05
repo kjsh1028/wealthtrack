@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msfihxgtjy9q",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 11000,
+      "date": "2026-08-05",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "한우 소머리 국밥 남산옥",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "msfie4731muq",
       "type": "expense",
       "currency": "KRW",
@@ -1445,7 +1458,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 126172856,
+      "balance": 126161856,
       "number": "7321",
       "adjustments": [
         {
@@ -1925,6 +1938,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-05T03:10:02.876Z",
+  "exportedAt": "2026-08-05T03:13:00.775Z",
   "version": "v202607281538"
 }
