@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msgqay5bynyz",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 1800,
+      "date": "2026-08-06",
+      "category": "기타",
+      "payment": "체크카드(중국)",
+      "memo": "시아루 아버지 3 개월 생활비",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "msg0ddi9p5bj",
       "type": "expense",
       "currency": "KRW",
@@ -1552,7 +1565,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 288951.21,
+      "balance": 287151.21,
       "number": "2273",
       "adjustments": [
         {
@@ -1999,6 +2012,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-05T23:38:53.965Z",
+  "exportedAt": "2026-08-05T23:39:18.168Z",
   "version": "v202607281538"
 }
