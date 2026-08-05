@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msfmdfwy7wxj",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 45000,
+      "date": "2026-08-05",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "오딧세이 영화",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "msfihxgtjy9q",
       "type": "expense",
       "currency": "KRW",
@@ -1458,7 +1471,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 126161856,
+      "balance": 126116856,
       "number": "7321",
       "adjustments": [
         {
@@ -1938,6 +1951,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-05T05:00:51.072Z",
+  "exportedAt": "2026-08-05T05:01:29.868Z",
   "version": "v202607281538"
 }
