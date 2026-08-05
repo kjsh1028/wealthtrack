@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msfwy6emmmfn",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 66000,
+      "date": "2026-08-05",
+      "category": "업무",
+      "payment": "신한카드",
+      "memo": "Cam card 일년 구독",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": true
+    },
+    {
       "id": "msfwmkgpsexh",
       "type": "expense",
       "currency": "KRW",
@@ -1964,6 +1977,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-05T09:57:05.895Z",
+  "exportedAt": "2026-08-05T09:57:33.479Z",
   "version": "v202607281538"
 }
