@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msfhq72kxkvc",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 15000,
+      "date": "2026-08-05",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "운전면허증 재발급",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "msfhpr8jrea8",
       "type": "expense",
       "currency": "KRW",
@@ -1419,7 +1432,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 126194156,
+      "balance": 126179156,
       "number": "7321",
       "adjustments": [
         {
@@ -1899,6 +1912,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-05T02:51:06.333Z",
+  "exportedAt": "2026-08-05T02:51:26.853Z",
   "version": "v202607281538"
 }
