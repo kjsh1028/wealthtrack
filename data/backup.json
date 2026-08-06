@@ -1961,6 +1961,15 @@
       "day": 6,
       "payment": "신한카드",
       "category": "구독"
+    },
+    {
+      "id": "msh0z8288uwy",
+      "name": "Claude 시아루 이메일 ",
+      "currency": "KRW",
+      "amount": 33000,
+      "day": 6,
+      "payment": "체크카드(한국)",
+      "category": "구독"
     }
   ],
   "fixedStatus": {},
@@ -2012,6 +2021,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-06T04:37:34.190Z",
+  "exportedAt": "2026-08-06T04:38:06.922Z",
   "version": "v202607281538"
 }
