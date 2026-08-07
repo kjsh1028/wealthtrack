@@ -5,7 +5,7 @@
       "type": "expense",
       "currency": "KRW",
       "amount": 35753,
-      "date": "2026-08-07",
+      "date": "2026-08-06",
       "category": "기타",
       "payment": "체크카드(한국)",
       "memo": "클로드 비용",
@@ -2038,6 +2038,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-07T06:04:32.124Z",
+  "exportedAt": "2026-08-07T06:04:49.739Z",
   "version": "v202607281538"
 }
