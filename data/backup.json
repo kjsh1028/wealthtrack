@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msinpt73wuae",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 19000,
+      "date": "2026-08-07",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "커피 도산 대로 골든",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "msiji7nkx35r",
       "type": "expense",
       "currency": "KRW",
@@ -1549,7 +1562,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 126054803,
+      "balance": 126035803,
       "number": "7321",
       "adjustments": [
         {
@@ -2038,6 +2051,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-07T08:02:00.992Z",
+  "exportedAt": "2026-08-07T08:02:25.098Z",
   "version": "v202607281538"
 }
