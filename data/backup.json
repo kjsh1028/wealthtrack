@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msjofmesis6y",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 150000,
+      "date": "2026-08-08",
+      "category": "의료",
+      "payment": "체크카드(한국)",
+      "memo": "워너블 헬스장 월이용권",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "msiwn81twiqp",
       "type": "expense",
       "currency": "KRW",
@@ -1588,7 +1601,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 126022303,
+      "balance": 125872303,
       "number": "7321",
       "adjustments": [
         {
@@ -2077,6 +2090,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-08T01:09:53.646Z",
+  "exportedAt": "2026-08-08T01:10:15.533Z",
   "version": "v202607281538"
 }
