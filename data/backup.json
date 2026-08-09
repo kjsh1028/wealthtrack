@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msmf3ux6rgmy",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 212,
+      "date": "2026-08-10",
+      "category": "기타",
+      "payment": "초상카드",
+      "memo": "",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": true
+    },
+    {
       "id": "mslrkv8gzw7w",
       "type": "expense",
       "currency": "KRW",
@@ -2220,6 +2233,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-09T23:12:08.663Z",
+  "exportedAt": "2026-08-09T23:12:28.676Z",
   "version": "v202607281538"
 }
