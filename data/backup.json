@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msn4kg6ke0s8",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 27000,
+      "date": "2026-08-10",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "정영수 중국 친구 커피 양재",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "msmf3ux6rgmy",
       "type": "expense",
       "currency": "CNY",
@@ -1744,7 +1757,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 125607153,
+      "balance": 125580153,
       "number": "7321",
       "adjustments": [
         {
@@ -2233,6 +2246,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-10T11:04:51.600Z",
+  "exportedAt": "2026-08-10T11:05:13.127Z",
   "version": "v202607281538"
 }
