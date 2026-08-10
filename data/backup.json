@@ -1838,7 +1838,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 282801.21,
+      "balance": 278451.21,
       "number": "2273",
       "adjustments": [
         {
@@ -1976,12 +1976,20 @@
       "currency": "CNY",
       "cost": 3270000,
       "value": 3270000,
-      "loan": 1489549,
+      "loan": 1485199,
       "loanPrincipal": 2770000,
       "loanRate": 3,
       "loanDue": "2056-05-26",
       "loanAccId": "mrq0aee0e0wp",
-      "loanRepayments": []
+      "loanRepayments": [
+        {
+          "id": "msn5vbao5987",
+          "date": "2026-08-10",
+          "amount": 4350,
+          "type": "원금+이자",
+          "memo": ""
+        }
+      ]
     },
     {
       "id": "mrr9syreo09t",
@@ -2285,6 +2293,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-10T11:37:48.257Z",
+  "exportedAt": "2026-08-10T11:41:39.627Z",
   "version": "v202607281538"
 }
