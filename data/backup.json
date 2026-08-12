@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mspc1d9fzooa",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 98410,
+      "date": "2026-08-12",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "전화비",
+      "ccPaid": false,
+      "linkedAccountId": null,
+      "isCreditCard": false
+    },
+    {
       "id": "mspc06x6sdvr",
       "type": "income",
       "currency": "KRW",
@@ -2384,6 +2397,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-12T00:08:57.284Z",
+  "exportedAt": "2026-08-12T00:09:52.158Z",
   "version": "v202607281538"
 }
