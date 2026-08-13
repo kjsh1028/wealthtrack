@@ -14,19 +14,6 @@
       "isCreditCard": false
     },
     {
-      "id": "msrhl67vrgrx",
-      "type": "expense",
-      "currency": "CNY",
-      "amount": 800,
-      "date": "2026-08-13",
-      "category": "기타",
-      "payment": "체크카드(한국)",
-      "memo": "상해 임대 영수증",
-      "ccPaid": false,
-      "linkedAccountId": "mrq0aee0e0wp",
-      "isCreditCard": false
-    },
-    {
       "id": "msrhjg0ucq0p",
       "type": "expense",
       "currency": "KRW",
@@ -2033,7 +2020,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 280989.21,
+      "balance": 281789.21,
       "number": "2273",
       "adjustments": [
         {
@@ -2488,6 +2475,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-13T12:21:53.747Z",
+  "exportedAt": "2026-08-13T12:23:35.018Z",
   "version": "v202607281538"
 }
