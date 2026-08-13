@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msrkvs9mdseu",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 29000,
+      "date": "2026-08-13",
+      "category": "기타",
+      "payment": "신한카드",
+      "memo": "Apple ",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": true
+    },
+    {
       "id": "msrhjg0ucq0p",
       "type": "expense",
       "currency": "KRW",
@@ -2478,6 +2491,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-13T13:52:23.678Z",
+  "exportedAt": "2026-08-13T13:53:00.564Z",
   "version": "v202607281538"
 }
