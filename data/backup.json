@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msu7vq0pb5j5",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 34000,
+      "date": "2026-08-15",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "곤드레 콩비지 용산 정중호",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "msty725e02n7",
       "type": "expense",
       "currency": "KRW",
@@ -2069,7 +2082,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 135193874,
+      "balance": 135159874,
       "number": "7321",
       "adjustments": [
         {
@@ -2582,6 +2595,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-15T10:12:00.060Z",
+  "exportedAt": "2026-08-15T10:12:21.171Z",
   "version": "v202607281538"
 }
