@@ -71,11 +71,11 @@
       "amount": 11100,
       "date": "2026-08-16",
       "category": "업무",
-      "payment": "체크카드(한국)",
+      "payment": "신한카드",
       "memo": "Icloud 구독료",
       "ccPaid": false,
       "linkedAccountId": "mrq082m3mg2f",
-      "isCreditCard": false
+      "isCreditCard": true
     },
     {
       "id": "msuco1lcaaru",
@@ -2185,7 +2185,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 134756649,
+      "balance": 134767749,
       "number": "7321",
       "adjustments": [
         {
@@ -2706,6 +2706,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-16T03:20:48.344Z",
+  "exportedAt": "2026-08-16T03:21:39.988Z",
   "version": "v202607281538"
 }
