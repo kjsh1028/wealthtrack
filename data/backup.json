@@ -2442,7 +2442,7 @@
       "currency": "KRW",
       "amount": 11100,
       "day": 15,
-      "payment": "신용카드(한국)",
+      "payment": "",
       "category": "구독"
     },
     {
@@ -2621,6 +2621,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-16T00:17:55.083Z",
+  "exportedAt": "2026-08-16T00:18:12.041Z",
   "version": "v202607281538"
 }
