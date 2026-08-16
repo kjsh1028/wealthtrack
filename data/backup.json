@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msv8g8ke9muu",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 39000,
+      "date": "2026-08-16",
+      "category": "쇼핑",
+      "payment": "체크카드(한국)",
+      "memo": "올젠 옷",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "msv249sodn1h",
       "type": "expense",
       "currency": "KRW",
@@ -2121,7 +2134,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 135129074,
+      "balance": 135090074,
       "number": "7321",
       "adjustments": [
         {
@@ -2634,6 +2647,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-16T03:15:48.948Z",
+  "exportedAt": "2026-08-16T03:16:04.504Z",
   "version": "v202607281538"
 }
