@@ -53,19 +53,6 @@
       "isCreditCard": false
     },
     {
-      "id": "msv249sodn1h",
-      "type": "expense",
-      "currency": "KRW",
-      "amount": 11100,
-      "date": "2026-08-16",
-      "category": "업무",
-      "payment": "신한카드",
-      "memo": "Icloud 구독료",
-      "ccPaid": false,
-      "linkedAccountId": "mrq082m3mg2f",
-      "isCreditCard": true
-    },
-    {
       "id": "msuco1lcaaru",
       "type": "expense",
       "currency": "KRW",
@@ -2694,6 +2681,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-16T03:21:47.748Z",
+  "exportedAt": "2026-08-16T03:22:30.050Z",
   "version": "v202607281538"
 }
