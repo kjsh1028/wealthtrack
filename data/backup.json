@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msv8hiajsybk",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 172720,
+      "date": "2026-08-16",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "이마트 시아루 소고기 침대보 등",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "msv8gsxaui5k",
       "type": "expense",
       "currency": "KRW",
@@ -2147,7 +2160,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 134918074,
+      "balance": 134745354,
       "number": "7321",
       "adjustments": [
         {
@@ -2660,6 +2673,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-16T03:16:30.889Z",
+  "exportedAt": "2026-08-16T03:17:03.765Z",
   "version": "v202607281538"
 }
