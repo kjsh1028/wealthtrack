@@ -10,7 +10,7 @@
       "payment": "체크카드(한국)",
       "memo": "코코아",
       "ccPaid": false,
-      "linkedAccountId": null,
+      "linkedAccountId": "mrq082m3mg2f",
       "isCreditCard": false
     },
     {
@@ -2341,7 +2341,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 134564873,
+      "balance": 134538773,
       "number": "7321",
       "adjustments": [
         {
@@ -2870,6 +2870,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-17T13:42:35.564Z",
+  "exportedAt": "2026-08-17T13:43:37.062Z",
   "version": "v202607281538"
 }
