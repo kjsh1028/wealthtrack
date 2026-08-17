@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "msxa9sojetfc",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 26100,
+      "date": "2026-08-17",
+      "category": "쇼핑",
+      "payment": "체크카드(한국)",
+      "memo": "코코아",
+      "ccPaid": false,
+      "linkedAccountId": null,
+      "isCreditCard": false
+    },
+    {
       "id": "msxa132pl2cj",
       "type": "expense",
       "currency": "KRW",
@@ -2857,6 +2870,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-17T13:42:18.160Z",
+  "exportedAt": "2026-08-17T13:42:35.564Z",
   "version": "v202607281538"
 }
