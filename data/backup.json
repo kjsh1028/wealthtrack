@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mt048m33knen",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 20400,
+      "date": "2026-08-19",
+      "category": "교통",
+      "payment": "체크카드(한국)",
+      "memo": "교통비 카카오 역삼- 용산",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mt03auo39yht",
       "type": "expense",
       "currency": "KRW",
@@ -2393,7 +2406,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 134279473,
+      "balance": 134259073,
       "number": "7321",
       "adjustments": [
         {
@@ -2922,6 +2935,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-19T13:16:23.302Z",
+  "exportedAt": "2026-08-19T13:17:01.193Z",
   "version": "v202607281538"
 }
