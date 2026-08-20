@@ -28,17 +28,15 @@
     },
     {
       "id": "mt14049jdlp2",
-      "type": "transfer",
+      "type": "expense",
       "currency": "CNY",
       "amount": 4100,
       "date": "2026-08-20",
-      "category": "이체",
-      "payment": "계좌이체",
-      "memo": "",
-      "transferFrom": "mrq0aee0e0wp",
-      "transferTo": "mrq082m3mg2f",
+      "category": "기타",
+      "payment": "체크카드(중국)",
+      "memo": "백현종 이체",
       "ccPaid": false,
-      "linkedAccountId": null,
+      "linkedAccountId": "mrq0aee0e0wp",
       "isCreditCard": false
     },
     {
@@ -2518,7 +2516,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 331805.7,
+      "balance": 327705.7,
       "number": "2273",
       "adjustments": [
         {
@@ -2989,6 +2987,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-20T06:04:40.469Z",
+  "exportedAt": "2026-08-20T06:06:11.721Z",
   "version": "v202607281538"
 }
