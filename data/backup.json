@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mt14atn8r17d",
+      "type": "income",
+      "currency": "KRW",
+      "amount": 850000,
+      "date": "2026-08-20",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "백현종 이체",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mt142ftmfv4s",
       "type": "income",
       "currency": "CNY",
@@ -2458,7 +2471,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 134259373,
+      "balance": 135109373,
       "number": "7321",
       "adjustments": [
         {
@@ -2987,6 +3000,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-20T06:06:11.721Z",
+  "exportedAt": "2026-08-20T06:06:30.478Z",
   "version": "v202607281538"
 }
