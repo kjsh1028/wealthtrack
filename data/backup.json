@@ -1,6 +1,21 @@
 {
   "ledger": [
     {
+      "id": "mt14049jdlp2",
+      "type": "transfer",
+      "currency": "CNY",
+      "amount": 4100,
+      "date": "2026-08-20",
+      "category": "이체",
+      "payment": "계좌이체",
+      "memo": "",
+      "transferFrom": "mrq0aee0e0wp",
+      "transferTo": "mrq082m3mg2f",
+      "ccPaid": false,
+      "linkedAccountId": null,
+      "isCreditCard": false
+    },
+    {
       "id": "mt04fgjkfpbr",
       "type": "expense",
       "currency": "KRW",
@@ -2419,7 +2434,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 134255273,
+      "balance": 134259373,
       "number": "7321",
       "adjustments": [
         {
@@ -2477,7 +2492,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 282001.21,
+      "balance": 277901.21,
       "number": "2273",
       "adjustments": [
         {
@@ -2948,6 +2963,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-20T05:57:30.097Z",
+  "exportedAt": "2026-08-20T05:58:11.024Z",
   "version": "v202607281538"
 }
