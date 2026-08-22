@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mt43525hrv95",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 27000,
+      "date": "2026-08-22",
+      "category": "쇼핑",
+      "payment": "신한카드",
+      "memo": "유투브 영화",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": true
+    },
+    {
       "id": "mt41qm14h6lk",
       "type": "expense",
       "currency": "KRW",
@@ -3163,6 +3176,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-22T07:56:36.286Z",
+  "exportedAt": "2026-08-22T07:57:20.479Z",
   "version": "v202607281538"
 }
