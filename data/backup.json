@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mt72bmd7wepr",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 162730,
+      "date": "2026-08-24",
+      "category": "공과금",
+      "payment": "체크카드(한국)",
+      "memo": "래미안 관리비",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mt714bqrjnd8",
       "type": "income",
       "currency": "KRW",
@@ -2743,7 +2756,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 138205594,
+      "balance": 138042864,
       "number": "7321",
       "adjustments": [
         {
@@ -3280,6 +3293,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-24T09:57:31.523Z",
+  "exportedAt": "2026-08-24T09:57:45.527Z",
   "version": "v202607281538"
 }
