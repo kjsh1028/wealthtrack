@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mt86tw69be38",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 22800,
+      "date": "2026-08-25",
+      "category": "쇼핑",
+      "payment": "체크카드(한국)",
+      "memo": "쿠팡 휴대 면도기",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mt80tnn8x50w",
       "type": "expense",
       "currency": "KRW",
@@ -2795,7 +2808,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 138032764,
+      "balance": 138009964,
       "number": "7321",
       "adjustments": [
         {
@@ -3332,6 +3345,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-25T04:51:20.129Z",
+  "exportedAt": "2026-08-25T04:51:42.683Z",
   "version": "v202607281538"
 }
