@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mtck0uotbgck",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 50000000,
+      "date": "2026-08-28",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "이태경 5 천만원 대출",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mtbiydr3les2",
       "type": "expense",
       "currency": "KRW",
@@ -2912,7 +2925,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 134064729,
+      "balance": 84064729,
       "number": "7321",
       "adjustments": [
         {
@@ -3449,6 +3462,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-28T06:11:43.545Z",
+  "exportedAt": "2026-08-28T06:12:07.063Z",
   "version": "v202607281538"
 }
