@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mtdtsbn45e26",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 18000,
+      "date": "2026-08-29",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "용문 시장 김치 떡 만두",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mtdqgjjpvaev",
       "type": "expense",
       "currency": "KRW",
@@ -2951,7 +2964,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 84042929,
+      "balance": 84024929,
       "number": "7321",
       "adjustments": [
         {
@@ -3488,6 +3501,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-29T03:32:42.808Z",
+  "exportedAt": "2026-08-29T03:33:11.466Z",
   "version": "v202607281538"
 }
