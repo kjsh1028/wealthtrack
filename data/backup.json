@@ -416,32 +416,6 @@
       "isCreditCard": false
     },
     {
-      "id": "mt714bqrjnd8",
-      "type": "income",
-      "currency": "KRW",
-      "amount": 2470350,
-      "date": "2026-08-24",
-      "category": "기타",
-      "payment": "체크카드(한국)",
-      "memo": "신한카드",
-      "ccPaid": false,
-      "linkedAccountId": "mrq082m3mg2f",
-      "isCreditCard": false
-    },
-    {
-      "id": "mt713v45mu4j",
-      "type": "income",
-      "currency": "KRW",
-      "amount": 1139761,
-      "date": "2026-08-24",
-      "category": "기타",
-      "payment": "체크카드(한국)",
-      "memo": "신한카드",
-      "ccPaid": false,
-      "linkedAccountId": "mrq082m3mg2f",
-      "isCreditCard": false
-    },
-    {
       "id": "mt6y4b5vd03y",
       "type": "expense",
       "currency": "KRW",
@@ -3158,7 +3132,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 83619634,
+      "balance": 80009523,
       "number": "7321",
       "adjustments": [
         {
@@ -3703,6 +3677,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-30T23:14:59.657Z",
+  "exportedAt": "2026-08-30T23:16:48.425Z",
   "version": "v202607281538"
 }
