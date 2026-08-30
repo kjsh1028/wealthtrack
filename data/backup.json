@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mtf4h0aplwqj",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 16500,
+      "date": "2026-08-30",
+      "category": "의료",
+      "payment": "체크카드(한국)",
+      "memo": "헬스장 시아루",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mtef8yep8768",
       "type": "expense",
       "currency": "KRW",
@@ -3016,7 +3029,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 83732029,
+      "balance": 83715529,
       "number": "7321",
       "adjustments": [
         {
@@ -3553,6 +3566,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-30T01:19:44.519Z",
+  "exportedAt": "2026-08-30T01:20:05.499Z",
   "version": "v202607281538"
 }
