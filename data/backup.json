@@ -325,19 +325,6 @@
       "isCreditCard": false
     },
     {
-      "id": "mt8q7tmf4iwu",
-      "type": "expense",
-      "currency": "KRW",
-      "amount": 3610111,
-      "date": "2026-08-25",
-      "category": "업무",
-      "payment": "체크카드(한국)",
-      "memo": "법인카드 결제",
-      "ccPaid": false,
-      "linkedAccountId": "mrq082m3mg2f",
-      "isCreditCard": false
-    },
-    {
       "id": "mt8q61cwbulu",
       "type": "expense",
       "currency": "KRW",
@@ -3132,7 +3119,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 80009523,
+      "balance": 83619634,
       "number": "7321",
       "adjustments": [
         {
@@ -3677,6 +3664,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-30T23:16:48.425Z",
+  "exportedAt": "2026-08-30T23:16:52.320Z",
   "version": "v202607281538"
 }
