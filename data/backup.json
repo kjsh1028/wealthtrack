@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mtguiiuu0pfx",
+      "type": "income",
+      "currency": "KRW",
+      "amount": 6017086,
+      "date": "2026-08-31",
+      "category": "급여",
+      "payment": "체크카드(한국)",
+      "memo": "에이바 월급",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mtguggezuhay",
       "type": "expense",
       "currency": "KRW",
@@ -3158,7 +3171,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 83610734,
+      "balance": 89627820,
       "number": "7321",
       "adjustments": [
         {
@@ -3703,6 +3716,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-08-31T06:15:15.925Z",
+  "exportedAt": "2026-08-31T06:16:52.400Z",
   "version": "v202607281538"
 }
