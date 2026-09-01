@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mti2r67jmf4l",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 7890,
+      "date": "2026-09-01",
+      "category": "쇼핑",
+      "payment": "체크카드(한국)",
+      "memo": "쿠팡 회비",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mti2o5s4ihox",
       "type": "expense",
       "currency": "CNY",
@@ -3210,7 +3223,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 89612020,
+      "balance": 89604130,
       "number": "7321",
       "adjustments": [
         {
@@ -3755,6 +3768,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-01T02:52:58.495Z",
+  "exportedAt": "2026-09-01T02:55:19.018Z",
   "version": "v202607281538"
 }
