@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mtijabazwpuc",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 6500,
+      "date": "2026-09-01",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "김밥",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mtii5sjops0o",
       "type": "expense",
       "currency": "KRW",
@@ -3249,7 +3262,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 89585530,
+      "balance": 89579030,
       "number": "7321",
       "adjustments": [
         {
@@ -3794,6 +3807,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-01T10:38:01.249Z",
+  "exportedAt": "2026-09-01T10:38:05.941Z",
   "version": "v202607281538"
 }
