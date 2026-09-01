@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mti2o5s4ihox",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 7376.14,
+      "date": "2026-09-01",
+      "category": "업무",
+      "payment": "체크카드(한국)",
+      "memo": "중국 사무실 3 개월 임대료",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mth2vfgj6r47",
       "type": "expense",
       "currency": "KRW",
@@ -3271,7 +3284,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 256810.7,
+      "balance": 249434.56,
       "number": "2273",
       "adjustments": [
         {
@@ -3742,6 +3755,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-01T02:52:09.363Z",
+  "exportedAt": "2026-09-01T02:52:58.495Z",
   "version": "v202607281538"
 }
