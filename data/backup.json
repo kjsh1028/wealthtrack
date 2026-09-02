@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mtjw8yj7am8g",
+      "type": "expense",
+      "currency": "USD",
+      "amount": 43.98,
+      "date": "2026-09-02",
+      "category": "업무",
+      "payment": "신한카드",
+      "memo": "Deelp 구독료",
+      "ccPaid": false,
+      "linkedAccountId": null,
+      "isCreditCard": true
+    },
+    {
       "id": "mtijabazwpuc",
       "type": "expense",
       "currency": "KRW",
@@ -3807,6 +3820,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-02T09:27:39.643Z",
+  "exportedAt": "2026-09-02T09:28:43.918Z",
   "version": "v202607281538"
 }
