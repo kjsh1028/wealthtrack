@@ -3886,6 +3886,15 @@
       "day": 6,
       "payment": "체크카드(한국)",
       "category": "구독"
+    },
+    {
+      "id": "mtm1y5azg2ao",
+      "name": "카카오 이모티콘",
+      "currency": "KRW",
+      "amount": 6400,
+      "day": 4,
+      "payment": "자동이체",
+      "category": "구독"
     }
   ],
   "fixedStatus": {},
@@ -3937,6 +3946,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-03T21:42:51.635Z",
+  "exportedAt": "2026-09-03T21:43:49.526Z",
   "version": "v202607281538"
 }
