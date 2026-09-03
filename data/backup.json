@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mtkx5xw33zc0",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 200000,
+      "date": "2026-09-03",
+      "category": "쇼핑",
+      "payment": "체크카드(한국)",
+      "memo": "송승훈 결혼 선물",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mtkthql360hv",
       "type": "expense",
       "currency": "KRW",
@@ -3327,7 +3340,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 89287459,
+      "balance": 89087459,
       "number": "7321",
       "adjustments": [
         {
@@ -3872,6 +3885,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-03T02:41:50.373Z",
+  "exportedAt": "2026-09-03T02:42:08.909Z",
   "version": "v202607281538"
 }
