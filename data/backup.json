@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mtmzda0kd2rl",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 1000,
+      "date": "2026-09-04",
+      "category": "의료",
+      "payment": "체크카드(한국)",
+      "memo": "일본 소화제",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mtmy5spxq053",
       "type": "expense",
       "currency": "KRW",
@@ -3492,7 +3505,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 249434.56,
+      "balance": 248434.56,
       "number": "2273",
       "adjustments": [
         {
@@ -3972,6 +3985,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-04T12:45:34.175Z",
+  "exportedAt": "2026-09-04T13:19:22.802Z",
   "version": "v202607281538"
 }
