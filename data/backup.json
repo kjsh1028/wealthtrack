@@ -1,18 +1,6 @@
 {
   "ledger": [
     {
-      "id": "mto08jjprfel",
-      "type": "expense",
-      "currency": "KRW",
-      "amount": 200000,
-      "date": "2026-09-05",
-      "category": "잔액조정",
-      "payment": "신한은행(급여 생활비)",
-      "memo": "잔액불일치 조정 (조정 전: ₩89,200,509 → ₩89,000,509)",
-      "isAdjustment": true,
-      "ccPaid": false
-    },
-    {
       "id": "mto03jrq55lv",
       "type": "expense",
       "currency": "KRW",
@@ -4026,6 +4014,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-05T06:31:27.664Z",
+  "exportedAt": "2026-09-05T06:32:11.943Z",
   "version": "v202607281538"
 }
