@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mts4kpyy1acx",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 34000,
+      "date": "2026-09-08",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "김상형 쭈꾸미",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mtrwz7l0aikj",
       "type": "expense",
       "currency": "KRW",
@@ -3600,7 +3613,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 88748439,
+      "balance": 88714439,
       "number": "7321",
       "adjustments": [
         {
@@ -4170,6 +4183,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-08T03:43:41.966Z",
+  "exportedAt": "2026-09-08T03:43:59.028Z",
   "version": "v202607281538"
 }
