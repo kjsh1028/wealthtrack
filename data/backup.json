@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mtwd5kzlxq4a",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 5300000,
+      "date": "2026-09-11",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "곽상훈 ATGC 공탁급",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mtwd3jnquwtr",
       "type": "expense",
       "currency": "KRW",
@@ -3807,7 +3820,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 88582815,
+      "balance": 83282815,
       "number": "7321",
       "adjustments": [
         {
@@ -4393,6 +4406,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-11T02:53:38.945Z",
+  "exportedAt": "2026-09-11T02:55:13.980Z",
   "version": "v202607281538"
 }
