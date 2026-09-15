@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mu282xbx5d7s",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 31000,
+      "date": "2026-09-15",
+      "category": "의료",
+      "payment": "체크카드(한국)",
+      "memo": "약 소화제",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mu24k81701ki",
       "type": "expense",
       "currency": "CNY",
@@ -4119,7 +4132,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 90876800,
+      "balance": 90845800,
       "number": "7321",
       "adjustments": [
         {
@@ -4705,6 +4718,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-15T05:19:35.979Z",
+  "exportedAt": "2026-09-15T05:19:48.984Z",
   "version": "v202607281538"
 }
