@@ -4801,10 +4801,10 @@
   ],
   "fixedStatus": {},
   "rates": {
-    "usd": 1360,
-    "cny": 202,
-    "usdcny": 6.7268,
-    "updatedAt": "2026. 9. 17. 오전 7:55:04 (자동)"
+    "usd": 1370,
+    "cny": 204,
+    "usdcny": 6.7223,
+    "updatedAt": "2026. 9. 17. 오후 2:11:14 (자동)"
   },
   "budget": 10000000,
   "assetSnapshots": [],
@@ -4848,6 +4848,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-17T03:25:49.871Z",
+  "exportedAt": "2026-09-17T05:11:15.073Z",
   "version": "v202607281538"
 }
