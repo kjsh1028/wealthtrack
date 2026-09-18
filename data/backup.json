@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mu6lpi2px9s0",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 27800,
+      "date": "2026-09-18",
+      "category": "교통",
+      "payment": "체크카드(한국)",
+      "memo": "목동 출입국",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mu6jvuu1yg6y",
       "type": "expense",
       "currency": "KRW",
@@ -4391,7 +4404,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 90351410,
+      "balance": 90323610,
       "number": "7321",
       "adjustments": [
         {
@@ -4993,6 +5006,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-18T06:52:06.394Z",
+  "exportedAt": "2026-09-18T06:52:22.011Z",
   "version": "v202607281538"
 }
