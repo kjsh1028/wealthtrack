@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "muaokgujazc5",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 300000,
+      "date": "2026-09-21",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "이옥형 모친 부조",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mu9ujto54p03",
       "type": "expense",
       "currency": "KRW",
@@ -4623,7 +4636,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 89082584,
+      "balance": 88782584,
       "number": "7321",
       "adjustments": [
         {
@@ -5241,6 +5254,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-21T03:23:14.688Z",
+  "exportedAt": "2026-09-21T03:23:30.694Z",
   "version": "v202607281538"
 }
