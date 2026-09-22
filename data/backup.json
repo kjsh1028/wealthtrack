@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "muceq99h0stk",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 157160,
+      "date": "2026-09-22",
+      "category": "공과금",
+      "payment": "체크카드(한국)",
+      "memo": "양산 지방세",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mucem0srwuc6",
       "type": "expense",
       "currency": "KRW",
@@ -4727,7 +4740,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 88036864,
+      "balance": 87879704,
       "number": "7321",
       "adjustments": [
         {
@@ -5345,6 +5358,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-22T08:20:19.397Z",
+  "exportedAt": "2026-09-22T08:23:36.992Z",
   "version": "v202607281538"
 }
