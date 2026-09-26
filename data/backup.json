@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "muhwxlcnwnvy",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 138000,
+      "date": "2026-09-26",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "강원도 소고기",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "muhr2fi1gxpe",
       "type": "expense",
       "currency": "KRW",
@@ -4896,7 +4909,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 87385854,
+      "balance": 87247854,
       "number": "7321",
       "adjustments": [
         {
@@ -5470,7 +5483,7 @@
     "usd": 1357,
     "cny": 202,
     "usdcny": 6.7246,
-    "updatedAt": "2026. 9. 26. 오전 11:07:39 (자동)"
+    "updatedAt": "2026. 9. 26. 오후 1:51:49 (자동)"
   },
   "budget": 10000000,
   "assetSnapshots": [],
@@ -5514,6 +5527,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-09-26T04:51:47.391Z",
+  "exportedAt": "2026-09-26T04:52:03.217Z",
   "version": "v202607281538"
 }
