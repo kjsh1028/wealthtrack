@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "muwqbhoogzh4",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 1000,
+      "date": "2026-10-06",
+      "category": "쇼핑",
+      "payment": "체크카드(한국)",
+      "memo": "시아루 어머니 가방 선물",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "muwgrllssv9q",
       "type": "expense",
       "currency": "CNY",
@@ -5754,7 +5767,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 287171.4,
+      "balance": 286171.4,
       "number": "2273",
       "adjustments": [
         {
@@ -6250,6 +6263,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-06T13:43:04.796Z",
+  "exportedAt": "2026-10-06T13:43:26.978Z",
   "version": "v202607281538"
 }
