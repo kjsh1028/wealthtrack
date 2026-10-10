@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mv26ef9hoi4g",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 22,
+      "date": "2026-10-10",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "스타벅스 소다수",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mv247tm8m84o",
       "type": "expense",
       "currency": "CNY",
@@ -5975,7 +5988,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 278558.9,
+      "balance": 278536.9,
       "number": "2273",
       "adjustments": [
         {
@@ -6471,6 +6484,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-10T09:12:09.351Z",
+  "exportedAt": "2026-10-10T09:12:28.544Z",
   "version": "v202607281538"
 }
