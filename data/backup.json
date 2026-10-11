@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mv39zjw7f1cz",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 22,
+      "date": "2026-10-11",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "페리수",
+      "ccPaid": false,
+      "linkedAccountId": null,
+      "isCreditCard": false
+    },
+    {
       "id": "mv2a8nmlp24s",
       "type": "expense",
       "currency": "CNY",
@@ -6497,6 +6510,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-11T03:40:28.904Z",
+  "exportedAt": "2026-10-11T03:40:39.345Z",
   "version": "v202607281538"
 }
