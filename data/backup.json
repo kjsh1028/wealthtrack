@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mv4p7wcidewp",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 2500,
+      "date": "2026-10-12",
+      "category": "업무",
+      "payment": "체크카드(한국)",
+      "memo": "서홍매 1500 원. 세무법인 1000 원",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mv3rgvldvcxl",
       "type": "expense",
       "currency": "CNY",
@@ -6040,7 +6053,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 278340.9,
+      "balance": 275840.9,
       "number": "2273",
       "adjustments": [
         {
@@ -6536,6 +6549,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-12T03:34:24.761Z",
+  "exportedAt": "2026-10-12T03:34:49.150Z",
   "version": "v202607281538"
 }
