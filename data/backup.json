@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mv9d2wk9ja35",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 42,
+      "date": "2026-10-15",
+      "category": "의료",
+      "payment": "체크카드(한국)",
+      "memo": "신경통 약",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mv8zwuiimbk3",
       "type": "expense",
       "currency": "CNY",
@@ -6234,7 +6247,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 328966.39,
+      "balance": 328924.39,
       "number": "2273",
       "adjustments": [
         {
@@ -6738,6 +6751,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-15T09:53:35.710Z",
+  "exportedAt": "2026-10-15T09:53:51.637Z",
   "version": "v202607281538"
 }
