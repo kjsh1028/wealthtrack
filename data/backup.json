@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mvefi0wztotu",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 300,
+      "date": "2026-10-19",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "포동미술관표",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mvdn9ob7un1a",
       "type": "expense",
       "currency": "CNY",
@@ -6364,7 +6377,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 286295.79,
+      "balance": 285995.79,
       "number": "2273",
       "adjustments": [
         {
@@ -6868,6 +6881,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-18T23:00:00.249Z",
+  "exportedAt": "2026-10-18T23:00:27.230Z",
   "version": "v202607281538"
 }
