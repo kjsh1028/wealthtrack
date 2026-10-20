@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mvgbgk5kjk3k",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 300,
+      "date": "2026-10-20",
+      "category": "업무",
+      "payment": "현금(CNY)",
+      "memo": "기사 장려금",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mvgbb7lkwse3",
       "type": "expense",
       "currency": "CNY",
@@ -6488,7 +6501,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 285406.79,
+      "balance": 285106.79,
       "number": "2273",
       "adjustments": [
         {
@@ -6992,6 +7005,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-20T06:38:43.186Z",
+  "exportedAt": "2026-10-20T06:42:52.740Z",
   "version": "v202607281538"
 }
