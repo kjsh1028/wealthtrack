@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mvgbb7lkwse3",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 40,
+      "date": "2026-10-20",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "티",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mvf27slzfdjp",
       "type": "expense",
       "currency": "CNY",
@@ -6475,7 +6488,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 285446.79,
+      "balance": 285406.79,
       "number": "2273",
       "adjustments": [
         {
@@ -6979,6 +6992,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-20T06:38:26.516Z",
+  "exportedAt": "2026-10-20T06:38:43.186Z",
   "version": "v202607281538"
 }
