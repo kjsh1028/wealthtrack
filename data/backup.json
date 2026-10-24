@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mvm62dfntikv",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 28,
+      "date": "2026-10-24",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "이석호 차",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mvm09uyfcb99",
       "type": "expense",
       "currency": "CNY",
@@ -6657,7 +6670,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 283891.19,
+      "balance": 283863.19,
       "number": "2273",
       "adjustments": [
         {
@@ -7161,6 +7174,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-24T08:58:14.676Z",
+  "exportedAt": "2026-10-24T08:58:29.822Z",
   "version": "v202607281538"
 }
