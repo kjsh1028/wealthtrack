@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mvomeghlry51",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 692000,
+      "date": "2026-10-26",
+      "category": "공과금",
+      "payment": "체크카드(한국)",
+      "memo": "마포 오피스텔 부가가치세",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mvoiaknn23am",
       "type": "expense",
       "currency": "CNY",
@@ -6607,7 +6620,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 95216224,
+      "balance": 94524224,
       "number": "7321",
       "adjustments": [
         {
@@ -7265,6 +7278,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-26T02:10:56.489Z",
+  "exportedAt": "2026-10-26T02:11:19.859Z",
   "version": "v202607281538"
 }
