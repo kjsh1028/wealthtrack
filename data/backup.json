@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mvosjx5544q9",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 78,
+      "date": "2026-10-26",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "샤브샤브",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mvopk0vsgmwz",
       "type": "expense",
       "currency": "CNY",
@@ -6800,7 +6813,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 283143.19,
+      "balance": 283065.19,
       "number": "2273",
       "adjustments": [
         {
@@ -7304,6 +7317,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-26T05:03:12.617Z",
+  "exportedAt": "2026-10-26T05:03:32.419Z",
   "version": "v202607281538"
 }
