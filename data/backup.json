@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mvtdew6b6uu6",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 76400,
+      "date": "2026-10-29",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "이마트 식료품",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mvtdei0tfj2z",
       "type": "expense",
       "currency": "KRW",
@@ -6840,7 +6853,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 94126918,
+      "balance": 94050518,
       "number": "7321",
       "adjustments": [
         {
@@ -7506,6 +7519,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-29T09:58:16.184Z",
+  "exportedAt": "2026-10-29T09:58:34.525Z",
   "version": "v202607281538"
 }
