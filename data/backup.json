@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mvvvfj64spli",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 213000,
+      "date": "2026-10-31",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "장형식 다이몬 티켓 긋즈",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mvvtyh04uolt",
       "type": "expense",
       "currency": "KRW",
@@ -6970,7 +6983,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 93545834,
+      "balance": 93332834,
       "number": "7321",
       "adjustments": [
         {
@@ -7636,6 +7649,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-10-31T03:57:56.016Z",
+  "exportedAt": "2026-10-31T03:58:29.766Z",
   "version": "v202607281538"
 }
