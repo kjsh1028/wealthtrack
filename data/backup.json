@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mw53a0iqz1f6",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 160000,
+      "date": "2026-11-06",
+      "category": "기타",
+      "payment": "체크카드(한국)",
+      "memo": "시아루 동생 대출 반환",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mw531prq5qam",
       "type": "expense",
       "currency": "CNY",
@@ -7412,7 +7425,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 253179.69,
+      "balance": 93179.69,
       "number": "2273",
       "adjustments": [
         {
@@ -7916,6 +7929,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-06T14:47:23.127Z",
+  "exportedAt": "2026-11-06T14:48:04.829Z",
   "version": "v202607281538"
 }
