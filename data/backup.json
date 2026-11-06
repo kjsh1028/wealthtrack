@@ -1,6 +1,32 @@
 {
   "ledger": [
     {
+      "id": "mw4a0doc7vue",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 17000,
+      "date": "2026-11-06",
+      "category": "교통",
+      "payment": "체크카드(한국)",
+      "memo": "공항 버스",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
+      "id": "mw49zq9rn49k",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 200000,
+      "date": "2026-11-06",
+      "category": "업무",
+      "payment": "체크카드(한국)",
+      "memo": "김진경 대리 식사비 보조",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mw3ja82vwody",
       "type": "expense",
       "currency": "KRW",
@@ -7177,7 +7203,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 92900826,
+      "balance": 92683826,
       "number": "7321",
       "adjustments": [
         {
@@ -7851,6 +7877,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-06T01:07:52.064Z",
+  "exportedAt": "2026-11-06T01:08:46.455Z",
   "version": "v202607281538"
 }
