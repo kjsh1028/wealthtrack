@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mw6gk7id3o2f",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 226545,
+      "date": "2026-11-07",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "홍콩 김호석 저녁",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mw53a0iqz1f6",
       "type": "expense",
       "currency": "CNY",
@@ -7255,7 +7268,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 92662926,
+      "balance": 92436381,
       "number": "7321",
       "adjustments": [
         {
@@ -7882,10 +7895,10 @@
   ],
   "fixedStatus": {},
   "rates": {
-    "usd": 1348,
-    "cny": 202,
-    "usdcny": 6.6825,
-    "updatedAt": "2026. 11. 6. 오후 10:47:22 (자동)"
+    "usd": 1357,
+    "cny": 203,
+    "usdcny": 6.6861,
+    "updatedAt": "2026. 11. 7. 오후 9:47:23 (자동)"
   },
   "budget": 10000000,
   "assetSnapshots": [],
@@ -7929,6 +7942,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-06T14:48:04.829Z",
+  "exportedAt": "2026-11-07T13:47:41.633Z",
   "version": "v202607281538"
 }
