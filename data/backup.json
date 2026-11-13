@@ -17,7 +17,7 @@
       "id": "mwecbqbjr0ub",
       "type": "expense",
       "currency": "KRW",
-      "amount": 84400,
+      "amount": 84430,
       "date": "2026-11-13",
       "category": "업무",
       "payment": "체크카드(한국)",
@@ -7463,7 +7463,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 101809881,
+      "balance": 101809851,
       "number": "7321",
       "adjustments": [
         {
@@ -8137,6 +8137,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-13T02:11:46.276Z",
+  "exportedAt": "2026-11-13T02:12:02.557Z",
   "version": "v202607281538"
 }
