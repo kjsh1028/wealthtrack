@@ -5,7 +5,7 @@
       "type": "expense",
       "currency": "KRW",
       "amount": 27600,
-      "date": "2026-11-13",
+      "date": "2026-11-08",
       "category": "업무",
       "payment": "체크카드(한국)",
       "memo": "카카오 이체",
@@ -8098,6 +8098,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-13T02:10:09.324Z",
+  "exportedAt": "2026-11-13T02:10:23.126Z",
   "version": "v202607281538"
 }
