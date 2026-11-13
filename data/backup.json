@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mwech4iobce3",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 8914000,
+      "date": "2026-11-13",
+      "category": "공과금",
+      "payment": "체크카드(한국)",
+      "memo": "종합소득세",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mwecddd7h5s0",
       "type": "income",
       "currency": "KRW",
@@ -7475,7 +7488,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 101816503,
+      "balance": 92902503,
       "number": "7321",
       "adjustments": [
         {
@@ -8157,6 +8170,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-13T02:12:33.574Z",
+  "exportedAt": "2026-11-13T02:15:28.731Z",
   "version": "v202607281538"
 }
