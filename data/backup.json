@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mwecccve2gkn",
+      "type": "income",
+      "currency": "KRW",
+      "amount": 8573500,
+      "date": "2026-11-13",
+      "category": "급여",
+      "payment": "체크카드(한국)",
+      "memo": "율촌 급여",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mwecbqbjr0ub",
       "type": "expense",
       "currency": "KRW",
@@ -7450,7 +7463,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 93236381,
+      "balance": 101809881,
       "number": "7321",
       "adjustments": [
         {
@@ -8124,6 +8137,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-13T02:11:17.050Z",
+  "exportedAt": "2026-11-13T02:11:46.276Z",
   "version": "v202607281538"
 }
