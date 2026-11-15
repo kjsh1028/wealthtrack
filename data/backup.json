@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mwhs7c1qmtzk",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 367,
+      "date": "2026-11-15",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "오명 삼겹살",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mwhnoj9f5oxp",
       "type": "expense",
       "currency": "CNY",
@@ -7769,7 +7782,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 140788.77,
+      "balance": 140421.77,
       "number": "2273",
       "adjustments": [
         {
@@ -8281,6 +8294,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-15T11:58:44.570Z",
+  "exportedAt": "2026-11-15T11:59:04.402Z",
   "version": "v202607281538"
 }
