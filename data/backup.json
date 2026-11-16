@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mwj4ys60032u",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 108,
+      "date": "2026-11-16",
+      "category": "식비",
+      "payment": "체크카드(한국)",
+      "memo": "보스코 식사",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mwiqzfriq93a",
       "type": "expense",
       "currency": "CNY",
@@ -7821,7 +7834,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 140269.97,
+      "balance": 140161.97,
       "number": "2273",
       "adjustments": [
         {
@@ -8333,6 +8346,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-16T10:43:50.674Z",
+  "exportedAt": "2026-11-16T10:44:06.483Z",
   "version": "v202607281538"
 }
