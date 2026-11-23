@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mwt92em6j5vh",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 52500,
+      "date": "2026-11-23",
+      "category": "숙박",
+      "payment": "체크카드(한국)",
+      "memo": "상해 임차료",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mwt4p4oistfv",
       "type": "expense",
       "currency": "CNY",
@@ -8172,7 +8185,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 135607.37,
+      "balance": 83107.37,
       "number": "2273",
       "adjustments": [
         {
@@ -8684,6 +8697,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-23T12:36:11.674Z",
+  "exportedAt": "2026-11-23T12:36:35.769Z",
   "version": "v202607281538"
 }
