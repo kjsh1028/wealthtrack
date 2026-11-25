@@ -1,6 +1,18 @@
 {
   "ledger": [
     {
+      "id": "mwvxa74epidi",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 215.5,
+      "date": "2026-11-25",
+      "category": "잔액조정",
+      "payment": "초상은행(급여 생활비)",
+      "memo": "잔액불일치 조정 (조정 전: ¥81,098.38 → ¥80,882.88)",
+      "isAdjustment": true,
+      "ccPaid": false
+    },
+    {
       "id": "mwvx9kif2gg7",
       "type": "expense",
       "currency": "CNY",
@@ -8263,7 +8275,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 81098.38,
+      "balance": 80882.88,
       "number": "2273",
       "adjustments": [
         {
@@ -8321,6 +8333,14 @@
           "newBalance": 141588.77,
           "diff": -116.70000000001164,
           "id": "mwh5z3gqz28d"
+        },
+        {
+          "date": "2026-11-25",
+          "reason": "잔액불일치 조정",
+          "oldBalance": 81098.38,
+          "newBalance": 80882.88,
+          "diff": -215.5,
+          "id": "mwvxa74dhd2v"
         }
       ]
     },
@@ -8775,6 +8795,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-25T09:29:33.138Z",
+  "exportedAt": "2026-11-25T09:30:02.441Z",
   "version": "v202607281538"
 }
