@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mwxegmmhiidt",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 1000,
+      "date": "2026-11-26",
+      "category": "의료",
+      "payment": "체크카드(한국)",
+      "memo": "안마",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mwx7kjhks0k5",
       "type": "expense",
       "currency": "CNY",
@@ -8327,7 +8340,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 80671.88,
+      "balance": 79671.88,
       "number": "2273",
       "adjustments": [
         {
@@ -8803,7 +8816,7 @@
     "usd": 1343,
     "cny": 201,
     "usdcny": 6.6782,
-    "updatedAt": "2026. 11. 26. 오후 2:30:07 (자동)"
+    "updatedAt": "2026. 11. 26. 오후 6:18:34 (자동)"
   },
   "budget": 10000000,
   "assetSnapshots": [],
@@ -8847,6 +8860,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-26T10:18:32.399Z",
+  "exportedAt": "2026-11-26T10:18:42.116Z",
   "version": "v202607281538"
 }
