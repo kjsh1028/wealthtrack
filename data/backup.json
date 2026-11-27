@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mwynundc3izd",
+      "type": "expense",
+      "currency": "KRW",
+      "amount": 1083590,
+      "date": "2026-11-27",
+      "category": "공과금",
+      "payment": "체크카드(한국)",
+      "memo": "홍성 토지세",
+      "ccPaid": false,
+      "linkedAccountId": "mrq082m3mg2f",
+      "isCreditCard": false
+    },
+    {
       "id": "mwynbqfwemeo",
       "type": "expense",
       "currency": "CNY",
@@ -8175,7 +8188,7 @@
       "bank": "신한은행",
       "name": "급여 생활비",
       "currency": "KRW",
-      "balance": 92849553,
+      "balance": 91765963,
       "number": "7321",
       "adjustments": [
         {
@@ -8873,6 +8886,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-27T07:29:02.890Z",
+  "exportedAt": "2026-11-27T07:29:18.987Z",
   "version": "v202607281538"
 }
