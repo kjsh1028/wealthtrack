@@ -1,6 +1,19 @@
 {
   "ledger": [
     {
+      "id": "mwzv0sjba3z0",
+      "type": "expense",
+      "currency": "CNY",
+      "amount": 860,
+      "date": "2026-11-28",
+      "category": "교통",
+      "payment": "체크카드(한국)",
+      "memo": "복건 기차표 황동욱",
+      "ccPaid": false,
+      "linkedAccountId": "mrq0aee0e0wp",
+      "isCreditCard": false
+    },
+    {
       "id": "mwyvovieno48",
       "type": "expense",
       "currency": "CNY",
@@ -8392,7 +8405,7 @@
       "bank": "초상은행",
       "name": "급여 생활비",
       "currency": "CNY",
-      "balance": 79440.88,
+      "balance": 78580.88,
       "number": "2273",
       "adjustments": [
         {
@@ -8865,10 +8878,10 @@
   ],
   "fixedStatus": {},
   "rates": {
-    "usd": 1344,
-    "cny": 201,
-    "usdcny": 6.675,
-    "updatedAt": "2026. 11. 27. 오후 5:37:31 (자동)"
+    "usd": 1335,
+    "cny": 200,
+    "usdcny": 6.6709,
+    "updatedAt": "2026. 11. 28. 오전 11:37:32 (자동)"
   },
   "budget": 10000000,
   "assetSnapshots": [],
@@ -8912,6 +8925,6 @@
       "exchange": "업비트"
     }
   ],
-  "exportedAt": "2026-11-28T03:37:32.168Z",
+  "exportedAt": "2026-11-28T03:37:49.107Z",
   "version": "v202607281538"
 }
